@@ -45,8 +45,8 @@ const Dashboard: React.FC<DashboardProps> = ({
     },
     {
       title: 'Pending Homework',
-      value: pendingHomework.length,
-      icon: BookOpen,
+      value: pendingHomeworkCount, // Use the placeholder
+  icon: BookOpen,
       color: 'from-yellow-500 to-yellow-600',
       textColor: 'text-yellow-600'
     },
