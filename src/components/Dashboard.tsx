@@ -15,7 +15,6 @@ interface DashboardProps {
   student: Student;
   feeRecords: FeeRecord[];
   examRecords: ExamRecord[];
-  homework: Homework[];
   notifications: Notification[];
 }
 
