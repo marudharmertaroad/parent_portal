@@ -139,14 +139,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             ))}
             
     
-          </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-        <HomeworkSection student={student} />
-      </div>
 
-    </div>
-);
       </div>
       
 
