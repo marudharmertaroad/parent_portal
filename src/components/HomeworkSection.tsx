@@ -16,7 +16,16 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ student }) => {
   if (!student) {
     return null; // Or you could return a message like <div>Student data not available.</div>
   }
-  const [homeworkList, setHomeworkList] = useState<Homework[]>([]);
+  const [homeworkList, setHomeworkList] = useState<Homework[]>([
+    {
+        id: 1,
+        title: 'Test: Chapter 5 Algebra',
+        description: 'This is a test homework to see if the UI renders.',
+        subject: 'Mathematics',
+        due_date: '2025-12-31',
+        created_at: '2024-01-01',
+        attachment_url: 'https://supabase.com'
+    }
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
