@@ -123,17 +123,18 @@ const Dashboard: React.FC<DashboardProps> = ({
           <div className="space-y-3">
             {/* FIX: Use properties that exist on the FeeRecord type */}
             {pendingFees.slice(0, 2).map((fee) => (
-              <div key={fee.recordId} className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <DollarSign size={16} className="text-red-500" />
-                  <div>
-                    <p className="font-medium text-gray-900">Fee Payment Due</p>
-                    <p className="text-sm text-gray-600">Due: {new Date(fee.dueDate).toLocaleDateString('en-IN')}</p>
-                  </div>
-                </div>
-                <p className="font-bold text-red-600">₹{fee.pendingFees.toLocaleString('en-IN')}</p>
-              </div>
-            ))}
+  <div key={fee.id} className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+    <div className="flex items-center space-x-3">
+      <DollarSign size={16} className="text-red-500" />
+      <div>
+        {/* Use fee.feeType which exists in your type */}
+        <p className="font-medium text-gray-900">{fee.feeType}</p>
+        <p className="text-sm text-gray-600">Due: {new Date(fee.dueDate).toLocaleDateString('en-IN')}</p>
+      </div>
+    </div>
+    <p className="font-bold text-red-600">₹{fee.amount.toLocaleString('en-IN')}</p>
+  </div>
+))}
             {/* The pending homework map has been correctly removed */}
           </div>
         </div>
