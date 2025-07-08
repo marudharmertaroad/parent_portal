@@ -1,127 +1,18 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { supabase } from '/src/lib/supabase.ts';
+import React, { useState } from 'react';
 import { Homework } from '../types';
-import { BookOpen, Calendar, Clock, CheckCircle, AlertCircle, Upload, X } from 'lucide-react';
+import { BookOpen, Calendar, Clock, CheckCircle, AlertCircle, Upload } from 'lucide-react';
 
 interface HomeworkSectionProps {
-  student: {
-    srNo: string;
-    class: string;
-    medium: string;
-  };
+  homework: Homework[];
+  onSubmitHomework: (homeworkId: string, file: File) => Promise<any>;
 }
 
-const HomeworkSection: React.FC<HomeworkSectionProps> = ({ student }) => {
-  const [homeworkList, setHomeworkList] = useState<Homework[]>([]);
-  const [loading, setLoading] = useState(true);
+const HomeworkSection: React.FC<HomeworkSectionProps> = ({ homework, onSubmitHomework }) => {
   const [selectedHomework, setSelectedHomework] = useState<Homework | null>(null);
   const [showSubmissionModal, setShowSubmissionModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const fetchHomeworkData = useCallback(async () => {
-    if (!student || !student.class || !student.medium) {
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-    try {
-      // Step 1: Fetch all active assignments for the student's class and medium
-      const { data: assignments, error: assignmentError } = await supabase
-        .from('homework_assignments')
-        .select('*')
-        .eq('class', student.class)
-        .eq('medium', student.medium)
-        .eq('is_active', true);
-
-      if (assignmentError) throw assignmentError;
-
-      // Step 2: Fetch all of this specific student's submissions
-      const { data: submissions, error: submissionError } = await supabase
-        .from('homework_submissions')
-        .select('*')
-        .eq('student_sr_no', student.srNo);
-
-      if (submissionError) throw submissionError;
-
-      // Create a quick lookup map of submissions
-      const submissionMap = new Map(submissions.map(sub => [sub.homework_id, sub]));
-
-      // Step 3: Merge the two datasets to create the final homework list
-      const mergedHomework = assignments.map((hw): Homework => {
-        const submission = submissionMap.get(hw.id);
-        const isOverdue = new Date(hw.due_date) < new Date() && !submission;
-
-        return {
-          id: hw.id,
-          title: hw.title,
-          description: hw.description,
-          subject: hw.subject,
-          dueDate: hw.due_date,
-          status: submission ? 'submitted' : (isOverdue ? 'overdue' : 'pending'),
-          submissionDate: submission?.submitted_at,
-          teacherComments: submission?.teacher_comments,
-          // You can add other fields from the assignment if your Homework type needs them
-        };
-      });
-
-      setHomeworkList(mergedHomework);
-    } catch (error) {
-      console.error("Error fetching homework data:", error);
-      // Optionally set an error state to show a message to the user
-    } finally {
-      setLoading(false);
-    }
-  }, [student]);
-
-  useEffect(() => {
-    fetchHomeworkData();
-  }, [fetchHomeworkData]);
-   const onSubmitHomework = async (homeworkId: string, file: File) => {
-    try {
-      // 1. Upload the file to Supabase Storage
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${student.srNo}-${homeworkId}-${Date.now()}.${fileExt}`;
-      const filePath = `homework-submissions/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('submissions') // NOTE: You MUST have a bucket named 'submissions' in Supabase Storage
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      // 2. Get the public URL of the uploaded file
-      const { data: urlData } = supabase.storage
-        .from('submissions')
-        .getPublicUrl(filePath);
-
-      // 3. Insert a record into the 'homework_submissions' table
-      const { data: submissionData, error: insertError } = await supabase
-        .from('homework_submissions')
-        .insert({
-          homework_id: homeworkId,
-          student_sr_no: student.srNo,
-          attachment_url: urlData.publicUrl,
-          submitted_at: new Date().toISOString(),
-          status: 'submitted',
-        })
-        .select()
-        .single();
-      
-      if (insertError) throw insertError;
-
-      // Refresh the homework list to show the new status
-      fetchHomeworkData(); 
-
-      return { success: true, data: { submissionId: submissionData.id } };
-
-    } catch (error: any) {
-      console.error("Submission failed:", error);
-      return { success: false, error: error.message };
-    }
-  };
-  
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'submitted':
@@ -148,9 +39,9 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ student }) => {
     }
   };
 
-  const pendingCount = homeworkList.filter(hw => hw.status === 'pending').length;
-  const overdueCount = homeworkList.filter(hw => hw.status === 'overdue').length;
-  const submittedCount = homeworkList.filter(hw => hw.status === 'submitted').length;
+  const pendingCount = homework.filter(hw => hw.status === 'pending').length;
+  const overdueCount = homework.filter(hw => hw.status === 'overdue').length;
+  const submittedCount = homework.filter(hw => hw.status === 'submitted').length;
 
   const handleSubmission = (hw: Homework) => {
     setSelectedHomework(hw);
@@ -237,7 +128,7 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ student }) => {
         </div>
         
         <div className="divide-y divide-gray-200">
-          {homeworkList.map((hw) => (
+          {homework.map((hw) => (
             <div key={hw.id} className="p-6 hover:bg-gray-50 transition-colors">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -270,11 +161,6 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ student }) => {
                       {hw.teacherComments && (
                         <p className="text-sm text-green-800 mt-1">
                           <strong>Teacher Comments:</strong> {hw.teacherComments}
-                        </p>
-                      )}
-                      {hw.grade && (
-                        <p className="text-sm text-green-800 mt-1">
-                          <strong>Grade:</strong> {hw.grade}
                         </p>
                       )}
                     </div>
