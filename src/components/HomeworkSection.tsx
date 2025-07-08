@@ -4,6 +4,7 @@ import React from 'react';
 import { Homework } from '../types';
 import { BookOpen, Calendar, Clock, Link as LinkIcon, AlertCircle } from 'lucide-react';
 import { formatDate } from '../utils';
+import { supabase } from '/src/lib/supabase';
 
 // This version has NO props and NO other imports. It's a "dummy" component.
 const HomeworkSection: React.FC = () => {
