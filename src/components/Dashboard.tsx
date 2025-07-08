@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { formatDate } from '../utils';
 import HomeworkSection from './HomeworkSection'; 
+
 interface DashboardProps {
   student: Student;
   feeRecords: FeeRecord[];
@@ -19,49 +20,30 @@ interface DashboardProps {
   notifications: Notification[];
 }
 
+// --- FIX IS HERE ---
+// By adding default empty arrays (= []), we prevent the component from crashing if the props are not ready yet.
 const Dashboard: React.FC<DashboardProps> = ({
   student,
-  feeRecords = [], // If feeRecords is undefined, use [] instead
-  examRecords = [], // If examRecords is undefined, use [] instead
-  notifications = [], // If notifications is undefined, use [] instead
+  feeRecords = [],
+  examRecords = [],
+  notifications = []
 }) => {
-  
+  // Now these lines are safe, because .filter() and .reduce() on an empty array work perfectly fine.
   const pendingFees = feeRecords.filter(fee => fee.status === 'pending' || fee.status === 'overdue');
-  const unreadNotifications = notifications.filter(n => !n.read);
+  const unreadNotifications = notifications.filter(n => !n.read); // Assuming 'read' property exists on Notification type
+  
   const averageScore = examRecords.length > 0 
-  ? examRecords.reduce((sum, exam) => sum + (exam.obtainedMarks / exam.maxMarks * 100), 0) / examRecords.length
-  : 0;
-  const pendingHomeworkCount = 0;
+    ? examRecords.reduce((sum, exam) => sum + (exam.obtainedMarks / exam.maxMarks * 100), 0) / examRecords.length
+    : 0;
+
+  // This can be updated later to get the real count from HomeworkSection if needed
+  const pendingHomeworkCount = 0; 
 
   const stats = [
-    {
-      title: 'Pending Fees',
-      value: pendingFees.length,
-      icon: DollarSign,
-      color: 'from-red-500 to-red-600',
-      textColor: 'text-red-600'
-    },
-    {
-      title: 'Average Score',
-      value: `${averageScore.toFixed(1)}%`,
-      icon: TrendingUp,
-      color: 'from-green-500 to-green-600',
-      textColor: 'text-green-600'
-    },
-    {
-      title: 'Pending Homework',
-      value: pendingHomeworkCount, // Use the placeholder
-  icon: BookOpen,
-      color: 'from-yellow-500 to-yellow-600',
-      textColor: 'text-yellow-600'
-    },
-    {
-      title: 'Unread Notifications',
-      value: unreadNotifications.length,
-      icon: Bell,
-      color: 'from-blue-500 to-blue-600',
-      textColor: 'text-blue-600'
-    }
+    { title: 'Pending Fees', value: pendingFees.length, icon: DollarSign, color: 'from-red-500 to-red-600', textColor: 'text-red-600' },
+    { title: 'Average Score', value: `${averageScore.toFixed(1)}%`, icon: TrendingUp, color: 'from-green-500 to-green-600', textColor: 'text-green-600' },
+    { title: 'Pending Homework', value: pendingHomeworkCount, icon: BookOpen, color: 'from-yellow-500 to-yellow-600', textColor: 'text-yellow-600' },
+    { title: 'Unread Notifications', value: unreadNotifications.length, icon: Bell, color: 'from-blue-500 to-blue-600', textColor: 'text-blue-600' }
   ];
 
   return (
@@ -75,7 +57,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           <div>
             <h2 className="text-2xl font-bold">Welcome, {student.name}</h2>
             <p className="text-blue-100">Class: {student.class}</p>
-<p className="text-blue-100">SR Number: {student.srNo}</p>
+            <p className="text-blue-100">SR Number: {student.srNo}</p>
           </div>
         </div>
       </div>
@@ -107,19 +89,18 @@ const Dashboard: React.FC<DashboardProps> = ({
           </h3>
           <div className="space-y-3">
             {examRecords.slice(0, 3).map((exam) => (
-    <div key={exam.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-      <div>
-        <p className="font-medium text-gray-900">{exam.examType}</p>
-        {/* Use the correct property from your ExamRecord type. Let's assume it's created_at */}
-        <p className="text-sm text-gray-600">Date: {formatDate(exam.created_at)}</p>
-      </div>
-      <div className="text-right">
-        <p className="font-bold text-gray-900">{exam.obtainedMarks}/{exam.maxMarks}</p>
-        <p className="text-sm text-green-600 font-medium">{exam.grade}</p>
-      </div>
-    </div>
-  ))}
-</div>
+              <div key={exam.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-medium text-gray-900">{exam.examType}</p>
+                  <p className="text-sm text-gray-600">Date: {formatDate(exam.created_at)}</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold text-gray-900">{exam.obtainedMarks}/{exam.maxMarks}</p>
+                  <p className="text-sm text-green-600 font-medium">{exam.grade}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Upcoming Deadlines */}
@@ -129,7 +110,6 @@ const Dashboard: React.FC<DashboardProps> = ({
             Upcoming Deadlines
           </h3>
           <div className="space-y-3">
-            {/* Pending Fees */}
             {pendingFees.slice(0, 2).map((fee) => (
               <div key={fee.recordId} className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
                 <div className="flex items-center space-x-3">
@@ -142,7 +122,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 <p className="font-bold text-red-600">₹{fee.pendingFees.toLocaleString('en-IN')}</p>
               </div>
             ))}
-            </div>
+          </div>
         </div>
       </div>
       
@@ -151,8 +131,6 @@ const Dashboard: React.FC<DashboardProps> = ({
         <HomeworkSection student={student} />
       </div>
             
-      
-
       {/* Quick Actions */}
       <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
@@ -175,7 +153,6 @@ const Dashboard: React.FC<DashboardProps> = ({
         </div>
       </div>
     </div>
-    
   );
 };
 
