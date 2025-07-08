@@ -148,9 +148,9 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ student }) => {
     }
   };
 
-  const pendingCount = homework.filter(hw => hw.status === 'pending').length;
-  const overdueCount = homework.filter(hw => hw.status === 'overdue').length;
-  const submittedCount = homework.filter(hw => hw.status === 'submitted').length;
+  const pendingCount = homeworkList.filter(hw => hw.status === 'pending').length;
+  const overdueCount = homeworkList.filter(hw => hw.status === 'overdue').length;
+  const submittedCount = homeworkList.filter(hw => hw.status === 'submitted').length;
 
   const handleSubmission = (hw: Homework) => {
     setSelectedHomework(hw);
