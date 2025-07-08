@@ -130,7 +130,11 @@ const Dashboard: React.FC<DashboardProps> = ({
                 <p className="font-bold text-red-600">₹{fee.amount.toLocaleString('en-IN')}</p>
               </div>
             ))}
-            
+           
+          </div>
+        </div>
+      </div>
+
       {/* Quick Actions */}
       <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
