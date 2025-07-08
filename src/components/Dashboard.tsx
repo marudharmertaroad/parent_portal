@@ -158,7 +158,6 @@ const Dashboard: React.FC<DashboardProps> = ({
       </div>
 
     </div>
-);
 
       {/* Quick Actions */}
       <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
