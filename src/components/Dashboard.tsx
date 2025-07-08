@@ -43,13 +43,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       color: 'from-green-500 to-green-600',
       textColor: 'text-green-600'
     },
-    {
-      title: 'Pending Homework',
-      value: pendingHomework.length,
-      icon: BookOpen,
-      color: 'from-yellow-500 to-yellow-600',
-      textColor: 'text-yellow-600'
-    },
+    
     {
       title: 'Unread Notifications',
       value: unreadNotifications.length,
