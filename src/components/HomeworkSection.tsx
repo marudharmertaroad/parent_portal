@@ -78,6 +78,49 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ homework, onSubmitHom
   useEffect(() => {
     fetchHomeworkData();
   }, [fetchHomeworkData]);
+   const onSubmitHomework = async (homeworkId: string, file: File) => {
+    try {
+      // 1. Upload the file to Supabase Storage
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${student.srNo}-${homeworkId}-${Date.now()}.${fileExt}`;
+      const filePath = `homework-submissions/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('submissions') // NOTE: You MUST have a bucket named 'submissions' in Supabase Storage
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      // 2. Get the public URL of the uploaded file
+      const { data: urlData } = supabase.storage
+        .from('submissions')
+        .getPublicUrl(filePath);
+
+      // 3. Insert a record into the 'homework_submissions' table
+      const { data: submissionData, error: insertError } = await supabase
+        .from('homework_submissions')
+        .insert({
+          homework_id: homeworkId,
+          student_sr_no: student.srNo,
+          attachment_url: urlData.publicUrl,
+          submitted_at: new Date().toISOString(),
+          status: 'submitted',
+        })
+        .select()
+        .single();
+      
+      if (insertError) throw insertError;
+
+      // Refresh the homework list to show the new status
+      fetchHomeworkData(); 
+
+      return { success: true, data: { submissionId: submissionData.id } };
+
+    } catch (error: any) {
+      console.error("Submission failed:", error);
+      return { success: false, error: error.message };
+    }
+  };
   
   const getStatusColor = (status: string) => {
     switch (status) {
