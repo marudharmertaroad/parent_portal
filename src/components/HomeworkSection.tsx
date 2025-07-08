@@ -26,6 +26,8 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ student }) => {
         created_at: '2024-01-01',
         attachment_url: 'https://supabase.com'
     }
+    ]);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
