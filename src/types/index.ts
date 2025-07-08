@@ -48,18 +48,13 @@ export interface Notice {
 }
 
 export interface Homework {
-  id: string;
-  studentId: string;
-  subject: string;
+  id: number;
   title: string;
   description: string;
-  dueDate: string;
-  status: 'pending' | 'submitted' | 'overdue';
-  submissionDate?: string;
-  teacherComments?: string;
-  grade?: string;
-  attachmentUrl?: string;
-  submissionId?: string;
+  subject: string;
+  due_date: string; // Keep the database column name
+  created_at: string;
+  attachment_url?: string; // It's good to keep this if teachers provide attachments
 }
 
 export interface Notification {
