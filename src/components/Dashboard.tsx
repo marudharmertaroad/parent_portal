@@ -152,12 +152,14 @@ const Dashboard: React.FC<DashboardProps> = ({
             ))}
           </div>
         </div>
-      </div>
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
         <HomeworkSection student={student} />
       </div>
 
     </div>
+);
+      </div>
+      
 
       {/* Quick Actions */}
       <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
@@ -181,6 +183,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         </div>
       </div>
     </div>
+    
   );
 };
 
