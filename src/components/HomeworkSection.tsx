@@ -119,7 +119,7 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ student }) => {
     } catch (error: any) {
       console.error("Submission failed:", error);
       return { success: false, error: error.message };
-
+    }
   };
   
   const getStatusColor = (status: string) => {
