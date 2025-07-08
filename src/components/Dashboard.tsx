@@ -137,6 +137,14 @@ const Dashboard: React.FC<DashboardProps> = ({
                 <p className="font-bold text-red-600">₹{fee.pendingFees.toLocaleString('en-IN')}</p>
               </div>
             ))}
+            </div>
+        </div>
+      </div>
+      
+      {/* Homework Section */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <HomeworkSection student={student} />
+      </div>
             
       
 
