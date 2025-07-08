@@ -65,8 +65,9 @@ const Dashboard: React.FC<DashboardProps> = ({
           </div>
           <div>
             <h2 className="text-2xl font-bold">Welcome, {student.name}</h2>
-            <p className="text-blue-100">Class {student.class} - Section {student.section}</p>
-            <p className="text-blue-100">Roll Number: {student.rollNumber}</p>
+            {/* FIX: Use properties that exist on the Student type */}
+            <p className="text-blue-100">Class: {student.class}</p>
+            <p className="text-blue-100">SR Number: {student.srNo}</p>
           </div>
         </div>
       </div>
