@@ -19,6 +19,66 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ homework, onSubmitHom
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const fetchHomeworkData = useCallback(async () => {
+    if (!student || !student.class || !student.medium) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Step 1: Fetch all active assignments for the student's class and medium
+      const { data: assignments, error: assignmentError } = await supabase
+        .from('homework_assignments')
+        .select('*')
+        .eq('class', student.class)
+        .eq('medium', student.medium)
+        .eq('is_active', true);
+
+      if (assignmentError) throw assignmentError;
+
+      // Step 2: Fetch all of this specific student's submissions
+      const { data: submissions, error: submissionError } = await supabase
+        .from('homework_submissions')
+        .select('*')
+        .eq('student_sr_no', student.srNo);
+
+      if (submissionError) throw submissionError;
+
+      // Create a quick lookup map of submissions
+      const submissionMap = new Map(submissions.map(sub => [sub.homework_id, sub]));
+
+      // Step 3: Merge the two datasets to create the final homework list
+      const mergedHomework = assignments.map((hw): Homework => {
+        const submission = submissionMap.get(hw.id);
+        const isOverdue = new Date(hw.due_date) < new Date() && !submission;
+
+        return {
+          id: hw.id,
+          title: hw.title,
+          description: hw.description,
+          subject: hw.subject,
+          dueDate: hw.due_date,
+          status: submission ? 'submitted' : (isOverdue ? 'overdue' : 'pending'),
+          submissionDate: submission?.submitted_at,
+          teacherComments: submission?.teacher_comments,
+          // You can add other fields from the assignment if your Homework type needs them
+        };
+      });
+
+      setHomeworkList(mergedHomework);
+    } catch (error) {
+      console.error("Error fetching homework data:", error);
+      // Optionally set an error state to show a message to the user
+    } finally {
+      setLoading(false);
+    }
+  }, [student]);
+
+  useEffect(() => {
+    fetchHomeworkData();
+  }, [fetchHomeworkData]);
+  
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'submitted':
