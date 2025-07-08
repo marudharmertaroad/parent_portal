@@ -131,23 +131,6 @@ const Dashboard: React.FC<DashboardProps> = ({
               </div>
             ))}
             
-            {/* Pending Homework */}
-            {pendingHomework.slice(0, 1).map((hw) => (
-              <div key={hw.id} className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <BookOpen size={16} className="text-yellow-500" />
-                  <div>
-                    <p className="font-medium text-gray-900">{hw.subject}</p>
-                    <p className="text-sm text-gray-600">Due: {new Date(hw.dueDate).toLocaleDateString('en-IN')}</p>
-                  </div>
-                </div>
-                <Clock size={16} className="text-yellow-600" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
       {/* Quick Actions */}
       <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
