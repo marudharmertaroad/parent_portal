@@ -22,7 +22,6 @@ const Dashboard: React.FC<DashboardProps> = ({
   student,
   feeRecords,
   examRecords,
-  homework,
   notifications
 }) => {
   const pendingFees = feeRecords.filter(fee => fee.status === 'pending' || fee.status === 'overdue');
