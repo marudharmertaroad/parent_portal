@@ -99,18 +99,18 @@ const Dashboard: React.FC<DashboardProps> = ({
           </h3>
           <div className="space-y-3">
             {examRecords.slice(0, 3).map((exam) => (
-              <div key={exam.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div>
-                  {/* FIX: Use properties that exist on the ExamRecord type */}
-                  <p className="font-medium text-gray-900">{exam.examType}</p>
-                  <p className="text-sm text-gray-600">Date: {formatDate(exam.created_at)}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-gray-900">{exam.obtainedMarks}/{exam.maxMarks}</p>
-                  <p className="text-sm text-green-600 font-medium">{exam.grade}</p>
-                </div>
-              </div>
-            ))}
+  <div key={exam.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+    <div>
+      <p className="font-medium text-gray-900">{exam.examName}</p>
+      <p className="text-sm text-gray-600">Subject: {exam.subject}</p>
+      <p className="text-sm text-gray-600">Date: {formatDate(exam.date)}</p>
+    </div>
+    <div className="text-right">
+      <p className="font-bold text-gray-900">{exam.obtainedMarks}/{exam.maxMarks}</p>
+      <p className="text-sm text-green-600 font-medium">{exam.grade}</p>
+    </div>
+  </div>
+))}
           </div>
         </div>
 
