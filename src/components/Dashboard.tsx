@@ -11,6 +11,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import HomeworkSection from './HomeworkSection';
+import { formatDate } from '../utils'; 
 
 
 interface DashboardProps {
