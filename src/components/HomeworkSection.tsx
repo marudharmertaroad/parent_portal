@@ -21,8 +21,6 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ student }) => {
   const [error, setError] = useState<string | null>(null);
 
   const fetchHomework = useCallback(async () => {
-     
-
     setLoading(true);
     setError(null);
     try {
