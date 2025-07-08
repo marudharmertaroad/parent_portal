@@ -10,6 +10,7 @@ import {
   Clock,
   CheckCircle
 } from 'lucide-react';
+import { formatDate } from '../utils';
 import HomeworkSection from './HomeworkSection'; 
 interface DashboardProps {
   student: Student;
