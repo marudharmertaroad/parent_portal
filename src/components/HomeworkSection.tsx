@@ -12,75 +12,57 @@ interface HomeworkSectionProps {
 }
 
 
-const HomeworkSection: React.FC<HomeworkSectionProps> = ({ homework, onSubmitHomework }) => {
-  const [selectedHomework, setSelectedHomework] = useState<Homework | null>(null);
-  const [showSubmissionModal, setShowSubmissionModal] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+const HomeworkSection: React.FC<HomeworkSectionProps> = ({ student }) => {
+  const [homeworkList, setHomeworkList] = useState<Homework[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'submitted':
-        return 'bg-green-100 text-green-800';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'overdue':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+  const fetchHomework = useCallback(async () => {
+    if (!student.class || !student.medium) {
+        setLoading(false);
+        return;
     }
-  };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'submitted':
-        return <CheckCircle size={16} className="text-green-600" />;
-      case 'pending':
-        return <Clock size={16} className="text-yellow-600" />;
-      case 'overdue':
-        return <AlertCircle size={16} className="text-red-600" />;
-      default:
-        return <Clock size={16} className="text-gray-600" />;
-    }
-  };
-
-  const pendingCount = homework.filter(hw => hw.status === 'pending').length;
-  const overdueCount = homework.filter(hw => hw.status === 'overdue').length;
-  const submittedCount = homework.filter(hw => hw.status === 'submitted').length;
-
-  const handleSubmission = (hw: Homework) => {
-    setSelectedHomework(hw);
-    setShowSubmissionModal(true);
-  };
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-    }
-  };
-
-  const handleFileUpload = async () => {
-    if (!selectedHomework || !selectedFile) return;
-
-    setIsSubmitting(true);
+    setLoading(true);
+    setError(null);
     try {
-      const response = await onSubmitHomework(selectedHomework.id, selectedFile);
-      
-      if (response.success) {
-        alert(`Homework submitted successfully for ${selectedHomework.subject}! Submission ID: ${response.data?.submissionId}`);
-        setShowSubmissionModal(false);
-        setSelectedHomework(null);
-        setSelectedFile(null);
-      } else {
-        alert(`Submission failed: ${response.error || 'Unknown error'}`);
-      }
-    } catch (error) {
-      alert('Submission failed. Please try again.');
+      const { data, error: fetchError } = await supabase
+        .from('homework_assignments')
+        .select('*')
+        .eq('class', student.class)
+        .eq('medium', student.medium)
+        .eq('is_active', true)
+        .order('due_date', { ascending: true }); // Order by due date
+
+      if (fetchError) throw fetchError;
+
+      setHomeworkList(data || []);
+    } catch (err: any) {
+      console.error("Error fetching homework:", err);
+      setError("Could not load homework assignments. Please try again later.");
     } finally {
-      setIsSubmitting(false);
+      setLoading(false);
     }
-  };
+  }, [student.class, student.medium]);
+
+  useEffect(() => {
+    fetchHomework();
+  }, [fetchHomework]);
+  
+  const isOverdue = (dueDate: string) => new Date(dueDate) < new Date();
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center p-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className="p-8 text-center text-red-600">{error}</div>;
+  }
+
 
   return (
     <div className="space-y-6">
