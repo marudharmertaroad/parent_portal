@@ -109,14 +109,6 @@ const Dashboard: React.FC<DashboardProps> = ({
             ))}
           </div>
         </div>
-
-        {/* Upcoming Deadlines */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <Calendar size={20} className="mr-2 text-purple-500" />
-            Upcoming Deadlines
-          </h3>
-          <div className="space-y-3">
             {/* Pending Fees */}
             {pendingFees.slice(0, 2).map((fee) => (
               <div key={fee.id} className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
