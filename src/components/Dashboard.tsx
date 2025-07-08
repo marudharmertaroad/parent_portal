@@ -27,6 +27,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   const pendingFees = feeRecords.filter(fee => fee.status === 'pending' || fee.status === 'overdue');
   const unreadNotifications = notifications.filter(n => !n.read);
   const averageScore = examRecords.reduce((sum, exam) => sum + (exam.obtainedMarks / exam.maxMarks * 100), 0) / examRecords.length;
+  const pendingHomeworkCount = 0;
 
   const stats = [
     {
