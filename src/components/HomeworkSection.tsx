@@ -4,8 +4,11 @@ import { Homework } from '../types';
 import { BookOpen, Calendar, Clock, CheckCircle, AlertCircle, Upload } from 'lucide-react';
 
 interface HomeworkSectionProps {
-  homework: Homework[];
-  onSubmitHomework: (homeworkId: string, file: File) => Promise<any>;
+  student: {
+    srNo: string;
+    class: string;
+    medium: string;
+  };
 }
 
 const HomeworkSection: React.FC<HomeworkSectionProps> = ({ homework, onSubmitHomework }) => {
