@@ -107,8 +107,6 @@ const Dashboard: React.FC<DashboardProps> = ({
                 </div>
               </div>
             ))}
-          </div>
-        </div>
             {/* Pending Fees */}
             {pendingFees.slice(0, 2).map((fee) => (
               <div key={fee.id} className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
