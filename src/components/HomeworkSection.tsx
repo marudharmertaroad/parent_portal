@@ -1,11 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { supabase } from '/src/lib/supabase'; // Using your correct import path
 import { Homework } from '../types';
-import { BookOpen, Calendar, Clock, CheckCircle, AlertCircle, Upload } from 'lucide-react';
+import { BookOpen, Calendar, Clock, Link as LinkIcon, AlertCircle } from 'lucide-react';
+import { formatDate } from '../utils'; // Make sure you have this utility
 
 interface HomeworkSectionProps {
-  homework: Homework[];
-  onSubmitHomework: (homeworkId: string, file: File) => Promise<any>;
+  student: {
+    class: string;
+    medium: string;
+  };
 }
+
 
 const HomeworkSection: React.FC<HomeworkSectionProps> = ({ homework, onSubmitHomework }) => {
   const [selectedHomework, setSelectedHomework] = useState<Homework | null>(null);
