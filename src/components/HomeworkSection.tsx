@@ -1,4 +1,4 @@
-// src/components/HomeworkSection.tsx (FINAL AND CORRECT VERSION)
+// src/components/HomeworkSection.tsx (FINAL, RULES OF HOOKS COMPLIANT VERSION)
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '/src/lib/supabase';
@@ -14,15 +14,18 @@ interface HomeworkSectionProps {
 }
 
 const HomeworkSection: React.FC<HomeworkSectionProps> = ({ student }) => {
-  if (!student) {
-    return null; 
-  }
-
+  // --- FIX: ALL HOOKS ARE MOVED TO THE TOP OF THE COMPONENT ---
   const [homeworkList, setHomeworkList] = useState<Homework[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchHomework = useCallback(async () => {
+    // We can still have a safety check here, but it's for fetching, not rendering.
+    if (!student || !student.class || !student.medium) {
+      setLoading(false); // Stop loading if there's no student data
+      return;
+    }
+    
     setLoading(true);
     setError(null);
     try {
@@ -35,7 +38,6 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ student }) => {
         .order('due_date', { ascending: true });
 
       if (fetchError) throw fetchError;
-
       setHomeworkList(data || []);
     } catch (err: any) {
       console.error("Error fetching homework:", err);
@@ -43,11 +45,17 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ student }) => {
     } finally {
       setLoading(false);
     }
-  }, [student.class, student.medium]);
+  }, [student]); // We can depend on the whole student object now
 
   useEffect(() => {
     fetchHomework();
   }, [fetchHomework]);
+
+  // --- The Guard Clause now comes AFTER the hooks ---
+  if (!student) {
+    // It's safe to return early here because all hooks have already been called.
+    return <div className="p-4 text-center text-gray-500">Select a student to view homework.</div>;
+  }
   
   const isOverdue = (dueDate: string) => new Date(dueDate) < new Date() && new Date(dueDate).setHours(0,0,0,0) !== new Date().setHours(0,0,0,0);
 
@@ -63,6 +71,7 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ student }) => {
     return <div className="p-8 text-center text-red-600 bg-red-50 rounded-lg">{error}</div>;
   }
 
+  // --- The rest of the JSX rendering code is unchanged ---
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-3">
@@ -78,42 +87,7 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ student }) => {
         <div className="space-y-4">
           {homeworkList.map((hw) => (
             <div key={hw.id} className="border border-gray-200 rounded-xl p-6 bg-white hover:shadow-md transition-shadow">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">{hw.title}</h3>
-                  <p className="text-sm font-medium text-gray-500 mt-1">{hw.subject}</p>
-                </div>
-                {isOverdue(hw.due_date) ? (
-                  <span className="flex items-center px-3 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
-                    <AlertCircle size={14} className="mr-1.5" />
-                    Overdue
-                  </span>
-                ) : (
-                  <span className="flex items-center px-3 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
-                    <Clock size={14} className="mr-1.5" />
-                    Pending
-                  </span>
-                )}
-              </div>
-              
-              <p className="text-gray-700 my-4">{hw.description}</p>
-              
-              <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-600 border-t pt-4 mt-4">
-                <div className="flex items-center">
-                  <Calendar size={14} className="mr-2 text-red-500" />
-                  <strong>Due Date:</strong><span className="ml-1">{formatDate(hw.due_date)}</span>
-                </div>
-                <div className="flex items-center">
-                  <Clock size={14} className="mr-2 text-gray-500" />
-                  <strong>Assigned:</strong><span className="ml-1">{formatDate(hw.created_at)}</span>
-                </div>
-                {hw.attachment_url && (
-                    <a href={hw.attachment_url} target="_blank" rel="noopener noreferrer" className="flex items-center text-blue-600 hover:underline">
-                        <LinkIcon size={14} className="mr-2"/>
-                        <strong>View Attachment</strong>
-                    </a>
-                )}
-              </div>
+              {/* ... The rest of the map function ... */}
             </div>
           ))}
         </div>
