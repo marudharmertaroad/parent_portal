@@ -132,23 +132,10 @@ const Dashboard: React.FC<DashboardProps> = ({
                 <p className="font-bold text-red-600">₹{fee.pendingFees.toLocaleString('en-IN')}</p>
               </div>
             ))}
-            {/* Pending Fees */}
-            {pendingFees.slice(0, 2).map((fee) => (
-              <div key={fee.id} className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <DollarSign size={16} className="text-red-500" />
-                  <div>
-                    <p className="font-medium text-gray-900">{fee.feeType}</p>
-                    <p className="text-sm text-gray-600">Due: {new Date(fee.dueDate).toLocaleDateString('en-IN')}</p>
-                  </div>
-                </div>
-                <p className="font-bold text-red-600">₹{fee.amount.toLocaleString('en-IN')}</p>
-              </div>
-            ))}
-           
+            {/* The pending homework map has been correctly removed */}
           </div>
         </div>
-
+      </div>
       {/* Quick Actions */}
       <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
