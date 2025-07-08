@@ -10,40 +10,56 @@ import {
   Clock,
   CheckCircle
 } from 'lucide-react';
-import { formatDate } from '../utils';
-import HomeworkSection from './HomeworkSection'; 
 
 interface DashboardProps {
   student: Student;
   feeRecords: FeeRecord[];
   examRecords: ExamRecord[];
+  homework: Homework[];
   notifications: Notification[];
 }
 
-// --- FIX IS HERE ---
-// By adding default empty arrays (= []), we prevent the component from crashing if the props are not ready yet.
 const Dashboard: React.FC<DashboardProps> = ({
   student,
-  feeRecords = [],
-  examRecords = [],
-  notifications = []
+  feeRecords,
+  examRecords,
+  homework,
+  notifications
 }) => {
-  // Now these lines are safe, because .filter() and .reduce() on an empty array work perfectly fine.
   const pendingFees = feeRecords.filter(fee => fee.status === 'pending' || fee.status === 'overdue');
-  const unreadNotifications = notifications.filter(n => !n.read); // Assuming 'read' property exists on Notification type
-  
-  const averageScore = examRecords.length > 0 
-    ? examRecords.reduce((sum, exam) => sum + (exam.obtainedMarks / exam.maxMarks * 100), 0) / examRecords.length
-    : 0;
-
-  // This can be updated later to get the real count from HomeworkSection if needed
-  const pendingHomeworkCount = 0; 
+  const pendingHomework = homework.filter(hw => hw.status === 'pending' || hw.status === 'overdue');
+  const unreadNotifications = notifications.filter(n => !n.read);
+  const averageScore = examRecords.reduce((sum, exam) => sum + (exam.obtainedMarks / exam.maxMarks * 100), 0) / examRecords.length;
 
   const stats = [
-    { title: 'Pending Fees', value: pendingFees.length, icon: DollarSign, color: 'from-red-500 to-red-600', textColor: 'text-red-600' },
-    { title: 'Average Score', value: `${averageScore.toFixed(1)}%`, icon: TrendingUp, color: 'from-green-500 to-green-600', textColor: 'text-green-600' },
-    { title: 'Pending Homework', value: pendingHomeworkCount, icon: BookOpen, color: 'from-yellow-500 to-yellow-600', textColor: 'text-yellow-600' },
-    { title: 'Unread Notifications', value: unreadNotifications.length, icon: Bell, color: 'from-blue-500 to-blue-600', textColor: 'text-blue-600' }
+    {
+      title: 'Pending Fees',
+      value: pendingFees.length,
+      icon: DollarSign,
+      color: 'from-red-500 to-red-600',
+      textColor: 'text-red-600'
+    },
+    {
+      title: 'Average Score',
+      value: `${averageScore.toFixed(1)}%`,
+      icon: TrendingUp,
+      color: 'from-green-500 to-green-600',
+      textColor: 'text-green-600'
+    },
+    {
+      title: 'Pending Homework',
+      value: pendingHomework.length,
+      icon: BookOpen,
+      color: 'from-yellow-500 to-yellow-600',
+      textColor: 'text-yellow-600'
+    },
+    {
+      title: 'Unread Notifications',
+      value: unreadNotifications.length,
+      icon: Bell,
+      color: 'from-blue-500 to-blue-600',
+      textColor: 'text-blue-600'
+    }
   ];
 
   return (
@@ -56,8 +72,8 @@ const Dashboard: React.FC<DashboardProps> = ({
           </div>
           <div>
             <h2 className="text-2xl font-bold">Welcome, {student.name}</h2>
-            <p className="text-blue-100">Class: {student.class}</p>
-            <p className="text-blue-100">SR Number: {student.srNo}</p>
+            <p className="text-blue-100">Class {student.class} - Section {student.section}</p>
+            <p className="text-blue-100">Roll Number: {student.rollNumber}</p>
           </div>
         </div>
       </div>
@@ -91,8 +107,8 @@ const Dashboard: React.FC<DashboardProps> = ({
             {examRecords.slice(0, 3).map((exam) => (
               <div key={exam.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div>
-                  <p className="font-medium text-gray-900">{exam.examType}</p>
-                  <p className="text-sm text-gray-600">Date: {formatDate(exam.created_at)}</p>
+                  <p className="font-medium text-gray-900">{exam.subject}</p>
+                  <p className="text-sm text-gray-600">{exam.examName}</p>
                 </div>
                 <div className="text-right">
                   <p className="font-bold text-gray-900">{exam.obtainedMarks}/{exam.maxMarks}</p>
@@ -110,27 +126,37 @@ const Dashboard: React.FC<DashboardProps> = ({
             Upcoming Deadlines
           </h3>
           <div className="space-y-3">
+            {/* Pending Fees */}
             {pendingFees.slice(0, 2).map((fee) => (
-              <div key={fee.recordId} className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+              <div key={fee.id} className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
                 <div className="flex items-center space-x-3">
                   <DollarSign size={16} className="text-red-500" />
                   <div>
-                    <p className="font-medium text-gray-900">Fee Payment Due</p>
+                    <p className="font-medium text-gray-900">{fee.feeType}</p>
                     <p className="text-sm text-gray-600">Due: {new Date(fee.dueDate).toLocaleDateString('en-IN')}</p>
                   </div>
                 </div>
-                <p className="font-bold text-red-600">₹{fee.pendingFees.toLocaleString('en-IN')}</p>
+                <p className="font-bold text-red-600">₹{fee.amount.toLocaleString('en-IN')}</p>
+              </div>
+            ))}
+            
+            {/* Pending Homework */}
+            {pendingHomework.slice(0, 1).map((hw) => (
+              <div key={hw.id} className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <BookOpen size={16} className="text-yellow-500" />
+                  <div>
+                    <p className="font-medium text-gray-900">{hw.subject}</p>
+                    <p className="text-sm text-gray-600">Due: {new Date(hw.dueDate).toLocaleDateString('en-IN')}</p>
+                  </div>
+                </div>
+                <Clock size={16} className="text-yellow-600" />
               </div>
             ))}
           </div>
         </div>
       </div>
-      
-      {/* Homework Section */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <HomeworkSection student={student} />
-      </div>
-            
+
       {/* Quick Actions */}
       <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
