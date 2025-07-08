@@ -57,6 +57,9 @@ export interface Homework {
   status: 'pending' | 'submitted' | 'overdue';
   submissionDate?: string;
   teacherComments?: string;
+  grade?: string;
+  attachmentUrl?: string;
+  submissionId?: string;
 }
 
 export interface Notification {

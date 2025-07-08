@@ -355,108 +355,201 @@ class SupabaseApiService {
   // Homework - Mock data for now (you can implement this based on your needs)
   async getHomework(studentId: string): Promise<ApiResponse<Homework[]>> {
     try {
-      // Mock homework data - replace with actual implementation
-      const homework: Homework[] = [
-        {
-          id: '1',
-          studentId: studentId,
-          subject: 'Mathematics',
-          title: 'Algebra Practice',
-          description: 'Complete exercises 1-10 from chapter 5',
-          dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          status: 'pending',
-        },
-        {
-          id: '2',
-          studentId: studentId,
-          subject: 'Science',
-          title: 'Physics Lab Report',
-          description: 'Write a report on the pendulum experiment',
-          dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          status: 'pending',
-        }
-      ];
+      console.log('🔍 Fetching homework for student:', studentId);
+      
+      const { data, error } = await supabase
+        .rpc('get_student_homework', {
+          p_student_id: parseInt(studentId)
+        });
+
+      if (error) {
+        console.error('Homework fetch error:', error);
+        return { success: false, error: error.message };
+      }
+
+      const homework: Homework[] = (data || []).map((record: any) => ({
+        id: record.homework_id.toString(),
+        studentId: studentId,
+        subject: record.subject,
+        title: record.title,
+        description: record.description,
+        dueDate: record.due_date,
+        status: this.determineHomeworkStatus(record),
+        submissionDate: record.submitted_at,
+        teacherComments: record.teacher_comments,
+        grade: record.grade,
+        attachmentUrl: record.attachment_url,
+        submissionId: record.submission_id?.toString(),
+      }));
 
       return { success: true, data: homework };
     } catch (error) {
+      console.error('Homework fetch error:', error);
       return { success: false, error: 'Failed to fetch homework' };
     }
   }
 
+  private determineHomeworkStatus(record: any): 'pending' | 'submitted' | 'overdue' {
+    if (record.submission_id) {
+      return 'submitted';
+    }
+    
+    const dueDate = new Date(record.due_date);
+    const today = new Date();
+    
+    if (dueDate < today) {
+      return 'overdue';
+    }
+    
+    return 'pending';
+  }
+
   async submitHomework(homeworkId: string, file: File): Promise<ApiResponse<{ submissionId: string }>> {
     try {
-      // Mock submission - implement actual file upload logic
-      console.log('Submitting homework:', homeworkId, file.name);
+      console.log('📤 Submitting homework:', homeworkId, file.name);
+      
+      // Get current student ID from token
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        return { success: false, error: 'Not authenticated' };
+      }
+      
+      const decoded = JSON.parse(atob(token));
+      const studentId = decoded.studentId;
+      
+      // Upload file to storage
+      const fileName = `${studentId}_${homeworkId}_${Date.now()}_${file.name}`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('homework-submissions')
+        .upload(fileName, file);
+
+      if (uploadError) {
+        console.error('File upload error:', uploadError);
+        return { success: false, error: 'Failed to upload file' };
+      }
+
+      // Get public URL for the uploaded file
+      const { data: { publicUrl } } = supabase.storage
+        .from('homework-submissions')
+        .getPublicUrl(fileName);
+
+      // Submit homework using database function
+      const { data, error } = await supabase
+        .rpc('submit_homework', {
+          p_homework_id: parseInt(homeworkId),
+          p_student_id: parseInt(studentId),
+          p_submission_text: `Submitted file: ${file.name}`,
+          p_attachment_url: publicUrl
+        });
+
+      if (error) {
+        console.error('Homework submission error:', error);
+        return { success: false, error: error.message };
+      }
+
+      const result = data[0];
+      if (!result.success) {
+        return { success: false, error: result.message };
+      }
       
       return { 
         success: true, 
-        data: { submissionId: `SUB${Date.now()}` } 
+        data: { submissionId: result.submission_id.toString() } 
       };
     } catch (error) {
+      console.error('Homework submission error:', error);
       return { success: false, error: 'Homework submission failed' };
     }
   }
 
-  // Notices - Mock data
+  // Notices - Real data from database
   async getNotices(): Promise<ApiResponse<Notice[]>> {
     try {
-      const notices: Notice[] = [
-        {
-          id: '1',
-          title: 'School Holiday Notice',
-          content: 'School will remain closed on 15th August due to Independence Day.',
-          date: new Date().toISOString().split('T')[0],
-          priority: 'high',
-          category: 'Holiday',
-        },
-        {
-          id: '2',
-          title: 'Parent-Teacher Meeting',
-          content: 'Parent-teacher meeting scheduled for next Saturday at 10 AM.',
-          date: new Date().toISOString().split('T')[0],
-          priority: 'medium',
-          category: 'Meeting',
-        }
-      ];
+      console.log('🔍 Fetching notices...');
+      
+      const { data, error } = await supabase
+        .rpc('get_notices');
+
+      if (error) {
+        console.error('Notices fetch error:', error);
+        return { success: false, error: error.message };
+      }
+
+      const notices: Notice[] = (data || []).map((record: any) => ({
+        id: record.notice_id.toString(),
+        title: record.title,
+        content: record.message,
+        date: record.created_at.split('T')[0],
+        priority: record.priority,
+        category: this.mapNoticeCategory(record.type),
+      }));
 
       return { success: true, data: notices };
     } catch (error) {
+      console.error('Notices fetch error:', error);
       return { success: false, error: 'Failed to fetch notices' };
     }
   }
 
-  // Notifications - Mock data
+  private mapNoticeCategory(type: string): string {
+    const categoryMap: Record<string, string> = {
+      'general': 'General',
+      'event': 'Event',
+      'urgent': 'Urgent',
+      'exam': 'Exam',
+      'fee': 'Fee',
+      'homework': 'Homework'
+    };
+    return categoryMap[type] || 'General';
+  }
+
+  // Notifications - Real data from database
   async getNotifications(studentId: string): Promise<ApiResponse<Notification[]>> {
     try {
-      const notifications: Notification[] = [
-        {
-          id: '1',
-          title: 'Fee Payment Reminder',
-          message: 'Your tuition fee payment is due in 3 days.',
-          type: 'warning',
-          date: new Date().toISOString(),
-          read: false,
-        },
-        {
-          id: '2',
-          title: 'Exam Results Published',
-          message: 'Your mid-term exam results are now available.',
-          type: 'info',
-          date: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-          read: false,
-        }
-      ];
+      console.log('🔍 Fetching notifications for student:', studentId);
+      
+      const { data, error } = await supabase
+        .rpc('get_student_notifications', {
+          p_student_id: parseInt(studentId)
+        });
+
+      if (error) {
+        console.error('Notifications fetch error:', error);
+        return { success: false, error: error.message };
+      }
+
+      const notifications: Notification[] = (data || []).map((record: any) => ({
+        id: record.notification_id.toString(),
+        title: record.title,
+        message: record.message,
+        type: this.mapNotificationType(record.type),
+        date: record.created_at,
+        read: record.is_read || false,
+      }));
 
       return { success: true, data: notifications };
     } catch (error) {
+      console.error('Notifications fetch error:', error);
       return { success: false, error: 'Failed to fetch notifications' };
     }
   }
 
+  private mapNotificationType(type: string): 'info' | 'warning' | 'success' | 'error' {
+    const typeMap: Record<string, 'info' | 'warning' | 'success' | 'error'> = {
+      'general': 'info',
+      'homework': 'info',
+      'fee': 'warning',
+      'exam': 'info',
+      'event': 'info',
+      'urgent': 'error'
+    };
+    return typeMap[type] || 'info';
+  }
+
   async markNotificationAsRead(notificationId: string): Promise<ApiResponse<void>> {
     try {
-      // Mock implementation
-      console.log('Marking notification as read:', notificationId);
+      console.log('📝 Marking notification as read:', notificationId);
+      // For now, we'll just log this - you can implement a read status table later
       return { success: true };
     } catch (error) {
       return { success: false, error: 'Failed to mark notification as read' };
@@ -465,8 +558,8 @@ class SupabaseApiService {
 
   async markAllNotificationsAsRead(studentId: string): Promise<ApiResponse<void>> {
     try {
-      // Mock implementation
-      console.log('Marking all notifications as read for student:', studentId);
+      console.log('📝 Marking all notifications as read for student:', studentId);
+      // For now, we'll just log this - you can implement a read status table later
       return { success: true };
     } catch (error) {
       return { success: false, error: 'Failed to mark all notifications as read' };

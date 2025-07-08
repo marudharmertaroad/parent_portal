@@ -68,7 +68,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-6 text-white">
         <div className="flex items-center space-x-4">
           <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-            <span className="text-2xl font-bold">{student.name.charAt(0)}</span>
+              {pendingFees.length > 0 && pendingFees.slice(0, 2).map((fee) => (
           </div>
           <div>
             <h2 className="text-2xl font-bold">Welcome, {student.name}</h2>
@@ -78,18 +78,28 @@ const Dashboard: React.FC<DashboardProps> = ({
         </div>
       </div>
 
-      {/* Stats Grid */}
+              {examRecords.length > 0 ? examRecords.slice(0, 3).map((exam) => (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => (
           <div key={index} className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
+              {pendingHomework.length > 0 && pendingHomework.slice(0, 2).map((hw) => (
               <div>
                 <p className="text-sm font-medium text-gray-600">{stat.title}</p>
                 <p className={`text-2xl font-bold ${stat.textColor}`}>{stat.value}</p>
               </div>
               <div className={`p-3 rounded-full bg-gradient-to-r ${stat.color}`}>
                 <stat.icon size={24} className="text-white" />
-              </div>
+              )) : (
+                <div className="text-center py-4 text-gray-500">
+                  <p>No exam records available</p>
+                </div>
+              )}
+              
+              {pendingFees.length === 0 && pendingHomework.length === 0 && (
+                <div className="text-center py-4 text-gray-500">
+                  <p>No upcoming deadlines</p>
+                </div>
+              )}
             </div>
           </div>
         ))}

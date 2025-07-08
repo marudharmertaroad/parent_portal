@@ -163,6 +163,11 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ homework, onSubmitHom
                           <strong>Teacher Comments:</strong> {hw.teacherComments}
                         </p>
                       )}
+                      {hw.grade && (
+                        <p className="text-sm text-green-800 mt-1">
+                          <strong>Grade:</strong> {hw.grade}
+                        </p>
+                      )}
                     </div>
                   )}
                 </div>
