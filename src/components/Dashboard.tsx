@@ -72,8 +72,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"> {/* FIX: Changed to 3 columns since one card was removed */}
         {stats.map((stat, index) => (
           <div key={index} className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
@@ -88,7 +87,6 @@ const Dashboard: React.FC<DashboardProps> = ({
           </div>
         ))}
       </div>
-
       {/* Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Exams */}
