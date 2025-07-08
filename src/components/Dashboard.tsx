@@ -143,7 +143,6 @@ const Dashboard: React.FC<DashboardProps> = ({
       {/* Homework Section */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <p>Homework section is temporarily disabled for testing.</p>
-        <HomeworkSection student={student} />
       </div>
       
       {/* Quick Actions */}
