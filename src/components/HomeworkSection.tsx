@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { supabase } from '../utils/supabase';
 import { Homework } from '../types';
 import { BookOpen, Calendar, Clock, CheckCircle, AlertCircle, Upload } from 'lucide-react';
 
