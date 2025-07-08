@@ -128,7 +128,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   <DollarSign size={16} className="text-red-500" />
                   <div>
                     <p className="font-medium text-gray-900">Fee Payment Due</p>
-                    <p className="font-bold text-red-600">₹{fee.pendingFees.toLocaleString('en-IN')}</p>
+                    <p className="text-sm text-gray-600">Due: {new Date(fee.dueDate).toLocaleDateString('en-IN')}</p>
                   </div>
                 </div>
                 <p className="font-bold text-red-600">₹{fee.pendingFees.toLocaleString('en-IN')}</p>
