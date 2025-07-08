@@ -178,8 +178,7 @@ const StudentPortal: React.FC = () => {
         
         <main className="flex-1 p-6 md:ml-0">
           <div className="max-w-7xl mx-auto">
-            {renderContent()}
-          </div>
+{!loading && !error && renderContent()}          </div>
         </main>
       </div>
 
