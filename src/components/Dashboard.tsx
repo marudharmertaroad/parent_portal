@@ -104,8 +104,8 @@ const Dashboard: React.FC<DashboardProps> = ({
             {examRecords.slice(0, 3).map((exam) => (
               <div key={exam.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div>
-                  <p className="font-medium text-gray-900">{exam.subject}</p>
-                  <p className="text-sm text-gray-600">{exam.examName}</p>
+                  <p className="font-medium text-gray-900">{exam.examType}</p>
+<p className="text-sm text-gray-600">Date: {formatDate(exam.examDate)}</p>
                 </div>
                 <div className="text-right">
                   <p className="font-bold text-gray-900">{exam.obtainedMarks}/{exam.maxMarks}</p>
