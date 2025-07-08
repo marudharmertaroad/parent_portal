@@ -106,18 +106,19 @@ const Dashboard: React.FC<DashboardProps> = ({
           </h3>
           <div className="space-y-3">
             {examRecords.slice(0, 3).map((exam) => (
-              <div key={exam.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div>
-                  <p className="font-medium text-gray-900">{exam.examType}</p>
-<p className="text-sm text-gray-600">Date: {formatDate(exam.examDate)}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-gray-900">{exam.obtainedMarks}/{exam.maxMarks}</p>
-                  <p className="text-sm text-green-600 font-medium">{exam.grade}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+    <div key={exam.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+      <div>
+        <p className="font-medium text-gray-900">{exam.examType}</p>
+        {/* Use the correct property from your ExamRecord type. Let's assume it's created_at */}
+        <p className="text-sm text-gray-600">Date: {formatDate(exam.created_at)}</p>
+      </div>
+      <div className="text-right">
+        <p className="font-bold text-gray-900">{exam.obtainedMarks}/{exam.maxMarks}</p>
+        <p className="text-sm text-green-600 font-medium">{exam.grade}</p>
+      </div>
+    </div>
+  ))}
+</div>
         </div>
 
         {/* Upcoming Deadlines */}
