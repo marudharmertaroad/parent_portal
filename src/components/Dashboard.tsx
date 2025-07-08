@@ -10,6 +10,8 @@ import {
   Clock,
   CheckCircle
 } from 'lucide-react';
+import HomeworkSection from './HomeworkSection';
+
 
 interface DashboardProps {
   student: Student;
