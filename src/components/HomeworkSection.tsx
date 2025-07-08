@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '/src/lib/supabase.ts';
 import { Homework } from '../types';
 import { BookOpen, Calendar, Clock, CheckCircle, AlertCircle, Upload } from 'lucide-react';
