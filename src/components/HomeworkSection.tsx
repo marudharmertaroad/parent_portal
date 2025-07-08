@@ -237,7 +237,7 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ student }) => {
         </div>
         
         <div className="divide-y divide-gray-200">
-          {homework.map((hw) => (
+          {homeworkList.map((hw) => (
             <div key={hw.id} className="p-6 hover:bg-gray-50 transition-colors">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
