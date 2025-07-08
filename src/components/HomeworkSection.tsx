@@ -4,14 +4,18 @@ import { Homework } from '../types';
 import { BookOpen, Calendar, Clock, Link as LinkIcon, AlertCircle } from 'lucide-react';
 import { formatDate } from '../utils';
 interface HomeworkSectionProps {
-  student: {
-    class: string;
+student?: {
+  class: string;
     medium: string;
   };
 }
 
 
 const HomeworkSection: React.FC<HomeworkSectionProps> = ({ student }) => {
+
+  if (!student) {
+    return null; // Or you could return a message like <div>Student data not available.</div>
+  }
   const [homeworkList, setHomeworkList] = useState<Homework[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
