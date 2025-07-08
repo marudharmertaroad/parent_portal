@@ -1,6 +1,8 @@
 // src/components/HomeworkSection.tsx (BARE MINIMUM TEST VERSION)
 
 import React from 'react';
+import { Homework } from '../types';
+import { BookOpen, Calendar, Clock, Link as LinkIcon, AlertCircle } from 'lucide-react';
 
 // This version has NO props and NO other imports. It's a "dummy" component.
 const HomeworkSection: React.FC = () => {
