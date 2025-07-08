@@ -21,10 +21,11 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = ({
   student,
-  feeRecords,
-  examRecords,
-  notifications
+  feeRecords = [], // If feeRecords is undefined, use [] instead
+  examRecords = [], // If examRecords is undefined, use [] instead
+  notifications = [], // If notifications is undefined, use [] instead
 }) => {
+  
   const pendingFees = feeRecords.filter(fee => fee.status === 'pending' || fee.status === 'overdue');
   const unreadNotifications = notifications.filter(n => !n.read);
   const averageScore = examRecords.length > 0 
