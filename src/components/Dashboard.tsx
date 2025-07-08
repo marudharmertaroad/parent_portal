@@ -20,9 +20,9 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = ({
   student,
-  feeRecords,
-  examRecords,
-  notifications
+  feeRecords = [], // Keep the default values, they are good practice!
+  examRecords = [],
+  notifications = []
 }) => {
   const pendingFees = feeRecords.filter(fee => fee.status === 'pending' || fee.status === 'overdue');
   const pendingHomework = homework.filter(hw => hw.status === 'pending' || hw.status === 'overdue');
