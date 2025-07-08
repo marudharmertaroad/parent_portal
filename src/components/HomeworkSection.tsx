@@ -12,6 +12,8 @@ interface HomeworkSectionProps {
 }
 
 const HomeworkSection: React.FC<HomeworkSectionProps> = ({ homework, onSubmitHomework }) => {
+  const [homeworkList, setHomeworkList] = useState<Homework[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedHomework, setSelectedHomework] = useState<Homework | null>(null);
   const [showSubmissionModal, setShowSubmissionModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
