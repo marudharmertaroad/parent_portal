@@ -30,7 +30,7 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ student }) => {
         .eq('class', student.class)
         .eq('medium', student.medium)
         .eq('is_active', true)
-        .order('due_date', { ascending: true }); // Order by due date
+        .order('due_date', { ascending: true });
 
       if (fetchError) throw fetchError;
 
@@ -42,6 +42,7 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ student }) => {
       setLoading(false);
     }
   }, [student.class, student.medium]);
+
 
   useEffect(() => {
     fetchHomework();
