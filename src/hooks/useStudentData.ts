@@ -1,137 +1,69 @@
-import { useState, useEffect } from 'react';
+// src/hooks/useStudentData.ts
+
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { apiService } from '../services/api';
-import { FeeRecord, ExamRecord, Homework, Notice, Notification } from '../types';
+import { FeeRecord, ExamRecord, Homework, Notice } from '../types';
 
 export const useStudentData = () => {
-  const { user, student } = useAuth();
+  const { student } = useAuth(); // Get the currently logged-in student
+
+  // State for all the different types of data
   const [feeRecords, setFeeRecords] = useState<FeeRecord[]>([]);
   const [examRecords, setExamRecords] = useState<ExamRecord[]>([]);
   const [homework, setHomework] = useState<Homework[]>([]);
   const [notices, setNotices] = useState<Notice[]>([]);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (user && student) {
-      fetchAllData();
+  const fetchData = useCallback(async () => {
+    // If there's no logged-in student, we can't fetch anything.
+    if (!student || !student.id) {
+        setLoading(false);
+        return;
     }
-  }, [user, student]);
 
-  const fetchAllData = async () => {
-    if (!student) return;
+    setLoading(true);
+    setError(null);
 
     try {
-      setLoading(true);
-      setError(null);
-
+      // Use Promise.all to fetch everything concurrently for better performance
       const [
         feesResponse,
         examsResponse,
-        homeworkResponse,
         noticesResponse,
-        notificationsResponse,
       ] = await Promise.all([
         apiService.getFeeRecords(student.id),
         apiService.getExamRecords(student.id),
-        apiService.getHomework(student.id),
-        apiService.getNotices(),
-        apiService.getNotifications(student.id),
+        apiService.getNotices(student.class, student.medium),
       ]);
 
-      if (feesResponse.success && feesResponse.data) {
-        setFeeRecords(feesResponse.data);
-      }
+      // Set state with the fetched data, defaulting to empty arrays if anything fails
+      setFeeRecords(feesResponse || []);
+      setExamRecords(examsResponse || []);
+      setNotices(noticesResponse || []);
 
-      if (examsResponse.success && examsResponse.data) {
-        setExamRecords(examsResponse.data);
-      }
-
-      if (homeworkResponse.success && homeworkResponse.data) {
-        setHomework(homeworkResponse.data);
-      }
-
-      if (noticesResponse.success && noticesResponse.data) {
-        setNotices(noticesResponse.data);
-      }
-
-      if (notificationsResponse.success && notificationsResponse.data) {
-        setNotifications(notificationsResponse.data);
-      }
-    } catch (err) {
-      setError('Failed to fetch student data');
-      console.error('Error fetching student data:', err);
+    } catch (err: any) {
+      console.error("Error fetching student data:", err);
+      setError("Could not load all student data. Please try refreshing.");
     } finally {
       setLoading(false);
     }
-  };
+  }, [student]); // This hook re-runs whenever the 'student' object changes (i.e., on login/logout)
 
-  const refreshData = () => {
-    fetchAllData();
-  };
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
-  const payFee = async (feeId: string, paymentData: any) => {
-    try {
-      const response = await apiService.payFee(feeId, paymentData);
-      if (response.success) {
-        // Refresh fee records after successful payment
-        const feesResponse = await apiService.getFeeRecords(student!.id);
-        if (feesResponse.success && feesResponse.data) {
-          setFeeRecords(feesResponse.data);
-        }
-        return response;
-      }
-      return response;
-    } catch (error) {
-      console.error('Payment failed:', error);
-      return { success: false, error: 'Payment failed' };
-    }
-  };
-
-  const markNotificationAsRead = async (notificationId: string) => {
-    try {
-      const response = await apiService.markNotificationAsRead(notificationId);
-      if (response.success) {
-        setNotifications(prev =>
-          prev.map(notif =>
-            notif.id === notificationId ? { ...notif, read: true } : notif
-          )
-        );
-      }
-      return response;
-    } catch (error) {
-      console.error('Failed to mark notification as read:', error);
-      return { success: false, error: 'Failed to update notification' };
-    }
-  };
-
-  const markAllNotificationsAsRead = async () => {
-    try {
-      const response = await apiService.markAllNotificationsAsRead(student!.id);
-      if (response.success) {
-        setNotifications(prev =>
-          prev.map(notif => ({ ...notif, read: true }))
-        );
-      }
-      return response;
-    } catch (error) {
-      console.error('Failed to mark all notifications as read:', error);
-      return { success: false, error: 'Failed to update notifications' };
-    }
-  };
-
+  // Return all the data and states for the component to use
   return {
     feeRecords,
     examRecords,
-    homework,
+    homework, // We will handle homework inside its own component
     notices,
-    notifications,
     loading,
     error,
-    refreshData,
-    payFee,
-    markNotificationAsRead,
-    markAllNotificationsAsRead,
+    refreshData: fetchData, // Expose a function to allow manual refresh
   };
 };
