@@ -13,6 +13,7 @@ import HomeworkSection from './HomeworkSection';
 import ProfileSection from './ProfileSection';
 import NoticesAndNotifications from './NoticesAndNotifications';
 import { Notice, Notification } from '../types';
+import { X } from 'lucide-react';
 // NoticesAndNotifications and ProfileSection can be added later
 
 const StudentPortal: React.FC = () => {
