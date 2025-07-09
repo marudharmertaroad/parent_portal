@@ -16,13 +16,16 @@ import { Notice, Notification } from '../types';
 // NoticesAndNotifications and ProfileSection can be added later
 
 const StudentPortal: React.FC = () => {
-  const [showNoticesAndNotifications, setShowNoticesAndNotifications] = useState(false);
-const [showProfile, setShowProfile] = useState(false);
-
   const { student, logout } = useAuth();
   const { feeRecords, examRecords, notices, loading, error, refreshData } = useStudentData();
+
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  // These are the correct state variables
+  const [showNoticesAndNotifications, setShowNoticesAndNotifications] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  
   const personalNotifications: Notification[] = []; 
   const unreadCount = personalNotifications.filter(n => !n.read).length;
 
