@@ -5,11 +5,12 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import LoginForm from './components/LoginForm';
 import StudentPortal from './components/StudentPortal'; // We will create this next
 
-// A small helper component to avoid calling useAuth() in App directly
+// A small helper component to keep our App clean
 const AppContent: React.FC = () => {
+  // Get the session state from our context
   const { student, isLoading } = useAuth();
 
-  // Show a loading spinner while the context checks for a saved session
+  // 1. Show a loading spinner while the context is checking localStorage for a saved session
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -18,14 +19,15 @@ const AppContent: React.FC = () => {
     );
   }
 
-  // If loading is done and a student is logged in, show the portal.
-  // Otherwise, show the login form.
+  // 2. If loading is done and a student is logged in, show the main portal.
+  //    Otherwise, show the login form.
   return student ? <StudentPortal /> : <LoginForm />;
 };
 
+// The main App component
 function App() {
   return (
-    // Wrap the entire application with the AuthProvider
+    // Wrap the entire application with the AuthProvider so all components can access the context
     <AuthProvider>
       <AppContent />
     </AuthProvider>
