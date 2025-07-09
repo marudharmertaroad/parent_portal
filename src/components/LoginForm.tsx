@@ -32,10 +32,10 @@ const LoginForm: React.FC = () => {
 
     const result = await login(credentials);
     if (!result.success) {
+      // Display the error message from the API service
       setError(result.error || 'Login failed. Please try again.');
     }
-    // On success, the AuthContext will automatically handle the state change,
-    // and the App component will render the StudentPortal instead of this form.
+    // On success, the AuthContext automatically handles the re-render.
   };
 
   return (
@@ -61,9 +61,7 @@ const LoginForm: React.FC = () => {
             )}
 
             <div>
-              <label htmlFor="rollNumber" className="block text-sm font-medium text-gray-700 mb-2">
-                SR Number
-              </label>
+              <label htmlFor="rollNumber" className="block text-sm font-medium text-gray-700 mb-2">SR Number</label>
               <div className="relative">
                 <User size={20} className="text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
@@ -73,16 +71,14 @@ const LoginForm: React.FC = () => {
                   value={credentials.rollNumber}
                   onChange={handleInputChange}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter your SR Number"
+                  placeholder="Enter Student SR Number"
                   required
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700 mb-2">
-                Date of Birth
-              </label>
+              <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
               <div className="relative">
                 <Calendar size={20} className="text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
@@ -100,17 +96,16 @@ const LoginForm: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-3 px-4 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-60"
+              className="w-full flex items-center justify-center bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-3 px-4 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-60"
             >
-              {isLoading ? 'Signing In...' : 'Sign In'}
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                  <span>Signing In...</span>
+                </>
+              ) : 'Sign In'}
             </button>
           </form>
-        </div>
-        
-        <div className="text-center mt-6">
-          <p className="text-xs text-gray-500">
-            Having trouble? Please contact the school office.
-          </p>
         </div>
       </div>
     </div>
