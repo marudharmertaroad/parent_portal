@@ -76,7 +76,7 @@ const StudentPortal: React.FC = () => {
         </main>
       </div>
 
-      <NoticesAndNotifications
+     <NoticesAndNotifications
         isOpen={showNoticesModal}
         onClose={() => setShowNoticesModal(false)}
         notices={notices}
@@ -101,6 +101,4 @@ const StudentPortal: React.FC = () => {
     </div>
   );
 };
-    
-
 export default StudentPortal;
