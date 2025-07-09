@@ -20,6 +20,8 @@ const StudentPortal: React.FC = () => {
   const { feeRecords, examRecords, notices, loading, error, refreshData } = useStudentData();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const personalNotifications: Notification[] = []; 
+  const unreadCount = personalNotifications.filter(n => !n.read).length;
 
   if (!student) {
     return <div>Error: No student data found. Please log out and try again.</div>;
