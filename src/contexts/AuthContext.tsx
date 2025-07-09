@@ -1,18 +1,21 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Student, AuthUser, LoginCredentials } from '../types';
+// src/contexts/AuthContext.tsx
+
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { Student, LoginCredentials } from '../types';
 import { apiService } from '../services/api';
 
+// Define the shape of the data and functions the context will provide
 interface AuthContextType {
-  user: AuthUser | null;
   student: Student | null;
   isLoading: boolean;
   login: (credentials: LoginCredentials) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
-  updateStudent: (data: Partial<Student>) => Promise<void>;
 }
 
+// Create the context with a default undefined value
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Create a custom hook for easy access to the context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
@@ -21,112 +24,65 @@ export const useAuth = () => {
   return context;
 };
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<AuthUser | null>(null);
+// Create the Provider component that will wrap our app
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [student, setStudent] = useState<Student | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // This effect runs once when the app loads to check for a saved session
   useEffect(() => {
-    checkAuthStatus();
-  }, []);
-
-  const checkAuthStatus = async () => {
     try {
-      const token = localStorage.getItem('authToken');
-      if (!token) {
-        setIsLoading(false);
-        return;
-      }
-
-      const response = await apiService.verifyToken();
-      if (response.success && response.data) {
-        setStudent(response.data);
-        setUser({
-          studentId: response.data.id,
-          rollNumber: response.data.rollNumber,
-          class: response.data.class,
-          isAuthenticated: true,
-        });
-      } else {
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('studentData');
+      const savedStudentData = localStorage.getItem('studentData');
+      if (savedStudentData) {
+        // If we find student data in localStorage, parse it and set it as the current user
+        setStudent(JSON.parse(savedStudentData));
       }
     } catch (error) {
-      console.error('Auth check failed:', error);
-      localStorage.removeItem('authToken');
+      console.error("Failed to parse student data from localStorage", error);
+      // If parsing fails, clear the invalid data
       localStorage.removeItem('studentData');
     } finally {
+      // We're done checking, so stop showing the initial loading spinner
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const login = async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
+  // The login function that the LoginForm will call
+  const login = useCallback(async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      const response = await apiService.login(credentials);
+      // Call our clean apiService login method
+      const loggedInStudent = await apiService.login(credentials);
       
-      if (response.success && response.data) {
-        const { token, student: studentData } = response.data;
-        
-        localStorage.setItem('authToken', token);
-        localStorage.setItem('studentData', JSON.stringify(studentData));
-        
-        setStudent(studentData);
-        setUser({
-          studentId: studentData.id,
-          rollNumber: studentData.rollNumber,
-          class: studentData.class,
-          isAuthenticated: true,
-        });
-        
-        return { success: true };
-      } else {
-        return { 
-          success: false, 
-          error: response.error || 'Login failed. Please check your credentials.' 
-        };
-      }
-    } catch (error) {
+      // If successful, save the student data to localStorage and update the state
+      localStorage.setItem('studentData', JSON.stringify(loggedInStudent));
+      setStudent(loggedInStudent);
+      
+      return { success: true };
+    } catch (error: any) {
+      // If it fails, return the error message to be displayed on the login form
       return { 
         success: false, 
-        error: 'Network error. Please try again.' 
+        error: error.message || 'An unknown error occurred.' 
       };
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const logout = () => {
-    apiService.logout();
-    setUser(null);
+  // The logout function
+  const logout = useCallback(() => {
     setStudent(null);
-  };
-
-  const updateStudent = async (data: Partial<Student>) => {
-    if (!student) return;
-    
-    try {
-      const response = await apiService.updateStudentProfile(student.id, data);
-      if (response.success && response.data) {
-        setStudent(response.data);
-        localStorage.setItem('studentData', JSON.stringify(response.data));
-      }
-    } catch (error) {
-      console.error('Failed to update student profile:', error);
-    }
-  };
-
+    localStorage.removeItem('studentData');
+    // You could also redirect the user to the login page here if needed
+  }, []);
+  
+  // The value that will be available to all components wrapped by this provider
   const value = {
-    user,
     student,
     isLoading,
     login,
     logout,
-    updateStudent,
   };
 
   return (
