@@ -66,8 +66,10 @@ const StudentPortal: React.FC = () => {
         studentName={student.name}
         onLogout={logout}
         onMenuClick={() => setIsMobileMenuOpen(true)}
-        onNotificationClick={() => setShowNoticesModal(true)} // Hook up the button
+        // --- FIX: Use the correct state setter function ---
+        onNotificationClick={() => setShowNoticesAndNotifications(true)}
         onProfileClick={() => setShowProfileModal(true)}
+        unreadNotifications={unreadCount}
       />
       <div className="flex">
         <Sidebar
