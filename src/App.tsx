@@ -1,33 +1,34 @@
+// src/App.tsx
+
 import React from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { MediumProvider } from './context/MediumContext';
 import LoginForm from './components/LoginForm';
-import StudentPortal from './components/StudentPortal';
+import StudentPortal from './components/StudentPortal'; // We will create this next
 
+// A small helper component to avoid calling useAuth() in App directly
 const AppContent: React.FC = () => {
-  const { user, isLoading } = useAuth();
+  const { student, isLoading } = useAuth();
 
+  // Show a loading spinner while the context checks for a saved session
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
-  return user?.isAuthenticated ? <StudentPortal /> : <LoginForm />;
+  // If loading is done and a student is logged in, show the portal.
+  // Otherwise, show the login form.
+  return student ? <StudentPortal /> : <LoginForm />;
 };
 
 function App() {
   return (
-    <MediumProvider>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    </MediumProvider>
+    // Wrap the entire application with the AuthProvider
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 
