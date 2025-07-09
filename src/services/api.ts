@@ -110,20 +110,36 @@ class ApiService {
    * Fetches all notices for a student's class or for everyone.
    */
   async getNotices(studentClass: string, medium: string): Promise<Notice[]> {
-    const { data, error } = await supabase
-      .from('notices')
-      .select('*')
-      .eq('is_active', true)
-      // This query gets notices where target_class is NULL (for all)
-      // OR where target_class matches the student's class and medium
-      .or(`target_class.is.null,and(target_class.eq.${studentClass},medium.eq.${medium})`);
+    try {
+      // --- THIS IS THE CORRECTED QUERY ---
+      const { data, error } = await supabase
+        .from('notices')
+        .select('*')
+        .eq('is_active', true)
+        // Correct syntax for: (target_class is null) OR (target_class = 'Tenth' AND medium = 'English')
+        .or(
+          `target_class.is.null, and(target_class.eq.${studentClass}, medium.eq.${medium})`
+        );
+        
+      if (error) {
+        // We will now throw the specific Supabase error for better debugging
+        throw error;
+      }
       
-    if (error) {
+      // Map the data to your Notice type
+      return (data || []).map(n => ({
+        id: n.id,
+        title: n.title,
+        content: n.content,
+        created_at: n.created_at,
+        // ... add other Notice properties if needed
+      }));
+
+    } catch (error: any) {
       console.error("API Error fetching notices:", error);
+      // Re-throw the error so the calling function knows it failed
       throw new Error("Failed to fetch notices.");
     }
-    return data || [];
-  }
 }
 
 // Create and export a single instance of the service for the whole app to use
