@@ -4,7 +4,8 @@ import { Homework } from '../types';
 import { 
     BookOpen, Calendar, Clock, Link as LinkIcon, AlertCircle, FileText, 
     ExternalLink, Download, Eye // <-- ADD 'Eye' HERE
-} from 'lucide-react';import { formatDate } from '../utils';
+} from 'lucide-react';
+import { formatDate } from '../utils';
 
 interface HomeworkSectionProps {
   student?: {
