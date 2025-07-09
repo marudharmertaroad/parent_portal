@@ -20,7 +20,7 @@ const Header: React.FC<HeaderProps> = ({
   onProfileClick,
   unreadNotifications = 0
 }) => {  return (
-    <header className="bg-white shadow-sm border-b sticky top-0 z-10">
+    <header className="bg-white shadow-sm border-b sticky top-0 z-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
@@ -28,16 +28,18 @@ const Header: React.FC<HeaderProps> = ({
             <button
               onClick={onMenuClick}
               className="lg:hidden p-2 rounded-md text-gray-500 hover:bg-gray-100 mr-2"
+              aria-label="Open menu"
             >
               <Menu size={24} />
             </button>
             <div className="flex-shrink-0">
-              <img className="h-8 w-8" src="/logo.png" alt="School Logo" />
+              <img className="h-8 w-8 object-contain" src="/logo.png" alt="School Logo" />
             </div>
-            <h1 className="ml-4 text-xl font-bold text-gray-800">Student Portal</h1>
           </div>
 
-          <button 
+          <div className="flex items-center space-x-4">
+            {/* Notification Bell Button */}
+            <button 
               onClick={onNotificationClick}
               className="relative p-2 rounded-full text-gray-500 hover:bg-gray-100" 
               title="View Notices & Alerts"
@@ -59,13 +61,17 @@ const Header: React.FC<HeaderProps> = ({
               </div>
               <span className="hidden md:block text-sm font-medium text-gray-700">{studentName}</span>
             </button>
-            <button
-              onClick={onLogout}
-              className="p-2 rounded-full text-gray-500 hover:bg-red-50 hover:text-red-600"
-              title="Logout"
-            >
-              <LogOut size={20} />
-            </button>
+            
+            {/* Logout Button */}
+            <div className="border-l pl-2">
+              <button
+                onClick={onLogout}
+                className="p-2 rounded-full text-gray-500 hover:bg-red-50 hover:text-red-600"
+                title="Logout"
+              >
+                <LogOut size={20} />
+              </button>
+            </div>
           </div>
         </div>
       </div>
