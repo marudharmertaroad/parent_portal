@@ -10,6 +10,9 @@ import Dashboard from './Dashboard';
 import FeesSection from './FeesSection';
 import AcademicRecords from './AcademicRecords';
 import HomeworkSection from './HomeworkSection';
+import ProfileSection from './ProfileSection';
+import NoticesAndNotifications from './NoticesAndNotifications';
+import { Notice, Notification } from '../types';
 // NoticesAndNotifications and ProfileSection can be added later
 
 const StudentPortal: React.FC = () => {
