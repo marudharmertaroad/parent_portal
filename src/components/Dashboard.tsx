@@ -10,7 +10,7 @@ import {
   TrendingUp,
   Calendar
 } from 'lucide-react';
-import { formatDate } from '../utils'; // Make sure this path is correct
+import { formatDate, getGradeColor } from '../utils';
 import HomeworkSection from './HomeworkSection'; // We will include this directly in the dashboard
 
 interface DashboardProps {
