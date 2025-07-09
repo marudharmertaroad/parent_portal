@@ -7,6 +7,9 @@ interface HeaderProps {
   studentName: string;
   onLogout: () => void;
   onMenuClick: () => void;
+   onNotificationClick: () => void; // Prop to open the notices modal
+  onProfileClick: () => void;      // Prop to open the profile modal
+  unreadNotifications?: number; 
 }
 
 const Header: React.FC<HeaderProps> = ({ studentName, onLogout, onMenuClick }) => {
