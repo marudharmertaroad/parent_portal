@@ -13,10 +13,11 @@ import HomeworkSection from './HomeworkSection';
 import ProfileSection from './ProfileSection';
 import NoticesAndNotifications from './NoticesAndNotifications';
 import { Notice, Notification } from '../types';
-const [showNoticesAndNotifications, setShowNoticesAndNotifications] = useState(false);
+// NoticesAndNotifications and ProfileSection can be added later
 
 const StudentPortal: React.FC = () => {
-  
+  const [showNoticesAndNotifications, setShowNoticesAndNotifications] = useState(false);
+
   const { student, logout } = useAuth();
   const { feeRecords, examRecords, notices, loading, error, refreshData } = useStudentData();
   const [activeTab, setActiveTab] = useState('dashboard');
