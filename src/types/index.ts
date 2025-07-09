@@ -1,78 +1,56 @@
+// src/types/index.ts (The Single Source of Truth)
+
+// This is the main Student object, matching your database
 export interface Student {
-  id: string;
+  id: number; // The database primary key
+  srNo: string;
   name: string;
   class: string;
-  section: string;
-  rollNumber: string;
-  admissionNumber: string;
-  dateOfBirth: string;
+  medium: string;
   fatherName: string;
-  motherName: string;
-  contactNumber: string;
-  email: string;
-  address: string;
-  medium?: string;
-  profileImage?: string;
+  motherName?: string;
+  gender?: string;
+  dob: string;
+  contact: string;
+  address?: string;
+  bus_route?: string;
+  religion?: string;
+  nicStudentId?: string;
+  isRte: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
+// For the Parent Login Form
+export interface LoginCredentials {
+  rollNumber: string; // We'll keep 'rollNumber' for the form field name
+  dateOfBirth: string;
+}
+
+// For displaying fee records
 export interface FeeRecord {
-  id: string;
-  studentId: string;
-  feeType: string;
-  amount: number;
-  totalAmount?: number;
-  paidAmount?: number;
-  discountAmount?: number;
-  busAmount?: number;
+  recordId: number;
+  totalFees: number;
+  paidFees: number;
+  pendingFees: number;
+  discountFees: number;
+  busFees: number;
   dueDate: string;
-  status: 'pending' | 'paid' | 'overdue' | 'partial';
-  paymentDate?: string;
-  paymentHistory?: PaymentHistory[];
-  transactionId?: string;
+  status: 'Paid' | 'Pending' | 'Overdue';
 }
 
-export interface PaymentHistory {
-  id: number;
-  amount: number;
-  payment_date: string;
-}
-
+// For displaying exam records
 export interface ExamRecord {
-  id: string;
-  studentId: string;
-  examName: string;
-  subject: string;
-  maxMarks: number;
+  id: number;
+  examType: string;
+  totalMarks: number;
   obtainedMarks: number;
-  grade: string;
-  date: string;
-  semester: string;
-  percentage?: number;
-  subjectMarks?: SubjectMark[];
-  coScholasticMarks?: CoScholasticMark[];
+  percentage: number;
+  grade?: string;
+  examDate: string;
 }
 
-export interface SubjectMark {
-  subject: string;
-  max_marks: number;
-  obtained_marks: number;
-  grade: string;
-}
-
-export interface CoScholasticMark {
-  activity: string;
-  grade: string;
-}
-
-export interface Notice {
-  id: string;
-  title: string;
-  content: string;
-  date: string;
-  priority: 'low' | 'medium' | 'high';
-  category: string;
-}
-
+// For displaying homework
 export interface Homework {
   id: number;
   title: string;
@@ -81,34 +59,12 @@ export interface Homework {
   due_date: string;
   created_at: string;
   attachment_url?: string;
-  status: 'pending' | 'submitted' | 'overdue';
 }
 
-export interface Notification {
-  id: string;
+// For displaying notifications/notices
+export interface Notice {
+  id: number;
   title: string;
-  message: string;
-  type: 'info' | 'warning' | 'success' | 'error';
-  date: string;
-  read: boolean;
-}
-
-export interface AuthUser {
-  studentId: string;
-  rollNumber: string;
-  dateOfBirth: string;
-  medium?: string;
-  isAuthenticated: boolean;
-}
-
-export interface LoginCredentials {
-  rollNumber: string;
-  dateOfBirth: string;
-}
-
-export interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  message?: string;
-  error?: string;
+  content: string;
+  created_at: string;
 }
