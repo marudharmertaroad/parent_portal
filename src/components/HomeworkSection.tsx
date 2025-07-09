@@ -1,17 +1,14 @@
 import React, { useState } from 'react';
 import { Homework } from '../types';
-import { BookOpen, Calendar, Clock, CheckCircle, AlertCircle, Upload, FileText, Download } from 'lucide-react';
+import { BookOpen, Calendar, Clock, CheckCircle, AlertCircle, FileText, Download, ExternalLink } from 'lucide-react';
 
 interface HomeworkSectionProps {
   homework: Homework[];
-  onSubmitHomework: (homeworkId: string, file: File) => Promise<any>;
 }
 
-const HomeworkSection: React.FC<HomeworkSectionProps> = ({ homework, onSubmitHomework }) => {
+const HomeworkSection: React.FC<HomeworkSectionProps> = ({ homework }) => {
   const [selectedHomework, setSelectedHomework] = useState<Homework | null>(null);
-  const [showSubmissionModal, setShowSubmissionModal] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -43,59 +40,9 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ homework, onSubmitHom
   const overdueCount = homework.filter(hw => hw.status === 'overdue').length;
   const submittedCount = homework.filter(hw => hw.status === 'submitted').length;
 
-  const handleSubmission = (hw: Homework) => {
+  const handleViewDetails = (hw: Homework) => {
     setSelectedHomework(hw);
-    setShowSubmissionModal(true);
-  };
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Validate file size (10MB limit)
-      if (file.size > 10 * 1024 * 1024) {
-        alert('File size must be less than 10MB');
-        return;
-      }
-      
-      // Validate file type
-      const allowedTypes = [
-        'application/pdf',
-        'application/msword',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'text/plain',
-        'image/jpeg',
-        'image/png'
-      ];
-      
-      if (!allowedTypes.includes(file.type)) {
-        alert('Please select a valid file type (PDF, DOC, DOCX, TXT, JPG, PNG)');
-        return;
-      }
-      
-      setSelectedFile(file);
-    }
-  };
-
-  const handleFileUpload = async () => {
-    if (!selectedHomework || !selectedFile) return;
-
-    setIsSubmitting(true);
-    try {
-      const response = await onSubmitHomework(selectedHomework.id.toString(), selectedFile);
-      
-      if (response.success) {
-        alert(`Homework submitted successfully for ${selectedHomework.subject}! Submission ID: ${response.data?.submissionId}`);
-        setShowSubmissionModal(false);
-        setSelectedHomework(null);
-        setSelectedFile(null);
-      } else {
-        alert(`Submission failed: ${response.error || 'Unknown error'}`);
-      }
-    } catch (error) {
-      alert('Submission failed. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
+    setShowDetailsModal(true);
   };
 
   const isOverdue = (dueDate: string) => {
@@ -141,11 +88,11 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ homework, onSubmitHom
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Submitted</p>
-              <p className="text-2xl font-bold text-green-600">{submittedCount}</p>
+              <p className="text-sm font-medium text-gray-600">Total Assignments</p>
+              <p className="text-2xl font-bold text-blue-600">{homework.length}</p>
             </div>
-            <div className="p-3 rounded-full bg-green-100">
-              <CheckCircle size={24} className="text-green-600" />
+            <div className="p-3 rounded-full bg-blue-100">
+              <BookOpen size={24} className="text-blue-600" />
             </div>
           </div>
         </div>
@@ -207,7 +154,7 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ homework, onSubmitHom
                         )}
                       </div>
                       
-                      <p className="text-gray-700 mb-3 leading-relaxed">{hw.description}</p>
+                      <p className="text-gray-700 mb-3 leading-relaxed line-clamp-2">{hw.description}</p>
                       
                       {hw.attachment_url && (
                         <div className="mb-3">
@@ -219,7 +166,7 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ homework, onSubmitHom
                           >
                             <FileText size={14} className="mr-1" />
                             View Assignment File
-                            <Download size={12} className="ml-1" />
+                            <ExternalLink size={12} className="ml-1" />
                           </a>
                         </div>
                       )}
@@ -230,24 +177,13 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ homework, onSubmitHom
                     </div>
                     
                     <div className="ml-4">
-                      {hw.status === 'pending' || hw.status === 'overdue' ? (
-                        <button
-                          onClick={() => handleSubmission(hw)}
-                          className={`px-4 py-2 text-white rounded-lg transition-colors flex items-center space-x-2 ${
-                            hw.status === 'overdue' 
-                              ? 'bg-red-500 hover:bg-red-600' 
-                              : 'bg-blue-500 hover:bg-blue-600'
-                          }`}
-                        >
-                          <Upload size={16} />
-                          <span>Submit</span>
-                        </button>
-                      ) : (
-                        <div className="text-green-600 font-medium flex items-center space-x-2">
-                          <CheckCircle size={16} />
-                          <span>Submitted</span>
-                        </div>
-                      )}
+                      <button
+                        onClick={() => handleViewDetails(hw)}
+                        className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center space-x-2"
+                      >
+                        <FileText size={16} />
+                        <span>View Details</span>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -257,89 +193,78 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ homework, onSubmitHom
         </div>
       </div>
 
-      {/* Submission Modal */}
-      {showSubmissionModal && selectedHomework && (
+      {/* Details Modal */}
+      {showDetailsModal && selectedHomework && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 max-w-md w-full m-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-              <Upload size={20} className="mr-2 text-blue-500" />
-              Submit Homework
-            </h3>
+          <div className="bg-white rounded-xl p-6 max-w-2xl w-full m-4 max-h-[80vh] overflow-y-auto">
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">{selectedHomework.title}</h3>
+                <div className="flex items-center space-x-4 text-sm text-gray-600">
+                  <span className="flex items-center">
+                    <BookOpen size={14} className="mr-1" />
+                    {selectedHomework.subject}
+                  </span>
+                  <span className="flex items-center">
+                    <Calendar size={14} className="mr-1" />
+                    Due: {new Date(selectedHomework.due_date).toLocaleDateString('en-IN')}
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowDetailsModal(false)}
+                className="text-gray-400 hover:text-gray-600 text-2xl"
+              >
+                ×
+              </button>
+            </div>
+            
             <div className="space-y-4">
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-600">Subject</p>
-                <p className="font-medium text-gray-900">{selectedHomework.subject}</p>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-600">Assignment</p>
-                <p className="font-medium text-gray-900">{selectedHomework.title}</p>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-600">Due Date</p>
-                <p className={`font-medium ${isOverdue(selectedHomework.due_date) ? 'text-red-600' : 'text-gray-900'}`}>
-                  {new Date(selectedHomework.due_date).toLocaleDateString('en-IN')}
-                  {isOverdue(selectedHomework.due_date) && (
-                    <span className="ml-2 text-xs bg-red-100 text-red-800 px-2 py-1 rounded">OVERDUE</span>
-                  )}
-                </p>
+              <div>
+                <h4 className="font-medium text-gray-900 mb-2">Assignment Description</h4>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <p className="text-gray-700 leading-relaxed">{selectedHomework.description}</p>
+                </div>
               </div>
               
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
-                <input
-                  type="file"
-                  onChange={handleFileSelect}
-                  accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
-                  className="hidden"
-                  id="file-upload"
-                />
-                <label htmlFor="file-upload" className="cursor-pointer">
-                  <Upload size={32} className="mx-auto text-gray-400 mb-2" />
-                  <p className="text-sm text-gray-600 mb-1">
-                    {selectedFile ? (
-                      <span className="text-blue-600 font-medium">{selectedFile.name}</span>
-                    ) : (
-                      'Click to upload or drag and drop'
-                    )}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    PDF, DOC, DOCX, TXT, JPG, PNG up to 10MB
-                  </p>
-                </label>
-              </div>
-              
-              {selectedFile && (
-                <div className="p-3 bg-blue-50 rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <FileText size={16} className="text-blue-600" />
-                      <span className="text-sm text-blue-800">{selectedFile.name}</span>
-                    </div>
-                    <span className="text-xs text-blue-600">
-                      {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
-                    </span>
-                  </div>
+              {selectedHomework.attachment_url && (
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-2">Attachment</h4>
+                  <a
+                    href={selectedHomework.attachment_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                  >
+                    <FileText size={16} className="mr-2" />
+                    Open Assignment File
+                    <ExternalLink size={14} className="ml-2" />
+                  </a>
                 </div>
               )}
               
-              <div className="flex space-x-4">
-                <button
-                  onClick={() => {
-                    setShowSubmissionModal(false);
-                    setSelectedFile(null);
-                  }}
-                  disabled={isSubmitting}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleFileUpload}
-                  disabled={!selectedFile || isSubmitting}
-                  className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
-                >
-                  {isSubmitting ? 'Submitting...' : 'Submit'}
-                </button>
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-1">Status</h4>
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(selectedHomework.status)}`}>
+                    {getStatusIcon(selectedHomework.status)}
+                    <span className="ml-1 capitalize">{selectedHomework.status}</span>
+                  </span>
+                </div>
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-1">Assigned Date</h4>
+                  <p className="text-gray-600">{new Date(selectedHomework.created_at).toLocaleDateString('en-IN')}</p>
+                </div>
               </div>
+            </div>
+            
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setShowDetailsModal(false)}
+                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>

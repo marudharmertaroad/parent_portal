@@ -89,24 +89,6 @@ export const useStudentData = () => {
     }
   };
 
-  const submitHomework = async (homeworkId: string, file: File) => {
-    try {
-      const response = await apiService.submitHomework(homeworkId, file);
-      if (response.success) {
-        // Refresh homework after successful submission
-        const homeworkResponse = await apiService.getHomework(student!.id);
-        if (homeworkResponse.success && homeworkResponse.data) {
-          setHomework(homeworkResponse.data);
-        }
-        return response;
-      }
-      return response;
-    } catch (error) {
-      console.error('Homework submission failed:', error);
-      return { success: false, error: 'Submission failed' };
-    }
-  };
-
   const markNotificationAsRead = async (notificationId: string) => {
     try {
       const response = await apiService.markNotificationAsRead(notificationId);
@@ -149,7 +131,6 @@ export const useStudentData = () => {
     error,
     refreshData,
     payFee,
-    submitHomework,
     markNotificationAsRead,
     markAllNotificationsAsRead,
   };

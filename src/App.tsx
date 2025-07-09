@@ -1,5 +1,6 @@
 import React from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { MediumProvider } from './context/MediumContext';
 import LoginForm from './components/LoginForm';
 import StudentPortal from './components/StudentPortal';
 
@@ -22,9 +23,11 @@ const AppContent: React.FC = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <MediumProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </MediumProvider>
   );
 }
 

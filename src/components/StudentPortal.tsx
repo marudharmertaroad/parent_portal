@@ -22,7 +22,6 @@ const StudentPortal: React.FC = () => {
     error,
     refreshData,
     payFee,
-    submitHomework,
     markNotificationAsRead,
     markAllNotificationsAsRead,
   } = useStudentData();
@@ -141,7 +140,7 @@ const StudentPortal: React.FC = () => {
       case 'academic':
         return <AcademicRecords examRecords={examRecords} />;
       case 'homework':
-        return <HomeworkSection homework={homework} onSubmitHomework={submitHomework} />;
+        return <HomeworkSection homework={homework} />;
       default:
         return (
           <Dashboard
@@ -178,12 +177,11 @@ const StudentPortal: React.FC = () => {
         
         <main className="flex-1 p-6 md:ml-0">
           <div className="max-w-7xl mx-auto">
-  {!loading && !error && renderContent()}
+            {!loading && !error && renderContent()}
           </div>
         </main>
       </div>
 
-      
       {/* Notices and Notifications Modal */}
       <NoticesAndNotifications
         notices={notices}

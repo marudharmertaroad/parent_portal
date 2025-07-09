@@ -373,7 +373,7 @@ class SupabaseApiService {
     }
   }
 
-  // Homework using database function
+  // Homework using database function (removed submission functionality)
   async getHomework(studentId: string): Promise<ApiResponse<Homework[]>> {
     try {
       console.log('🔍 Fetching homework for student:', studentId);
@@ -407,7 +407,6 @@ class SupabaseApiService {
   }
 
   private determineHomeworkStatus(record: any): 'pending' | 'submitted' | 'overdue' {
-    // For now, all homework is pending since we don't have submission tracking yet
     const dueDate = new Date(record.due_date);
     const today = new Date();
     
@@ -418,63 +417,7 @@ class SupabaseApiService {
     return 'pending';
   }
 
-  async submitHomework(homeworkId: string, file: File): Promise<ApiResponse<{ submissionId: string }>> {
-    try {
-      console.log('📤 Submitting homework:', homeworkId, file.name);
-      
-      // Get current student ID from token
-      const token = localStorage.getItem('authToken');
-      if (!token) {
-        return { success: false, error: 'Not authenticated' };
-      }
-      
-      const decoded = JSON.parse(atob(token));
-      const studentId = decoded.studentId;
-      
-      // Upload file to storage
-      const fileName = `${studentId}_${homeworkId}_${Date.now()}_${file.name}`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('homework-submissions')
-        .upload(fileName, file);
-
-      if (uploadError) {
-        console.error('File upload error:', uploadError);
-        return { success: false, error: 'Failed to upload file' };
-      }
-
-      // Get public URL for the uploaded file
-      const { data: { publicUrl } } = supabase.storage
-        .from('homework-submissions')
-        .getPublicUrl(fileName);
-
-      // Submit homework using database function
-      const { data, error } = await supabase
-        .rpc('submit_homework', {
-          p_homework_id: parseInt(homeworkId),
-          p_student_id: parseInt(studentId),
-          p_submission_text: `Submitted file: ${file.name}`,
-          p_attachment_url: publicUrl
-        });
-
-      if (error) {
-        console.error('Homework submission error:', error);
-        return { success: false, error: error.message };
-      }
-
-      const result = data[0];
-      if (!result.success) {
-        return { success: false, error: result.message };
-      }
-      
-      return { 
-        success: true, 
-        data: { submissionId: result.submission_id } 
-      };
-    } catch (error) {
-      console.error('Homework submission error:', error);
-      return { success: false, error: 'Homework submission failed' };
-    }
-  }
+  // Removed submitHomework function as requested
 
   // Notices using database function
   async getNotices(): Promise<ApiResponse<Notice[]>> {
