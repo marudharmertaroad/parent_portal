@@ -1,122 +1,61 @@
+// src/components/StudentPortal.tsx
+
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useStudentData } from '../hooks/useStudentData';
-import Header from './Header';
-import Sidebar from './Sidebar';
+
+// Import all the section components you will be showing
+import Header from './Header'; // You will need to create this
+import Sidebar from './Sidebar'; // You will need to create this
 import Dashboard from './Dashboard';
 import FeesSection from './FeesSection';
 import AcademicRecords from './AcademicRecords';
 import HomeworkSection from './HomeworkSection';
-import ProfileSection from './ProfileSection';
 import NoticesAndNotifications from './NoticesAndNotifications';
 
 const StudentPortal: React.FC = () => {
+  // Get the student object and logout function from the Auth context
   const { student, logout } = useAuth();
+  
+  // Get all the data for this student using our new hook
   const {
     feeRecords,
     examRecords,
-    homework,
     notices,
-    notifications,
     loading,
     error,
     refreshData,
-    payFee,
-    markNotificationAsRead,
-    markAllNotificationsAsRead,
   } = useStudentData();
 
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [showNoticesAndNotifications, setShowNoticesAndNotifications] = useState(false);
-  const [showProfile, setShowProfile] = useState(false);
 
-  const unreadNotifications = notifications.filter(n => !n.read).length;
-
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
-  };
-
-  const handleMobileMenuToggle = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
-  const handleMobileMenuClose = () => {
-    setIsMobileMenuOpen(false);
-  };
-
-  const handleNotificationClick = () => {
-    setShowNoticesAndNotifications(true);
-  };
-
-  const handleProfileClick = () => {
-    setShowProfile(true);
-  };
-
-  const handleLogout = () => {
-    logout();
-  };
-
+  // This is a safety guard. The parent (App.tsx) should already prevent this,
+  // but it's good practice to have it.
+  if (!student) {
+    // This could redirect to login or show an error
+    return <div>No student data found. Please log in.</div>;
+  }
+  
+  // This handles the loading state for all the data
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 mb-4">
-            <img 
-              src="/logo.png" 
-              alt="Marudhar Defence Educational Group" 
-              className="w-16 h-16 object-contain animate-pulse"
-            />
-          </div>
-          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading student data...</p>
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center text-gray-600">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p>Loading {student.name}'s Dashboard...</p>
         </div>
       </div>
     );
   }
 
+  // This handles any errors during data fetching
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 mb-4 mx-auto">
-            <img 
-              src="/logo.png" 
-              alt="Marudhar Defence Educational Group" 
-              className="w-16 h-16 object-contain"
-            />
-          </div>
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
-          </div>
-          <button
-            onClick={refreshData}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!student) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 mb-4 mx-auto">
-            <img 
-              src="/logo.png" 
-              alt="Marudhar Defence Educational Group" 
-              className="w-16 h-16 object-contain"
-            />
-          </div>
-          <p className="text-gray-600 mb-4">Student data not found</p>
-          <button
-            onClick={handleLogout}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          >
-            Back to Login
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        <div className="text-center p-6 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-700 font-semibold mb-4">{error}</p>
+          <button onClick={refreshData} className="bg-blue-600 text-white px-4 py-2 rounded-lg">
+            Try Again
           </button>
         </div>
       </div>
@@ -126,98 +65,45 @@ const StudentPortal: React.FC = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
+        // Pass all the necessary data down to the dashboard
         return (
           <Dashboard
             student={student}
             feeRecords={feeRecords}
             examRecords={examRecords}
-            homework={homework}
-            notifications={notifications}
+            notices={notices}
           />
         );
       case 'fees':
-        return <FeesSection feeRecords={feeRecords} onPayFee={payFee} />;
+        // return <FeesSection feeRecords={feeRecords} />;
+        return <div className="p-4 bg-white rounded-lg">Fees Section Coming Soon</div>;
       case 'academic':
-        return <AcademicRecords examRecords={examRecords} />;
+        // return <AcademicRecords examRecords={examRecords} />;
+         return <div className="p-4 bg-white rounded-lg">Academic Records Coming Soon</div>;
       case 'homework':
-        return <HomeworkSection homework={homework} />;
+        // The homework section is smart and only needs the student object
+        return <HomeworkSection student={student} />;
       default:
-        return (
-          <Dashboard
-            student={student}
-            feeRecords={feeRecords}
-            examRecords={examRecords}
-            homework={homework}
-            notifications={notifications}
-          />
-        );
+        return <Dashboard student={student} feeRecords={feeRecords} examRecords={examRecords} notices={notices}/>;
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header
-        studentName={student.name}
-        studentMedium={student.medium}
-        unreadNotifications={unreadNotifications}
-        onNotificationClick={handleNotificationClick}
-        onProfileClick={handleProfileClick}
-        onMenuClick={handleMobileMenuToggle}
-        onLogout={handleLogout}
-        isMobileMenuOpen={isMobileMenuOpen}
-      />
+      {/* You would have a Header component here */}
+      {/* <Header studentName={student.name} onLogout={logout} /> */}
       
       <div className="flex">
-        <Sidebar
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-          isOpen={isMobileMenuOpen}
-          onClose={handleMobileMenuClose}
-        />
+        {/* You would have a Sidebar component here */}
+        {/* <Sidebar activeTab={activeTab} onTabChange={setActiveTab} /> */}
         
-        <main className="flex-1 p-6 md:ml-0">
+        <main className="flex-1 p-6">
           <div className="max-w-7xl mx-auto">
-            {!loading && !error && renderContent()}
+            <h1 className="text-2xl font-bold mb-4 capitalize">{activeTab}</h1>
+            {renderContent()}
           </div>
         </main>
       </div>
-
-      {/* Notices and Notifications Modal */}
-      <NoticesAndNotifications
-        notices={notices}
-        notifications={notifications}
-        isOpen={showNoticesAndNotifications}
-        onClose={() => setShowNoticesAndNotifications(false)}
-        onMarkAsRead={markNotificationAsRead}
-        onMarkAllAsRead={markAllNotificationsAsRead}
-      />
-
-      {/* Profile Modal */}
-      {showProfile && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl max-w-4xl w-full m-4 max-h-[90vh] overflow-y-auto">
-            <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-              <div className="flex items-center space-x-3">
-                <img 
-                  src="/logo.png" 
-                  alt="Marudhar Defence Educational Group" 
-                  className="w-8 h-8 object-contain"
-                />
-                <h2 className="text-xl font-semibold text-gray-900">Student Profile</h2>
-              </div>
-              <button
-                onClick={() => setShowProfile(false)}
-                className="text-gray-400 hover:text-gray-600 text-2xl"
-              >
-                ×
-              </button>
-            </div>
-            <div className="p-6">
-              <ProfileSection student={student} />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
