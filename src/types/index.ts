@@ -1,29 +1,25 @@
-// src/types/index.ts (The Single Source of Truth)
+// src/types/index.ts
 
-// This is the main Student object, matching your database
+// The single source of truth for the Student object
 export interface Student {
-  id: number; // The database primary key
+  id: number;
   srNo: string;
   name: string;
   class: string;
   medium: string;
   fatherName: string;
   motherName?: string;
-  gender?: string;
-  dob: string;
   contact: string;
   address?: string;
+  dob: string;
   bus_route?: string;
-  religion?: string;
-  nicStudentId?: string;
   isRte: boolean;
-  createdAt?: string;
-  updatedAt?: string;
+  // Add any other fields you need from the 'students' table
 }
 
 // For the Parent Login Form
 export interface LoginCredentials {
-  rollNumber: string; // We'll keep 'rollNumber' for the form field name
+  rollNumber: string;
   dateOfBirth: string;
 }
 
