@@ -72,7 +72,8 @@ class ApiService {
   
   // --- FIX: This function is now correctly placed INSIDE the ApiService class ---
   async getNotices(studentClass: string, medium: string): Promise<Notice[]> {
-    const { data, error } = await supabase
+    try {
+      const { data, error } = await supabase
         .from('notices')
         .select('*')
         .eq('is_active', true)
