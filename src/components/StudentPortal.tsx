@@ -77,10 +77,10 @@ const StudentPortal: React.FC = () => {
       </div>
 
      <NoticesAndNotifications
-        isOpen={showNoticesModal}
-        onClose={() => setShowNoticesModal(false)}
-        notices={notices}
-        notifications={personalNotifications}
+  isOpen={showNoticesAndNotifications}
+  onClose={() => setShowNoticesAndNotifications(false)}
+  notices={notices}
+  notifications={personalNotifications}
       />
 
       {showProfileModal && (
