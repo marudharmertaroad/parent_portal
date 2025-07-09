@@ -112,8 +112,6 @@ const NoticesAndNotifications: React.FC<Props> = ({ isOpen, onClose, notices, no
             </div>
           )}
         </div>
-      </div>
-    </div>
   );
 };
 
