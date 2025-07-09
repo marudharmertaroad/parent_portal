@@ -59,12 +59,23 @@ class ApiService {
     }));
   }
   
-  async getNotices(studentClass: string, medium: string): Promise<Notice[]> {
-    const { data, error } = await supabase.from('notices').select('*').eq('is_active', true)
-      .or(`target_class.is.null,and(target_class.eq.${studentClass},medium.eq.${medium})`);
-    if (error) throw error;
-    return data || [];
-  }
+  async getNotices(studentClass: string): Promise<Notice[]> { // No longer needs 'medium'
+    try {
+      // --- CORRECTED QUERY ---
+      const { data, error } = await supabase
+        .from('notices')
+        .select('*')
+        .eq('is_active', true)
+        // Correct syntax for: (target_class is null) OR (target_class = 'Tenth')
+        .or(`target_class.is.null,target_class.eq.${studentClass}`);
+        
+      if (error) throw error;
+      
+      return data || [];
+    } catch (error: any) {
+      console.error("API Error fetching notices:", error);
+      throw new Error("Failed to fetch notices.");
+    }
 }
 
 export const apiService = new ApiService();
