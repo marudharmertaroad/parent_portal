@@ -17,6 +17,7 @@ import { Notice, Notification } from '../types';
 
 const StudentPortal: React.FC = () => {
   const [showNoticesAndNotifications, setShowNoticesAndNotifications] = useState(false);
+const [showProfile, setShowProfile] = useState(false);
 
   const { student, logout } = useAuth();
   const { feeRecords, examRecords, notices, loading, error, refreshData } = useStudentData();
