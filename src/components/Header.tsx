@@ -37,16 +37,28 @@ const Header: React.FC<HeaderProps> = ({
             <h1 className="ml-4 text-xl font-bold text-gray-800">Student Portal</h1>
           </div>
 
-          <div className="flex items-center space-x-4">
-            <button className="p-2 rounded-full text-gray-500 hover:bg-gray-100">
-              <Bell size={20} />
+          <button 
+              onClick={onNotificationClick}
+              className="relative p-2 rounded-full text-gray-500 hover:bg-gray-100" 
+              title="View Notices & Alerts"
+            >
+              <Bell size={22} />
+              {unreadNotifications > 0 && (
+                <span className="absolute top-1 right-1 block h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-white"></span>
+              )}
             </button>
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold">
-                {studentName.charAt(0)}
+
+            {/* Profile Button */}
+            <button 
+              onClick={onProfileClick}
+              className="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-100"
+              title="View Profile"
+            >
+              <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                {studentName.charAt(0).toUpperCase()}
               </div>
               <span className="hidden md:block text-sm font-medium text-gray-700">{studentName}</span>
-            </div>
+            </button>
             <button
               onClick={onLogout}
               className="p-2 rounded-full text-gray-500 hover:bg-red-50 hover:text-red-600"
