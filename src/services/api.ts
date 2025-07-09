@@ -140,7 +140,7 @@ class ApiService {
       // Re-throw the error so the calling function knows it failed
       throw new Error("Failed to fetch notices.");
     }
-}
+};
 
 // Create and export a single instance of the service for the whole app to use
 export const apiService = new ApiService();
