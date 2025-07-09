@@ -11,7 +11,7 @@ export interface Student {
   contactNumber: string;
   email: string;
   address: string;
-  medium?: string; // Added medium support
+  medium?: string;
   profileImage?: string;
 }
 
@@ -20,10 +20,21 @@ export interface FeeRecord {
   studentId: string;
   feeType: string;
   amount: number;
+  totalAmount?: number;
+  paidAmount?: number;
+  discountAmount?: number;
+  busAmount?: number;
   dueDate: string;
-  status: 'pending' | 'paid' | 'overdue';
+  status: 'pending' | 'paid' | 'overdue' | 'partial';
   paymentDate?: string;
+  paymentHistory?: PaymentHistory[];
   transactionId?: string;
+}
+
+export interface PaymentHistory {
+  id: number;
+  amount: number;
+  payment_date: string;
 }
 
 export interface ExamRecord {
@@ -36,6 +47,21 @@ export interface ExamRecord {
   grade: string;
   date: string;
   semester: string;
+  percentage?: number;
+  subjectMarks?: SubjectMark[];
+  coScholasticMarks?: CoScholasticMark[];
+}
+
+export interface SubjectMark {
+  subject: string;
+  max_marks: number;
+  obtained_marks: number;
+  grade: string;
+}
+
+export interface CoScholasticMark {
+  activity: string;
+  grade: string;
 }
 
 export interface Notice {
@@ -52,9 +78,10 @@ export interface Homework {
   title: string;
   description: string;
   subject: string;
-  due_date: string; // Keep the database column name
+  due_date: string;
   created_at: string;
-  attachment_url?: string; // It's good to keep this if teachers provide attachments
+  attachment_url?: string;
+  status: 'pending' | 'submitted' | 'overdue';
 }
 
 export interface Notification {

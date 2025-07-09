@@ -48,25 +48,25 @@ class SupabaseApiService {
         dateOfBirth: credentials.dateOfBirth 
       });
       
-      // Find student by SR number and date of birth
-      const { data: studentData, error: studentError } = await supabase
-        .from('students')
-        .select('*')
-        .eq('sr_no', credentials.rollNumber)
-        .eq('dob', credentials.dateOfBirth)
-        .eq('status', 'active')
-        .single();
+      // Use the database function for authentication
+      const { data, error } = await supabase
+        .rpc('authenticate_student_by_dob', {
+          p_sr_no: credentials.rollNumber,
+          p_dob: credentials.dateOfBirth
+        });
 
-      console.log('📊 Database query result:', { studentData, error: studentError });
+      console.log('📊 Database query result:', { data, error });
 
-      if (studentError || !studentData) {
+      if (error || !data || data.length === 0 || !data[0].success) {
         console.log('❌ Login failed - student not found');
         return {
           success: false,
-          error: 'Invalid SR Number or Date of Birth. Please check your credentials.',
+          error: data?.[0]?.message || 'Invalid SR Number or Date of Birth. Please check your credentials.',
         };
       }
 
+      const studentData = data[0].student_data;
+      
       // Convert database format to app format
       const student: Student = {
         id: studentData.id.toString(),
@@ -74,7 +74,7 @@ class SupabaseApiService {
         class: studentData.class,
         section: 'A', // Default section
         rollNumber: studentData.sr_no,
-        admissionNumber: studentData.nic_student_id || studentData.sr_no,
+        admissionNumber: studentData.sr_no,
         dateOfBirth: studentData.dob || '2009-01-01',
         fatherName: studentData.father_name,
         motherName: studentData.mother_name || '',
@@ -136,7 +136,7 @@ class SupabaseApiService {
         class: studentData.class,
         section: 'A',
         rollNumber: studentData.sr_no,
-        admissionNumber: studentData.nic_student_id || studentData.sr_no,
+        admissionNumber: studentData.sr_no,
         dateOfBirth: studentData.dob || '2009-01-01',
         fatherName: studentData.father_name,
         motherName: studentData.mother_name || '',
@@ -173,7 +173,7 @@ class SupabaseApiService {
         class: data.class,
         section: 'A',
         rollNumber: data.sr_no,
-        admissionNumber: data.nic_student_id || data.sr_no,
+        admissionNumber: data.sr_no,
         dateOfBirth: data.dob || '2009-01-01',
         fatherName: data.father_name,
         motherName: data.mother_name || '',
@@ -219,7 +219,7 @@ class SupabaseApiService {
         class: data.class,
         section: 'A',
         rollNumber: data.sr_no,
-        admissionNumber: data.nic_student_id || data.sr_no,
+        admissionNumber: data.sr_no,
         dateOfBirth: data.dob || '2009-01-01',
         fatherName: data.father_name,
         motherName: data.mother_name || '',
@@ -254,9 +254,14 @@ class SupabaseApiService {
         studentId: record.student_id,
         feeType: this.determineFeeType(record),
         amount: parseFloat(record.pending_fees || '0'),
+        totalAmount: parseFloat(record.total_fees || '0'),
+        paidAmount: parseFloat(record.paid_fees || '0'),
+        discountAmount: parseFloat(record.discount_fees || '0'),
+        busAmount: parseFloat(record.bus_fees || '0'),
         dueDate: record.due_date,
         status: this.determineFeeStatus(record),
         paymentDate: record.last_payment_date,
+        paymentHistory: record.payment_history || [],
         transactionId: undefined,
       }));
 
@@ -268,17 +273,27 @@ class SupabaseApiService {
   }
 
   private determineFeeType(record: any): string {
-    if (record.bus_fees && parseFloat(record.bus_fees) > 0) {
+    const totalFees = parseFloat(record.total_fees || '0');
+    const busFees = parseFloat(record.bus_fees || '0');
+    
+    if (busFees > 0 && totalFees > busFees) {
+      return 'Tuition + Bus Fee';
+    } else if (busFees > 0) {
       return 'Bus Fee';
     }
     return 'Tuition Fee';
   }
 
-  private determineFeeStatus(record: any): 'pending' | 'paid' | 'overdue' {
+  private determineFeeStatus(record: any): 'pending' | 'paid' | 'overdue' | 'partial' {
     const pendingFees = parseFloat(record.pending_fees || '0');
+    const paidFees = parseFloat(record.paid_fees || '0');
     
     if (pendingFees <= 0) {
       return 'paid';
+    }
+    
+    if (paidFees > 0) {
+      return 'partial';
     }
     
     const dueDate = new Date(record.due_date);
@@ -291,7 +306,7 @@ class SupabaseApiService {
     return 'pending';
   }
 
-  async payFee(feeId: string, paymentData: any): Promise<ApiResponse<{ transactionId: string }>> {
+  async payFee(feeId: string, paymentData: any): Promise<ApiResponse<{ transactionId: string; remainingBalance: number }>> {
     try {
       const { data, error } = await supabase
         .rpc('process_fee_payment', {
@@ -312,7 +327,10 @@ class SupabaseApiService {
 
       return { 
         success: true, 
-        data: { transactionId: result.transaction_id } 
+        data: { 
+          transactionId: result.transaction_id,
+          remainingBalance: result.remaining_balance
+        } 
       };
     } catch (error) {
       console.error('Payment error:', error);
@@ -337,12 +355,15 @@ class SupabaseApiService {
         id: record.exam_id.toString(),
         studentId: record.student_id,
         examName: record.exam_type,
-        subject: 'Overall', // For overall exam record
+        subject: 'Overall',
         maxMarks: record.total_marks || 100,
         obtainedMarks: record.obtained_marks || 0,
         grade: record.grade || 'N/A',
         date: record.exam_date,
         semester: 'Current',
+        percentage: record.percentage || 0,
+        subjectMarks: record.subject_marks || [],
+        coScholasticMarks: record.co_scholastic_marks || [],
       }));
 
       return { success: true, data: examRecords };
@@ -352,7 +373,7 @@ class SupabaseApiService {
     }
   }
 
-  // Homework - Mock data for now (you can implement this based on your needs)
+  // Homework using database function
   async getHomework(studentId: string): Promise<ApiResponse<Homework[]>> {
     try {
       console.log('🔍 Fetching homework for student:', studentId);
@@ -368,18 +389,14 @@ class SupabaseApiService {
       }
 
       const homework: Homework[] = (data || []).map((record: any) => ({
-        id: record.homework_id.toString(),
-        studentId: studentId,
-        subject: record.subject,
+        id: record.homework_id,
         title: record.title,
         description: record.description,
-        dueDate: record.due_date,
+        subject: record.subject,
+        due_date: record.due_date,
+        created_at: record.created_at,
+        attachment_url: record.attachment_url,
         status: this.determineHomeworkStatus(record),
-        submissionDate: record.submitted_at,
-        teacherComments: record.teacher_comments,
-        grade: record.grade,
-        attachmentUrl: record.attachment_url,
-        submissionId: record.submission_id?.toString(),
       }));
 
       return { success: true, data: homework };
@@ -390,10 +407,7 @@ class SupabaseApiService {
   }
 
   private determineHomeworkStatus(record: any): 'pending' | 'submitted' | 'overdue' {
-    if (record.submission_id) {
-      return 'submitted';
-    }
-    
+    // For now, all homework is pending since we don't have submission tracking yet
     const dueDate = new Date(record.due_date);
     const today = new Date();
     
@@ -454,7 +468,7 @@ class SupabaseApiService {
       
       return { 
         success: true, 
-        data: { submissionId: result.submission_id.toString() } 
+        data: { submissionId: result.submission_id } 
       };
     } catch (error) {
       console.error('Homework submission error:', error);
@@ -462,7 +476,7 @@ class SupabaseApiService {
     }
   }
 
-  // Notices - Real data from database
+  // Notices using database function
   async getNotices(): Promise<ApiResponse<Notice[]>> {
     try {
       console.log('🔍 Fetching notices...');
@@ -480,7 +494,7 @@ class SupabaseApiService {
         title: record.title,
         content: record.message,
         date: record.created_at.split('T')[0],
-        priority: record.priority,
+        priority: record.priority || 'medium',
         category: this.mapNoticeCategory(record.type),
       }));
 
@@ -503,7 +517,7 @@ class SupabaseApiService {
     return categoryMap[type] || 'General';
   }
 
-  // Notifications - Real data from database
+  // Notifications using database function
   async getNotifications(studentId: string): Promise<ApiResponse<Notification[]>> {
     try {
       console.log('🔍 Fetching notifications for student:', studentId);
@@ -549,7 +563,25 @@ class SupabaseApiService {
   async markNotificationAsRead(notificationId: string): Promise<ApiResponse<void>> {
     try {
       console.log('📝 Marking notification as read:', notificationId);
-      // For now, we'll just log this - you can implement a read status table later
+      
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        return { success: false, error: 'Not authenticated' };
+      }
+      
+      const decoded = JSON.parse(atob(token));
+      const studentId = decoded.studentId;
+      
+      const { data, error } = await supabase
+        .rpc('mark_notification_read', {
+          p_notification_id: parseInt(notificationId),
+          p_student_id: parseInt(studentId)
+        });
+
+      if (error) {
+        return { success: false, error: error.message };
+      }
+
       return { success: true };
     } catch (error) {
       return { success: false, error: 'Failed to mark notification as read' };
@@ -559,7 +591,7 @@ class SupabaseApiService {
   async markAllNotificationsAsRead(studentId: string): Promise<ApiResponse<void>> {
     try {
       console.log('📝 Marking all notifications as read for student:', studentId);
-      // For now, we'll just log this - you can implement a read status table later
+      // For now, we'll just return success since we don't have a bulk update function
       return { success: true };
     } catch (error) {
       return { success: false, error: 'Failed to mark all notifications as read' };
