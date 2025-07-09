@@ -16,6 +16,8 @@ import { Notice, Notification } from '../types';
 // NoticesAndNotifications and ProfileSection can be added later
 
 const StudentPortal: React.FC = () => {
+  const [showNoticesAndNotifications, setShowNoticesAndNotifications] = useState(false);
+
   const { student, logout } = useAuth();
   const { feeRecords, examRecords, notices, loading, error, refreshData } = useStudentData();
   const [activeTab, setActiveTab] = useState('dashboard');
