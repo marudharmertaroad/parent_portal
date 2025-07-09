@@ -72,16 +72,14 @@ class ApiService {
   
   // --- FIX: This function is now correctly placed INSIDE the ApiService class ---
   async getNotices(studentClass: string, medium: string): Promise<Notice[]> {
-    try {
-      const { data, error } = await supabase
+    const { data, error } = await supabase
         .from('notices')
         .select('*')
         .eq('is_active', true)
-        .or(`target_class.is.null,and(target_class.eq.${studentClass},medium.eq.${medium})`); // Re-added medium filter
+        .or(`target_class.is.null,target_class.eq.${studentClass}`);
         
       if (error) throw error;
       
-      // Map the data to your Notice type
       return (data || []).map(n => ({
         id: n.id,
         title: n.title,
