@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { apiService } from '../services/api';
-import { FeeRecord, ExamRecord, Homework, Notice } from '../types';
+import { FeeRecord, ExamRecord, Notice } from '../types';
 
 export const useStudentData = () => {
   const { student } = useAuth(); // Get the currently logged-in student
@@ -11,14 +11,13 @@ export const useStudentData = () => {
   // State for all the different types of data
   const [feeRecords, setFeeRecords] = useState<FeeRecord[]>([]);
   const [examRecords, setExamRecords] = useState<ExamRecord[]>([]);
-  const [homework, setHomework] = useState<Homework[]>([]);
   const [notices, setNotices] = useState<Notice[]>([]);
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
-    // If there's no logged-in student, we can't fetch anything.
+    // If there's no student, there's nothing to fetch.
     if (!student || !student.id) {
         setLoading(false);
         return;
@@ -28,7 +27,7 @@ export const useStudentData = () => {
     setError(null);
 
     try {
-      // Use Promise.all to fetch everything concurrently for better performance
+      // Use Promise.all to fetch everything at the same time for better performance
       const [
         feesResponse,
         examsResponse,
@@ -39,10 +38,9 @@ export const useStudentData = () => {
         apiService.getNotices(student.class, student.medium),
       ]);
 
-      // Set state with the fetched data, defaulting to empty arrays if anything fails
-      setFeeRecords(feesResponse || []);
-      setExamRecords(examsResponse || []);
-      setNotices(noticesResponse || []);
+      setFeeRecords(feesResponse);
+      setExamRecords(examsResponse);
+      setNotices(noticesResponse);
 
     } catch (err: any) {
       console.error("Error fetching student data:", err);
@@ -50,20 +48,19 @@ export const useStudentData = () => {
     } finally {
       setLoading(false);
     }
-  }, [student]); // This hook re-runs whenever the 'student' object changes (i.e., on login/logout)
+  }, [student]); // This hook re-runs whenever the 'student' object changes (i.e., on login)
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  // Return all the data and states for the component to use
+  // Expose all the data and states for the components to use
   return {
     feeRecords,
     examRecords,
-    homework, // We will handle homework inside its own component
     notices,
     loading,
     error,
-    refreshData: fetchData, // Expose a function to allow manual refresh
+    refreshData: fetchData, // A function to allow manual refresh
   };
 };
