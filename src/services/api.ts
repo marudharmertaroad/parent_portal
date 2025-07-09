@@ -1,11 +1,13 @@
-// src/services/api.ts
+// src/services/api.ts (The single, unified API service file)
 
-import { supabase } from '../lib/supabase'; // Make sure this path is correct
-import { LoginCredentials, Student, FeeRecord, ExamRecord, Homework, Notice } from '../types';
+import { supabase } from '../lib/supabase'; // Use your correct path to the supabase client
+import { LoginCredentials, Student, FeeRecord, ExamRecord, Notice, Homework } from '../types'; // Import all types from your central file
 
 class ApiService {
-  
-  // --- The Login Function ---
+  /**
+   * Logs in a student by verifying their SR No. and Date of Birth.
+   * On success, it returns the full, correctly mapped Student object.
+   */
   async login(credentials: LoginCredentials): Promise<Student> {
     const { rollNumber, dateOfBirth } = credentials;
     if (!rollNumber || !dateOfBirth) {
@@ -15,26 +17,30 @@ class ApiService {
     const { data, error } = await supabase
       .from('students')
       .select('*')
-      .eq('sr_no', rollNumber.trim())
+      .eq('sr_no', rollNumber.trim()) // Match database column
       .eq('dob', dateOfBirth)
       .single();
 
-    if (error || !data) {
+    if (error) {
       console.error("Login API Error:", error);
-      throw new Error("Invalid credentials or student not found.");
+      // Provide a user-friendly error for the most common failure case
+      if (error.code === 'PGRST116') { // "0 rows found"
+        throw new Error("Invalid SR Number or Date of Birth. Please check your details.");
+      }
+      throw new Error("Could not verify credentials. Please try again later.");
     }
 
-    // Map database snake_case to our frontend camelCase Student type
+    // Map the database columns (snake_case) to our frontend Student type (camelCase)
     return {
       id: data.id,
-      srNo: data.sr_no,
       name: data.name,
       class: data.class,
-      medium: data.medium,
+      srNo: data.sr_no,
       fatherName: data.father_name,
       motherName: data.mother_name,
       contact: data.contact,
       address: data.address,
+      medium: data.medium,
       gender: data.gender,
       dob: data.dob,
       bus_route: data.bus_route,
@@ -44,17 +50,24 @@ class ApiService {
     };
   }
 
-  // --- Data Fetching Functions ---
-
+  /**
+   * Fetches all fee records for a specific student using their database ID.
+   */
   async getFeeRecords(studentId: number): Promise<FeeRecord[]> {
     const { data, error } = await supabase
       .from('fee_records')
       .select('*')
-      .eq('student_primary_id', studentId);
-    if (error) throw error;
-    // Map data to FeeRecord type
+      .eq('student_primary_id', studentId); // Use the foreign key
+
+    if (error) {
+      console.error("API Error fetching fees:", error);
+      throw new Error("Failed to fetch fee records.");
+    }
+    
+    // Map data to the FeeRecord type
     return (data || []).map(r => ({
         recordId: r.id,
+        studentId: r.student_id, // This is the sr_no
         totalFees: r.total_fees,
         paidFees: r.paid_fees,
         pendingFees: r.pending_fees,
@@ -65,36 +78,53 @@ class ApiService {
     }));
   }
 
+  /**
+   * Fetches all exam records for a specific student.
+   */
   async getExamRecords(studentId: number): Promise<ExamRecord[]> {
     const { data, error } = await supabase
         .from('exam_records')
         .select('*')
         .eq('student_primary_id', studentId)
         .order('exam_date', { ascending: false });
-    if (error) throw error;
+
+    if (error) {
+        console.error("API Error fetching exams:", error);
+        throw new Error("Failed to fetch exam records.");
+    }
+
     return (data || []).map(r => ({
         id: r.id,
+        studentId: r.student_id,
         examType: r.exam_type,
         totalMarks: r.total_marks,
         obtainedMarks: r.obtained_marks,
         percentage: r.percentage,
         grade: r.grade,
-        examDate: r.exam_date
+        examDate: r.exam_date,
+        created_at: r.created_at, // Pass this along if needed
     }));
   }
-  
-  // Note: HomeworkSection will have its own fetch logic, so we don't need one here.
 
+  /**
+   * Fetches all notices for a student's class or for everyone.
+   */
   async getNotices(studentClass: string, medium: string): Promise<Notice[]> {
     const { data, error } = await supabase
       .from('notices')
       .select('*')
       .eq('is_active', true)
-      .or(`target_class.is.null,and(target_class.eq.${studentClass},medium.eq.${medium})`)
-      .order('created_at', { ascending: false });
-    if (error) throw error;
+      // This query gets notices where target_class is NULL (for all)
+      // OR where target_class matches the student's class and medium
+      .or(`target_class.is.null,and(target_class.eq.${studentClass},medium.eq.${medium})`);
+      
+    if (error) {
+      console.error("API Error fetching notices:", error);
+      throw new Error("Failed to fetch notices.");
+    }
     return data || [];
   }
 }
 
+// Create and export a single instance of the service for the whole app to use
 export const apiService = new ApiService();
