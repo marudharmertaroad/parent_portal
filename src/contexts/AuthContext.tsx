@@ -4,18 +4,18 @@ import React, { createContext, useContext, useState, useEffect, ReactNode, useCa
 import { Student, LoginCredentials } from '../types';
 import { apiService } from '../services/api';
 
-// Define the shape of the data and functions the context will provide
+// Define the shape of the data the context will provide
 interface AuthContextType {
-  student: Student | null;
-  isLoading: boolean;
+  student: Student | null; // The currently logged-in student object
+  isLoading: boolean;      // To show a loading spinner on app start
   login: (credentials: LoginCredentials) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
 }
 
-// Create the context with a default undefined value
+// Create the context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Create a custom hook for easy access to the context
+// Create a custom hook for easy access
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
@@ -24,7 +24,7 @@ export const useAuth = () => {
   return context;
 };
 
-// Create the Provider component that will wrap our app
+// Create the Provider component
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [student, setStudent] = useState<Student | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -32,39 +32,30 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // This effect runs once when the app loads to check for a saved session
   useEffect(() => {
     try {
-      const savedStudentData = localStorage.getItem('studentData');
+      const savedStudentData = localStorage.getItem('parentPortalStudent');
       if (savedStudentData) {
-        // If we find student data in localStorage, parse it and set it as the current user
         setStudent(JSON.parse(savedStudentData));
       }
     } catch (error) {
       console.error("Failed to parse student data from localStorage", error);
-      // If parsing fails, clear the invalid data
-      localStorage.removeItem('studentData');
+      localStorage.removeItem('parentPortalStudent');
     } finally {
-      // We're done checking, so stop showing the initial loading spinner
-      setIsLoading(false);
+      setIsLoading(false); // Done checking, stop initial loading
     }
   }, []);
 
-  // The login function that the LoginForm will call
+  // The login function that LoginForm will call
   const login = useCallback(async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     try {
-      // Call our clean apiService login method
       const loggedInStudent = await apiService.login(credentials);
       
-      // If successful, save the student data to localStorage and update the state
-      localStorage.setItem('studentData', JSON.stringify(loggedInStudent));
+      localStorage.setItem('parentPortalStudent', JSON.stringify(loggedInStudent));
       setStudent(loggedInStudent);
       
       return { success: true };
     } catch (error: any) {
-      // If it fails, return the error message to be displayed on the login form
-      return { 
-        success: false, 
-        error: error.message || 'An unknown error occurred.' 
-      };
+      return { success: false, error: error.message };
     } finally {
       setIsLoading(false);
     }
@@ -73,17 +64,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // The logout function
   const logout = useCallback(() => {
     setStudent(null);
-    localStorage.removeItem('studentData');
-    // You could also redirect the user to the login page here if needed
+    localStorage.removeItem('parentPortalStudent');
   }, []);
   
-  // The value that will be available to all components wrapped by this provider
-  const value = {
-    student,
-    isLoading,
-    login,
-    logout,
-  };
+  // The value provided to all child components
+  const value = { student, isLoading, login, logout };
 
   return (
     <AuthContext.Provider value={value}>
