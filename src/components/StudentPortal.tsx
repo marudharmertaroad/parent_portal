@@ -86,10 +86,11 @@ const StudentPortal: React.FC = () => {
       </div>
 
      <NoticesAndNotifications
-  isOpen={showNoticesAndNotifications}
-  onClose={() => setShowNoticesAndNotifications(false)}
-  notices={notices}
-  notifications={personalNotifications}
+        // --- FIX: Use the correct state variable and setter ---
+        isOpen={showNoticesAndNotifications}
+        onClose={() => setShowNoticesAndNotifications(false)}
+        notices={notices}
+        notifications={personalNotifications}
       />
 
      {showProfile && (
