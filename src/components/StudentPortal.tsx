@@ -59,6 +59,8 @@ const StudentPortal: React.FC = () => {
         studentName={student.name}
         onLogout={logout}
         onMenuClick={() => setIsMobileMenuOpen(true)}
+        onNotificationClick={() => setShowNoticesModal(true)} // Hook up the button
+        onProfileClick={() => setShowProfileModal(true)}
       />
       <div className="flex">
         <Sidebar
