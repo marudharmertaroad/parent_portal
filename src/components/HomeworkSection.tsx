@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '/src/lib/supabase';
 import { Homework } from '../types';
-import { BookOpen, Calendar, Clock, AlertCircle, FileText, ExternalLink } from 'lucide-react';
-import { formatDate } from '../utils';
+import { 
+    BookOpen, Calendar, Clock, Link as LinkIcon, AlertCircle, FileText, 
+    ExternalLink, Download, Eye // <-- ADD 'Eye' HERE
+} from 'lucide-react';import { formatDate } from '../utils';
 
 interface HomeworkSectionProps {
   student?: {
