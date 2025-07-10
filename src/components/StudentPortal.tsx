@@ -18,7 +18,7 @@ import { X } from 'lucide-react';
 
 const StudentPortal: React.FC = () => {
   const { student, logout } = useAuth();
-  const { feeRecords, examRecords, notices, loading, error, refreshData } = useStudentData();
+  const { feeRecords, examRecords, notices, notifications, loading, error, refreshData } = useStudentData();
 
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
