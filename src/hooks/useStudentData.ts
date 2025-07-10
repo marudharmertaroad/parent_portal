@@ -34,6 +34,7 @@ export const useStudentData = () => {
         feesResponse,
         examsResponse,
         noticesResponse,
+        notificationsResponse,
       ] = await Promise.all([
         apiService.getFeeRecords(student.id),
         apiService.getExamRecords(student.id),
