@@ -108,7 +108,39 @@ class ApiService {
     }
   }
 
-} // <-- The class now correctly ends here
+}
+async getNotifications(student: Student): Promise<Notification[]> {
+    if (!student || !student.class || !student.medium || !student.srNo) {
+        return [];
+    }
+    
+    try {
+        const { data, error } = await supabase
+            .from('notifications')
+            .select('*')
+            .or(
+                `target_audience.eq.all,` +
+                `and(target_audience.eq.class_specific,target_class.eq.${student.class},target_medium.eq.${student.medium}),` +
+                `and(target_audience.eq.student_specific,target_student_sr_no.eq.${student.srNo})`
+            )
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        
+        return (data || []).map(n => ({
+            id: n.id,
+            title: n.title,
+            message: n.message,
+            type: n.type,
+            date: n.created_at,
+            read: false // Placeholder, implement read status later if needed
+        }));
+
+    } catch (error) {
+        console.error("API Error fetching notifications:", error);
+        throw new Error("Failed to fetch personal notifications.");
+    }
+  }// <-- The class now correctly ends here
 
 // Create and export a single instance of the service for the whole app to use
 export const apiService = new ApiService();
