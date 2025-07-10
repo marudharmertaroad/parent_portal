@@ -45,6 +45,7 @@ apiService.getNotices(student.class),
       setFeeRecords(feesResponse);
       setExamRecords(examsResponse);
       setNotices(noticesResponse);
+      setNotifications(notificationsResponse);
 
     } catch (err: any) {
       console.error("Error fetching student data:", err);
