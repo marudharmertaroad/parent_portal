@@ -20,28 +20,33 @@ const AdmitCard: React.FC<AdmitCardProps> = ({ student }) => {
     const [loading, setLoading] = useState(true);
   useEffect(() => {
 
-    const fetchDatesheet = useCallback(async () => {
-        setLoading(true);
-        const { data, error } = await supabase
-            .from('datesheets')
-            .select('exam_title, schedule')
-            .eq('class_name', student.class)
-            .eq('medium', student.medium)
-            .order('created_at', { ascending: false })
-            .limit(1) // Get the most recently created datesheet for the class
-            .single();
+    const fetchDatesheet = async () => {
+            // Guard clause: If there's no student or they don't have a class/medium, do nothing.
+            if (!student || !student.class || !student.medium) {
+                setLoading(false);
+                return;
+            }
+            
+            setLoading(true);
+            const { data, error } = await supabase
+                .from('datesheets')
+                .select('exam_title, schedule')
+                .eq('class_name', student.class)
+                .eq('medium', student.medium)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single();
 
-        if (error && error.code !== 'PGRST116') {
-            console.error("Error fetching datesheet:", error);
-        } else if (data) {
-            setDatesheet(data);
-        }
-        setLoading(false);
-    }, [student.class, student.medium]);
+            if (error && error.code !== 'PGRST116') {
+                console.error("Error fetching datesheet:", error);
+            } else if (data) {
+                setDatesheet(data);
+            }
+            setLoading(false);
+        };
 
-    useEffect(() => {
         fetchDatesheet();
-    }, [fetchDatesheet]);
+    }, [student]);
 
     const handlePrint = () => window.print();
 
