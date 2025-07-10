@@ -68,8 +68,7 @@ const StudentPortal: React.FC = () => {
         studentName={student.name}
         onLogout={logout}
         onMenuClick={() => setIsMobileMenuOpen(true)}
-        // --- FIX: Use the correct state setter function ---
-        onNotificationClick={() => setShowNoticesAndNotifications(true)}
+        onNotificationClick={() => setShowNotificationModal(true)} // This now only opens the notification modal
         onProfileClick={() => setShowProfileModal(true)}
         unreadNotifications={unreadCount}
       />
@@ -80,7 +79,7 @@ const StudentPortal: React.FC = () => {
           isOpen={isMobileMenuOpen}
           onClose={() => setIsMobileMenuOpen(false)}
         />
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-6 lg:ml-64">
           <div className="max-w-7xl mx-auto">
             {renderContent()}
           </div>
