@@ -173,7 +173,8 @@ const AcademicRecords: React.FC<AcademicRecordsProps> = ({ student, examRecords 
     };
   }, [examRecords]);
 
-  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+  return (
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center space-x-4">
           <div className="p-3 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl">
             <Award className="w-8 h-8 text-white" />
@@ -269,7 +270,7 @@ const AcademicRecords: React.FC<AcademicRecordsProps> = ({ student, examRecords 
           </table>
         </div>
       </div>
-        
+
       <ExamDetailsModal exam={selectedExam} onClose={() => setSelectedExam(null)} />
       <AdmitCardModal 
         isOpen={showAdmitCard}
