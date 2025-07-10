@@ -1,0 +1,21 @@
+{
+  "short_name": "MDS Portal",
+  "name": "Marudhar Defence School - Parent Portal",
+  "description": "Access academic records, fees, and homework for your child.",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/logo512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#0000ff",
+  "background_color": "#ffffff"
+}
