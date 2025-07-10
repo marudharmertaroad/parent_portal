@@ -198,15 +198,15 @@ const AcademicRecords: React.FC<AcademicRecordsProps> = ({ student, examRecords 
           <p className="text-sm font-medium text-gray-600">Overall Percentage</p>
           <p className="text-3xl font-bold text-green-600">{stats.overallPercentage.toFixed(1)}%</p>
         </div>
-        <div className="bg-white rounded-xl p-6 shadow-md border">
+          <div className="bg-white rounded-xl p-6 shadow-md border">
           <p className="text-sm font-medium text-gray-600">Exams Appeared</p>
           <p className="text-3xl font-bold text-blue-600">{stats.examsTaken}</p>
-        </div>
+          </div>
         <div className="bg-white rounded-xl p-6 shadow-md border">
           <p className="text-sm font-medium text-gray-600">Best Subject</p>
           <p className="text-3xl font-bold text-purple-600">{stats.bestSubject}</p>
         </div>
-    
+      </div>
 
       {/* --- RESPONSIVE FIX: Table layout adjusted for mobile --- */}
       <div className="bg-white rounded-xl shadow-md border overflow-hidden">
