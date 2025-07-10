@@ -1,8 +1,8 @@
-// src/components/NoticesAndNotifications.tsx (CORRECTED)
+// src/components/NoticesAndNotifications.tsx
 
 import React, { useState } from 'react';
 import { Notice, Notification } from '../types';
-import { Bell, Megaphone, X } from 'lucide-react';
+import { Bell, Megaphone, X, Calendar, AlertTriangle } from 'lucide-react';
 import { formatDate } from '../utils';
 
 interface Props {
@@ -12,63 +12,72 @@ interface Props {
   notifications: Notification[];
 }
 
-const NoticesAndNotifications: React.FC<Props> = ({ isOpen, onClose, notices, notifications = [] }) => {
+const NoticesAndNotifications: React.FC<Props> = ({ isOpen, onClose, notices, notifications }) => {
   const [activeTab, setActiveTab] = useState<'notices' | 'notifications'>('notices');
 
-  if (!isOpen) {
-    return null;
+  if (!isOpen) return null;
+
+  const getNotificationPillStyle = (type: string) => {
+    switch(type) {
+      case 'urgent': return 'bg-red-100 text-red-800';
+      case 'fee': return 'bg-yellow-100 text-yellow-800';
+      case 'exam': return 'bg-purple-100 text-purple-800';
+      default: return 'bg-blue-100 text-blue-800';
+    }
   }
 
   return (
-    // This is the corrected line
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[80vh] flex flex-col shadow-2xl">
-        {/* Header */}
-        <div className="p-6 border-b flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-gray-800">Updates & Alerts</h2>
-          <button onClick={onClose} className="p-2 rounded-full text-gray-400 hover:bg-gray-100">
-            <X size={24} />
-          </button>
+      <div className="bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl">
+        <div className="flex justify-between items-center p-6 border-b">
+          <h2 className="text-2xl font-bold text-gray-800">Updates Center</h2>
+          <button onClick={onClose} className="p-2 rounded-full text-gray-400 hover:bg-gray-100"><X size={24} /></button>
         </div>
 
-        {/* Tab Buttons */}
         <div className="flex border-b p-2 bg-gray-50">
           <button
             onClick={() => setActiveTab('notices')}
-            className={`flex-1 py-2 px-4 rounded-lg font-semibold text-sm transition-all ${
-              activeTab === 'notices' ? 'bg-blue-600 text-white shadow' : 'text-gray-600'
-            }`}
+            className={`flex-1 py-3 font-semibold transition-all ${activeTab === 'notices' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
           >
-            <Megaphone size={16} className="inline mr-2" /> School Notices
+            <Megaphone className="inline-block mr-2" size={18} /> General Notices
           </button>
           <button
             onClick={() => setActiveTab('notifications')}
-            className={`flex-1 py-2 px-4 rounded-lg font-semibold text-sm transition-all ${
-              activeTab === 'notifications' ? 'bg-blue-600 text-white shadow' : 'text-gray-600'
-            }`}
+            className={`flex-1 py-3 font-semibold transition-all relative ${activeTab === 'notifications' ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-500'}`}
           >
-            <Bell size={16} className="inline mr-2" /> Personal Notifications
+            <Bell className="inline-block mr-2" size={18} /> Personal Alerts
+            {notifications.length > 0 && <span className="absolute top-2 right-4 w-2 h-2 bg-red-500 rounded-full"></span>}
           </button>
         </div>
-        
-        {/* Content */}
-        <div className="p-6 overflow-y-auto">
+
+        <div className="p-6 overflow-y-auto bg-gray-50/50 flex-1">
           {activeTab === 'notices' && (
             <div className="space-y-4">
               {notices.length > 0 ? notices.map(notice => (
-                <div key={notice.id} className="p-4 border rounded-lg bg-blue-50/50">
-                  <p className="font-bold text-blue-800">{notice.title}</p>
-                  <p className="text-gray-700 mt-1 text-sm">{notice.content}</p>
-                  <p className="text-xs text-gray-500 mt-2">Posted on: {formatDate(notice.created_at)}</p>
+                <div key={notice.id} className="p-5 border rounded-lg bg-white shadow-sm">
+                  <h3 className="font-bold text-gray-900">{notice.title}</h3>
+                  <p className="text-sm text-gray-500 mt-1 mb-3">Posted on: {formatDate(notice.created_at)}</p>
+                  <p className="text-gray-700 whitespace-pre-wrap">{notice.content}</p>
                 </div>
-              )) : <p className="text-center text-gray-500 py-8">No new school notices.</p>}
+              )) : <p className="text-center text-gray-500 py-10">No general notices available.</p>}
             </div>
           )}
 
           {activeTab === 'notifications' && (
-             <div className="text-center text-gray-500 py-8">
-                <p>Personal notifications are coming soon!</p>
-             </div>
+            <div className="space-y-4">
+              {notifications.length > 0 ? notifications.map(notification => (
+                <div key={notification.id} className={`p-5 border rounded-lg bg-white shadow-sm`}>
+                  <div className="flex justify-between items-start">
+                      <h3 className="font-bold text-gray-900">{notification.title}</h3>
+                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getNotificationPillStyle(notification.type)}`}>
+                        {notification.type.toUpperCase()}
+                      </span>
+                  </div>
+                  <p className="text-sm text-gray-500 mt-1 mb-3">Received: {formatDate(notification.date)}</p>
+                  <p className="text-gray-700 whitespace-pre-wrap">{notification.message}</p>
+                </div>
+              )) : <p className="text-center text-gray-500 py-10">No personal alerts to show.</p>}
+            </div>
           )}
         </div>
       </div>
