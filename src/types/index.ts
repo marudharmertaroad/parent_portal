@@ -72,3 +72,16 @@ export interface Notice {
   content: string;
   created_at: string;
 }
+export interface Notification {
+  id: number;
+  title: string;
+  message: string;
+  type: 'general' | 'homework' | 'fee' | 'exam' | 'event' | 'urgent';
+  target_audience: 'all' | 'class_specific' | 'student_specific';
+  target_class?: string;
+  target_medium?: string;
+  target_student_sr_no?: string;
+  created_at: string;
+  sent_at?: string;
+  read?: boolean; // Make 'read' optional, as it might not be in the DB yet
+}
