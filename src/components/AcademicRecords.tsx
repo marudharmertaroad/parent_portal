@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { ExamRecord, SubjectMark } from '../types';
 import { formatDate, getGradeColor, calculateGrade } from '../utils'; // Make sure these are in your utils file
-import { Award, TrendingUp, Book, FileText, X } from 'lucide-react';
+import { Award, TrendingUp, Book, Printer, FileText, X } from 'lucide-react';
 const AdmitCardModal: React.FC<{ isOpen: boolean; onClose: () => void; student: Student }> = ({ isOpen, onClose, student }) => {
   // This modal will have its own logic to fetch the datesheet
   const [datesheet, setDatesheet] = useState<any>(null);
