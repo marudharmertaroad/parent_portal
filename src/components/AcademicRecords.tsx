@@ -77,6 +77,7 @@ const AdmitCardModal: React.FC<{ isOpen: boolean; onClose: () => void; student: 
 
 
 interface AcademicRecordsProps {
+  student: Student;
   examRecords: ExamRecord[];
 }
 
