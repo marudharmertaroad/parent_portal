@@ -64,27 +64,39 @@ const StudentPortal: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Header
-        studentName={student.name}
-        onLogout={logout}
-        onMenuClick={() => setIsMobileMenuOpen(true)}
-        onNotificationClick={() => setShowNotificationModal(true)} // This now only opens the notification modal
-        onProfileClick={() => setShowProfileModal(true)}
-        unreadNotifications={unreadCount}
-      />
-      <div className="flex">
-        <Sidebar
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          isOpen={isMobileMenuOpen}
-          onClose={() => setIsMobileMenuOpen(false)}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <Header
+          onLogout={logout}
+          onMenuClick={() => setIsMobileMenuOpen(true)}
+          onNotificationClick={() => setShowNotificationModal(true)}
+          unreadNotifications={(notifications || []).filter(n => !n.read).length}
         />
-        <main className="flex-1 p-6 lg:ml-64">
+        
+        <main className="flex-1 overflow-y-auto p-6 bg-gray-100">
           <div className="max-w-7xl mx-auto">
+
+            {/* --- FIX: Student name and welcome message moved here --- */}
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-800">Welcome, {student.name}!</h1>
+                <p className="text-gray-500">Class: {student.class} | SR Number: {student.srNo}</p>
+              </div>
+              <button 
+                onClick={() => setShowProfileModal(true)}
+                className="flex items-center space-x-2 p-2 rounded-full hover:bg-gray-200 transition"
+              >
+                <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg">
+                  {student.name.charAt(0).toUpperCase()}
+                </div>
+                <span className="hidden sm:block font-semibold text-gray-700">{student.name}</span>
+              </button>
+            </div>
+
             {renderContent()}
           </div>
         </main>
       </div>
+
 
      <NotificationModal
         isOpen={showNotificationModal}
