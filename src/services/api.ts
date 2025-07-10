@@ -57,18 +57,32 @@ class ApiService {
   }
 
   async getExamRecords(studentId: number): Promise<ExamRecord[]> {
-    const { data, error } = await supabase.from('exam_records').select('*').eq('student_primary_id', studentId).order('exam_date', { ascending: false });
+    const { data, error } = await supabase
+        .from('exam_records')
+        // We must also fetch the related subject marks
+        .select('*, subject_marks(*)') 
+        .eq('student_primary_id', studentId)
+        .order('exam_date', { ascending: false });
+
     if (error) throw error;
+    
     return (data || []).map(r => ({
-      id: r.id,
-      examType: r.exam_type,
-      totalMarks: r.total_marks,
-      obtainedMarks: r.obtained_marks,
-      percentage: r.percentage,
-      grade: r.grade,
-      examDate: r.exam_date,
+        id: r.id,
+        examType: r.exam_type,
+        totalMarks: r.total_marks,
+        obtainedMarks: r.obtained_marks,
+        percentage: r.percentage,
+        grade: r.grade,
+        examDate: r.exam_date,
+        // Map the subject marks
+        subjects: (r.subject_marks || []).map(sm => ({
+            subject: sm.subject,
+            maxMarks: sm.max_marks,
+            obtainedMarks: sm.obtained_marks,
+            grade: sm.grade,
+        }))
     }));
-  }
+}
   
   // --- FIX: This function is now correctly placed INSIDE the ApiService class ---
   async getNotices(studentClass: string, medium: string): Promise<Notice[]> {
