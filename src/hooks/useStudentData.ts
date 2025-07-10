@@ -12,6 +12,8 @@ export const useStudentData = () => {
   const [feeRecords, setFeeRecords] = useState<FeeRecord[]>([]);
   const [examRecords, setExamRecords] = useState<ExamRecord[]>([]);
   const [notices, setNotices] = useState<Notice[]>([]);
+    const [notifications, setNotifications] = useState<Notification[]>([]);
+
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
