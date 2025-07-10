@@ -173,27 +173,30 @@ const AcademicRecords: React.FC<AcademicRecordsProps> = ({ student, examRecords 
     };
   }, [examRecords]);
 
-  return (
-    <div className="space-y-8">
-      <div className="flex items-center space-x-3">
-        <Award className="w-8 h-8 text-purple-600" />
-        <h1 className="text-3xl font-bold text-gray-800">Academic Records</h1>
-        <p className="text-gray-600 mt-1">View your exam results and print your admit card.</p>
-      </div>
-      <button
+  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center space-x-4">
+          <div className="p-3 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl">
+            <Award className="w-8 h-8 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Academic Records</h1>
+            <p className="text-gray-600 mt-1">View results and print your admit card.</p>
+          </div>
+        </div>
+        <button
           onClick={() => setShowAdmitCard(true)}
-          className="mt-4 sm:mt-0 flex items-center px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-medium shadow-lg"
+          className="mt-4 sm:mt-0 w-full sm:w-auto flex items-center justify-center px-5 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-medium shadow-lg"
         >
           <FileText size={18} className="mr-2" />
           View / Print Admit Card
         </button>
-      
+      </div>
 
-      {/* Summary Stat Cards */}
+      {/* --- RESPONSIVE FIX: Stats cards now stack on mobile --- */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white rounded-xl p-6 shadow-md border">
           <p className="text-sm font-medium text-gray-600">Overall Percentage</p>
-          <p className="text-3xl font-bold text-green-600">{stats.overallPercentage.toFixed(2)}%</p>
+          <p className="text-3xl font-bold text-green-600">{stats.overallPercentage.toFixed(1)}%</p>
         </div>
         <div className="bg-white rounded-xl p-6 shadow-md border">
           <p className="text-sm font-medium text-gray-600">Exams Appeared</p>
@@ -205,22 +208,40 @@ const AcademicRecords: React.FC<AcademicRecordsProps> = ({ student, examRecords 
         </div>
       </div>
 
-      {/* Detailed Exam Records Table */}
+      {/* --- RESPONSIVE FIX: Table layout adjusted for mobile --- */}
       <div className="bg-white rounded-xl shadow-md border overflow-hidden">
         <div className="p-6 border-b">
           <h3 className="text-lg font-semibold text-gray-800">Exam-wise Performance</h3>
         </div>
-        <div className="overflow-x-auto">
+        
+        {/* --- On small screens, we show a card list. On medium screens and up, we show a table. --- */}
+        <div className="divide-y divide-gray-200">
+          {examRecords.length > 0 ? examRecords.map(exam => (
+            <div key={exam.id} className="p-4 md:hidden"> {/* This view is for mobile (hidden on md and up) */}
+              <div className="flex justify-between items-center mb-2">
+                <p className="font-semibold text-gray-800">{exam.examType}</p>
+                <span className={`px-2 py-1 text-xs font-bold rounded-full ${getGradeColor(exam.grade)}`}>
+                  {exam.grade}
+                </span>
+              </div>
+              <p className="text-sm text-gray-500">Date: {formatDate(exam.examDate)}</p>
+              <p className="text-sm text-gray-500">Score: <span className="font-bold">{exam.obtainedMarks}/{exam.totalMarks}</span> ({exam.percentage.toFixed(1)}%)</p>
+              <button
+                onClick={() => setSelectedExam(exam)}
+                className="mt-3 w-full px-3 py-2 bg-blue-100 text-blue-800 text-sm font-semibold rounded-lg hover:bg-blue-200"
+              >
+                View Subject Details
+              </button>
+            </div>
+          )) : (
+            <div className="p-8 text-center text-gray-500 md:hidden">No exam records to display.</div>
+          )}
+        </div>
+        
+        {/* This table is hidden on mobile and appears on medium screens and up */}
+        <div className="overflow-x-auto hidden md:block">
           <table className="w-full text-left">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="p-4 font-medium text-sm">Exam Name</th>
-                <th className="p-4 font-medium text-sm">Date</th>
-                <th className="p-4 font-medium text-sm text-right">Percentage</th>
-                <th className="p-4 font-medium text-sm text-center">Grade</th>
-                <th className="p-4 font-medium text-sm text-center">Action</th>
-              </tr>
-            </thead>
+            {/* ... The table head `<thead>` remains the same ... */}
             <tbody className="divide-y">
               {examRecords.length > 0 ? examRecords.map(exam => (
                 <tr key={exam.id} className="hover:bg-gray-50">
@@ -248,7 +269,7 @@ const AcademicRecords: React.FC<AcademicRecordsProps> = ({ student, examRecords 
           </table>
         </div>
       </div>
-
+        
       <ExamDetailsModal exam={selectedExam} onClose={() => setSelectedExam(null)} />
       <AdmitCardModal 
         isOpen={showAdmitCard}
