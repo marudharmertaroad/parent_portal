@@ -64,6 +64,7 @@ apiService.getNotices(student.class),
     feeRecords,
     examRecords,
     notices,
+    notifications,
     loading,
     error,
     refreshData: fetchData, // A function to allow manual refresh
