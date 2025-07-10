@@ -8,8 +8,8 @@ interface SidebarProps {
   onTabChange: (tab: string) => void;
   isOpen: boolean;
   onClose: () => void;
+  studentName: string; // <-- ADD THIS LINE
 }
-
 const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, isOpen, onClose }) => {
   const navItems = [
     { id: 'dashboard', name: 'Dashboard', icon: Home },
