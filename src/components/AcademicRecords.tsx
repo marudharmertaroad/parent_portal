@@ -132,6 +132,7 @@ const ExamDetailsModal: React.FC<{ exam: ExamRecord | null, onClose: () => void 
 
 
 const AcademicRecords: React.FC<AcademicRecordsProps> = ({ examRecords = [] }) => {
+  const [showAdmitCard, setShowAdmitCard] = useState(false);
   const [selectedExam, setSelectedExam] = useState<ExamRecord | null>(null);
 
   // --- Calculate Stats using useMemo for performance ---
