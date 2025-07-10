@@ -36,6 +36,13 @@ export interface FeeRecord {
 }
 
 // For displaying exam records
+export interface SubjectMark {
+  subject: string;
+  maxMarks: number;
+  obtainedMarks: number;
+  grade?: string;
+}
+
 export interface ExamRecord {
   id: number;
   examType: string;
@@ -44,6 +51,7 @@ export interface ExamRecord {
   percentage: number;
   grade?: string;
   examDate: string;
+  subjects: SubjectMark[]; // <-- ADD THIS LINE
 }
 
 // For displaying homework
