@@ -82,7 +82,7 @@ const StudentPortal: React.FC = () => {
       />
       
       {/* This main element is now the only part that scrolls */}
-      <main className="flex-1 overflow-y-auto p-6">
+<main className="flex-1 overflow-y-auto p-6 lg:pl-64">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <div>
