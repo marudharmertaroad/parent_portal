@@ -249,6 +249,11 @@ const AcademicRecords: React.FC<AcademicRecordsProps> = ({ examRecords = [] }) =
       </div>
 
       <ExamDetailsModal exam={selectedExam} onClose={() => setSelectedExam(null)} />
+      <AdmitCardModal 
+        isOpen={showAdmitCard}
+        onClose={() => setShowAdmitCard(false)}
+        student={student}
+      />
     </div>
   );
 };
