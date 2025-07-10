@@ -24,7 +24,7 @@ const StudentPortal: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   // These are the correct state variables
-  const [showNoticesAndNotifications, setShowNoticesAndNotifications] = useState(false);
+  const [showNotificationModal, setShowNotificationModal] = useState(false); 
   const [showProfileModal, setShowProfileModal] = useState(false);
   
   const personalNotifications: Notification[] = []; 
