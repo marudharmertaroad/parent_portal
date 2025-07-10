@@ -56,8 +56,7 @@ const StudentPortal: React.FC = () => {
         return <HomeworkSection student={student} />;
         case 'notices': // <-- New case for the Notice Board tab
         return <NoticeBoard notices={notices} />;
-        case 'admit-card':
-  return <AdmitCard student={student} />;
+        
       default:
         return <Dashboard student={student} feeRecords={feeRecords} examRecords={examRecords} notices={notices} />;
     }
