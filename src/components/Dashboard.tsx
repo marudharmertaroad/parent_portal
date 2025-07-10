@@ -3,69 +3,61 @@
 import React from 'react';
 import { Student, FeeRecord, ExamRecord, Notice } from '../types';
 import { 
-  DollarSign, 
-  FileText, 
-  BookOpen, 
-  Bell, 
-  TrendingUp,
-  Calendar,
-  School,
-  User,
-  CheckCircle,
-  AlertCircle
+  DollarSign, FileText, Bell, TrendingUp, School, User, Phone
 } from 'lucide-react';
-import { formatDate } from '../utils';
-import { getGradeColor } from '../utils'; // Make sure this is in your utils file
-import HomeworkSection from './HomeworkSection'; 
+import { formatDate, getGradeColor } from '../utils';
 
 interface DashboardProps {
   student: Student;
   feeRecords: FeeRecord[];
   examRecords: ExamRecord[];
   notices: Notice[];
+  // We will need a function to open the profile modal from the parent
+  onProfileClick: () => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({
   student,
   feeRecords = [],
   examRecords = [],
-  notices = []
+  notices = [],
+  onProfileClick // Receive the function as a prop
 }) => {
-  // --- Calculations for Stat Cards ---
-  const pendingFees = feeRecords.filter(fee => fee.status === 'Pending' || fee.status === 'Overdue');
+  const pendingFees = feeRecords.filter(fee => fee.status !== 'Paid');
   const averageScore = examRecords.length > 0 
     ? examRecords.reduce((sum, exam) => sum + exam.percentage, 0) / examRecords.length
     : 0;
 
   const stats = [
-    { title: 'Pending Dues', value: pendingFees.length, icon: DollarSign, color: 'from-red-500 to-orange-500', textColor: 'text-red-600' },
+    { title: 'Pending Dues', value: pendingFees.length, icon: DollarSign, color: 'from-red-500 to-orange-500', textColor: 'text-red-600', isCurrency: true },
     { title: 'Average Score', value: `${averageScore.toFixed(1)}%`, icon: TrendingUp, color: 'from-green-500 to-emerald-600', textColor: 'text-green-600' },
     { title: 'School Notices', value: notices.length, icon: Bell, color: 'from-blue-500 to-indigo-600', textColor: 'text-blue-600' }
   ];
 
   return (
     <div className="space-y-8">
-      {/* --- FIX: New School-Focused Welcome Banner --- */}
+      {/* School-Focused Welcome Banner */}
       <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-800 rounded-2xl p-8 text-white relative overflow-hidden shadow-2xl">
         <div className="absolute -bottom-12 -right-12 opacity-10">
           <School className="w-64 h-64" />
         </div>
         <div className="relative z-10">
           <h2 className="text-4xl font-bold mb-3">Marudhar Defence School</h2>
-          <p className="text-blue-100 text-lg">Excellence in Education & Character - Welcome to the Parent Portal</p>
-          <p className="text-sm text-blue-200 mt-4 max-w-2xl">
-            Here you can track academic progress, view fee details, and stay updated with important school announcements. We are committed to a transparent and collaborative educational journey.
-          </p>
+          <p className="text-blue-100 text-lg">Welcome to the Parent & Student Portal</p>
         </div>
       </div>
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {stats.map((stat, index) => (
-          <div key={index} className="bg-white rounded-xl p-6 shadow-md border border-gray-200 hover:shadow-lg transition-shadow transform hover:-translate-y-1">
+          <div key={index} className="bg-white rounded-xl p-6 shadow-md border hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 mb-1">{stat.title}</p>
-                <p className={`text-3xl font-bold ${stat.textColor}`}>{stat.value}</p>
+                {/* --- FIX: Conditionally add the Rupee sign --- */}
+                <p className={`text-3xl font-bold ${stat.textColor}`}>
+                  {stat.isCurrency ? `₹${pendingFees.reduce((sum, fee) => sum + fee.pendingFees, 0).toLocaleString('en-IN')}` : stat.value}
+                </p>
               </div>
               <div className={`w-14 h-14 ${stat.color} rounded-xl flex items-center justify-center shadow-md`}>
                 <stat.icon size={28} className="text-white" />
@@ -74,6 +66,29 @@ const Dashboard: React.FC<DashboardProps> = ({
           </div>
         ))}
       </div>
+
+      {/* --- NEW: Dedicated Student Profile Card --- */}
+      <div className="bg-white rounded-xl p-6 shadow-md border">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center space-x-4">
+                  <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-3xl">
+                      {student.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                      <h3 className="text-xl font-bold text-gray-800">{student.name}</h3>
+                      <p className="text-gray-500">Class: {student.class} | SR No: {student.srNo}</p>
+                  </div>
+              </div>
+              <button
+                  onClick={onProfileClick} // Use the prop to open the modal
+                  className="mt-4 sm:mt-0 flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium text-sm transition-colors"
+              >
+                  <User size={16} className="mr-2" />
+                  View Full Profile
+              </button>
+          </div>
+      </div>
+      
 
       {/* Recent Activity & Upcoming Deadlines Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
