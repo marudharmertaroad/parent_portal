@@ -120,10 +120,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         </div>
       </div>
       
-      {/* Homework Section */}
-      <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
-        <HomeworkSection student={student} />
-      </div>
+      
     </div>
   );
 };
