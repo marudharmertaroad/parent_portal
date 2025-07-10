@@ -18,6 +18,7 @@ interface DatesheetData {
 const AdmitCard: React.FC<AdmitCardProps> = ({ student }) => {
     const [datesheet, setDatesheet] = useState<DatesheetData | null>(null);
     const [loading, setLoading] = useState(true);
+  useEffect(() => {
 
     const fetchDatesheet = useCallback(async () => {
         setLoading(true);
