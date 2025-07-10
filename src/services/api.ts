@@ -86,68 +86,38 @@ class ApiService {
   
   // --- FIX: This function is now correctly placed INSIDE the ApiService class ---
   async getNotices(studentClass: string, medium: string): Promise<Notice[]> {
-    try {
-      const { data, error } = await supabase
-        .from('notices')
-        .select('*')
-        .eq('is_active', true)
-        .or(`target_class.is.null,target_class.eq.${studentClass}`);
-        
-      if (error) throw error;
+    const { data, error } = await supabase
+      .from('notices')
+      .select('*')
+      .eq('is_active', true)
+      // This gets notices for ALL or for the student's SPECIFIC class.
+      .or(`target_class.is.null,target_class.eq.${studentClass}`);
       
-      return (data || []).map(n => ({
-        id: n.id,
-        title: n.title,
-        content: n.content,
-        created_at: n.created_at,
-      }));
-
-    } catch (error: any) {
+    if (error) {
       console.error("API Error fetching notices:", error);
-      throw new Error("Failed to fetch notices.");
+      throw new Error("Failed to fetch school notices.");
     }
+    return data || [];
   }
+
+  // --- NEW, CORRECT getNotifications FUNCTION ---
   async getNotifications(student: Student): Promise<Notification[]> {
-    // Safety check
-    if (!student || !student.class || !student.medium || !student.srNo) {
-        return [];
+    const { data, error } = await supabase
+      .from('notifications')
+      .select('*')
+      // This gets notifications for ALL, for the student's CLASS+MEDIUM, or for the specific STUDENT
+      .or(
+        `target_audience.eq.all,` +
+        `and(target_audience.eq.class_specific,target_class.eq.${student.class},target_medium.eq.${student.medium}),` +
+        `and(target_audience.eq.student_specific,target_student_sr_no.eq.${student.srNo})`
+      );
+
+    if (error) {
+      console.error("API Error fetching notifications:", error);
+      throw new Error("Failed to fetch personal notifications.");
     }
-
-    try {
-        // --- THIS IS THE CORRECTED QUERY ---
-        const { data, error } = await supabase
-            .from('notifications')
-            .select('*')
-            // The .or() filter finds rows that match ANY of these conditions:
-            .or(
-                // 1. Where the audience is 'all'
-                'target_audience.eq.all',
-                // 2. OR where it's for this student's specific class AND medium
-                `and(target_audience.eq.class_specific,target_class.eq.${student.class},target_medium.eq.${student.medium})`,
-                // 3. OR where it's for this student's specific SR Number
-                `and(target_audience.eq.student_specific,target_student_sr_no.eq.${student.srNo})`
-            )
-            .order('created_at', { ascending: false });
-
-        if (error) {
-            throw error;
-        }
-
-        // Map the data to your Notification type
-        return (data || []).map((n): Notification => ({
-            id: n.id,
-            title: n.title,
-            message: n.message,
-            type: n.type,
-            target_audience: n.target_audience,
-            created_at: n.created_at,
-            // Add other properties if they exist in your type/table
-        }));
-
-    } catch (error: any) {
-        console.error("API Error fetching notifications:", error);
-        throw new Error("Failed to fetch personal notifications.");
-    }
+    return data || [];
+  }
 }
 
 }
