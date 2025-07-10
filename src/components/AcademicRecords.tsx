@@ -179,6 +179,14 @@ const AcademicRecords: React.FC<AcademicRecordsProps> = ({ examRecords = [] }) =
         <h1 className="text-3xl font-bold text-gray-800">Academic Records</h1>
         <p className="text-gray-600 mt-1">View your exam results and print your admit card.</p>
       </div>
+      <button
+          onClick={() => setShowAdmitCard(true)}
+          className="mt-4 sm:mt-0 flex items-center px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-medium shadow-lg"
+        >
+          <FileText size={18} className="mr-2" />
+          View / Print Admit Card
+        </button>
+      </div>
 
       {/* Summary Stat Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
