@@ -107,9 +107,7 @@ class ApiService {
       throw new Error("Failed to fetch notices.");
     }
   }
-
-}
-async getNotifications(student: Student): Promise<Notification[]> {
+  async getNotifications(student: Student): Promise<Notification[]> {
     if (!student || !student.class || !student.medium || !student.srNo) {
         return [];
     }
@@ -140,7 +138,10 @@ async getNotifications(student: Student): Promise<Notification[]> {
         console.error("API Error fetching notifications:", error);
         throw new Error("Failed to fetch personal notifications.");
     }
-  }// <-- The class now correctly ends here
+  }
+
+}
+// <-- The class now correctly ends here
 
 // Create and export a single instance of the service for the whole app to use
 export const apiService = new ApiService();
