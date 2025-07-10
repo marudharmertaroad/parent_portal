@@ -16,6 +16,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, isOpen, onClo
     { id: 'fees', name: 'Fee Details', icon: CreditCard },
     { id: 'academic', name: 'Academic Records', icon: Award },
     { id: 'homework', name: 'Homework', icon: BookOpen },
+    { id: 'notices', name: 'Notice Board', icon: Megaphone },
   ];
 
   const sidebarClasses = `
