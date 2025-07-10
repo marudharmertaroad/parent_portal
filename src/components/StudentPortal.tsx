@@ -15,15 +15,15 @@ import NoticeBoard from './NoticeBoard'; // <-- Import the new NoticeBoard
 import NotificationModal from './NotificationModal';
 import { X } from 'lucide-react';
 // NoticesAndNotifications and ProfileSection can be added later
-
 const StudentPortal: React.FC = () => {
-  const StudentPortal: React.FC = () => {
-  // --- FIX: Call hooks at the top level, before any return statements or JSX ---
   const { student, logout } = useAuth();
-  const { feeRecords, examRecords, notices, loading, error, refreshData } = useStudentData();
+  const { feeRecords, examRecords, notices, notifications, loading, error, refreshData } = useStudentData();
+
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [showNotificationModal, setShowNotificationModal] = useState(false);
+  
+  // These are the correct state variables
+  const [showNotificationModal, setShowNotificationModal] = useState(false); 
   const [showProfileModal, setShowProfileModal] = useState(false);
   
   const personalNotifications: Notification[] = []; 
