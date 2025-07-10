@@ -193,7 +193,6 @@ const AcademicRecords: React.FC<AcademicRecordsProps> = ({ student, examRecords 
         </button>
       </div>
 
-      {/* --- RESPONSIVE FIX: Stats cards now stack on mobile --- */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white rounded-xl p-6 shadow-md border">
           <p className="text-sm font-medium text-gray-600">Overall Percentage</p>
@@ -207,7 +206,7 @@ const AcademicRecords: React.FC<AcademicRecordsProps> = ({ student, examRecords 
           <p className="text-sm font-medium text-gray-600">Best Subject</p>
           <p className="text-3xl font-bold text-purple-600">{stats.bestSubject}</p>
         </div>
-      </div>
+    
 
       {/* --- RESPONSIVE FIX: Table layout adjusted for mobile --- */}
       <div className="bg-white rounded-xl shadow-md border overflow-hidden">
