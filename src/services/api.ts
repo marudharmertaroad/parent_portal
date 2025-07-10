@@ -120,7 +120,7 @@ class ApiService {
   }
 }
 
-}
+
 // <-- The class now correctly ends here
 
 // Create and export a single instance of the service for the whole app to use
