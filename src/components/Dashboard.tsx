@@ -3,7 +3,7 @@
 import React from 'react';
 import { Student, FeeRecord, ExamRecord, Notice } from '../types';
 import { 
-  DollarSign, FileText, Bell, TrendingUp, School, User, Phone
+  DollarSign, FileText, Bell, TrendingUp, Calendar, School, User, Phone
 } from 'lucide-react';
 import { formatDate, getGradeColor } from '../utils';
 
