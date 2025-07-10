@@ -73,7 +73,7 @@ const NoticesAndNotifications: React.FC<Props> = ({ isOpen, onClose, notices, no
                         {notification.type.toUpperCase()}
                       </span>
                   </div>
-                  <p className="text-sm text-gray-500 mt-1 mb-3">Received: {formatDate(notification.date)}</p>
+                  <p className="text-sm text-gray-500 mt-1 mb-3">Received: {formatDate(notification.created_at)}</p>
                   <p className="text-gray-700 whitespace-pre-wrap">{notification.message}</p>
                 </div>
               )) : <p className="text-center text-gray-500 py-10">No personal alerts to show.</p>}
