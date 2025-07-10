@@ -186,7 +186,7 @@ const AcademicRecords: React.FC<AcademicRecordsProps> = ({ examRecords = [] }) =
           <FileText size={18} className="mr-2" />
           View / Print Admit Card
         </button>
-      </div>
+      
 
       {/* Summary Stat Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
