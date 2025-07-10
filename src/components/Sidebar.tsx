@@ -10,7 +10,7 @@ interface SidebarProps {
   onClose: () => void;
   studentName: string; // <-- ADD THIS LINE
 }
-const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, isOpen, onClose }) => {
+const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, isOpen, onClose, studentName }) => {
   const navItems = [
     { id: 'dashboard', name: 'Dashboard', icon: Home },
     { id: 'fees', name: 'Fee Details', icon: CreditCard },
