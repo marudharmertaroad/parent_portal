@@ -21,7 +21,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, isOpen, onClo
 
   const sidebarClasses = `
     fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-xl transform transition-transform
-    lg:relative lg:translate-x-0
+    lg:translate-x-0  // The sidebar is always translated on large screens
     ${isOpen ? 'translate-x-0' : '-translate-x-full'}
   `;
 
