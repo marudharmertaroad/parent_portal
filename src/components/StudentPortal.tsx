@@ -86,11 +86,11 @@ const StudentPortal: React.FC = () => {
       </div>
 
      <NoticesAndNotifications
-    isOpen={showNoticesModal}
-    onClose={() => setShowNoticesModal(false)}
-    notices={notices}
-    notifications={notifications} // Pass the fetched notifications
-  />
+  isOpen={showNoticesAndNotifications}
+  onClose={() => setShowNoticesAndNotifications(false)}
+  notices={notices}
+  notifications={personalNotifications}
+/>
       {showProfileModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl max-w-4xl w-full m-4 max-h-[90vh] overflow-y-auto">
