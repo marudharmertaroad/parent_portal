@@ -39,6 +39,7 @@ export const useStudentData = () => {
         apiService.getFeeRecords(student.id),
         apiService.getExamRecords(student.id),
 apiService.getNotices(student.class),
+        apiService.getNotifications(student),
       ]);
 
       setFeeRecords(feesResponse);
