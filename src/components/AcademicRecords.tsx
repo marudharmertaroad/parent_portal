@@ -4,6 +4,77 @@ import React, { useState, useMemo } from 'react';
 import { ExamRecord, SubjectMark } from '../types';
 import { formatDate, getGradeColor, calculateGrade } from '../utils'; // Make sure these are in your utils file
 import { Award, TrendingUp, Book, FileText, X } from 'lucide-react';
+const AdmitCardModal: React.FC<{ isOpen: boolean; onClose: () => void; student: Student }> = ({ isOpen, onClose, student }) => {
+  // This modal will have its own logic to fetch the datesheet
+  const [datesheet, setDatesheet] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      const fetchDatesheet = async () => {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('datesheets')
+          .select('exam_title, schedule')
+          .eq('class_name', student.class)
+          .eq('medium', student.medium)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+        
+        if (data) setDatesheet(data);
+        setLoading(false);
+      };
+      fetchDatesheet();
+    }
+  }, [isOpen, student.class, student.medium]);
+
+  const handlePrint = () => window.print();
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+      <style>{`@media print { .no-print { display: none; } #printable-admit-card { margin: 0; padding: 0; border: none; box-shadow: none; } }`}</style>
+      <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] flex flex-col">
+        <div id="printable-admit-card" className="p-8 overflow-y-auto">
+          {loading ? (
+            <p>Loading Exam Schedule...</p>
+          ) : datesheet ? (
+            <>
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-bold">MARUDHAR DEFENCE SCHOOL</h2>
+                <h3 className="text-lg font-semibold text-gray-700">{datesheet.exam_title}</h3>
+                <h4 className="text-md text-gray-600">ADMIT CARD</h4>
+              </div>
+              <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
+                <div><p><strong>Student:</strong> {student.name}</p><p><strong>Class:</strong> {student.class} ({student.medium})</p></div>
+                <div className="text-right"><p><strong>SR No:</strong> {student.srNo}</p><p><strong>Father's Name:</strong> {student.fatherName}</p></div>
+              </div>
+              <table className="w-full border-collapse">
+                <thead className="bg-gray-100"><tr><th className="border p-2">Date</th><th className="border p-2">Day</th><th className="border p-2">Subject</th><th className="border p-2">Time</th></tr></thead>
+                <tbody>
+                  {datesheet.schedule.map((row: any) => (
+                    <tr key={row.subject}><td className="border p-2">{formatDate(row.date)}</td><td className="border p-2">{row.day}</td><td className="border p-2 font-medium">{row.subject}</td><td className="border p-2">{row.time}</td></tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
+          ) : (
+            <p className="text-center text-red-500">No admit card or exam schedule has been published for your class yet.</p>
+          )}
+        </div>
+        <div className="p-4 border-t flex justify-end space-x-3 no-print">
+          <button onClick={onClose} className="px-4 py-2 border rounded-lg hover:bg-gray-100">Close</button>
+          <button onClick={handlePrint} disabled={!datesheet} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
+            <Printer size={16} className="inline mr-2" />Print Admit Card
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 
 interface AcademicRecordsProps {
   examRecords: ExamRecord[];
