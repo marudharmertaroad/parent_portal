@@ -102,22 +102,73 @@ class ApiService {
 
   // --- NEW, CORRECT getNotifications FUNCTION ---
   async getNotifications(student: Student): Promise<Notification[]> {
-    const { data, error } = await supabase
-      .from('notifications')
-      .select('*')
-      // This gets notifications for ALL, for the student's CLASS+MEDIUM, or for the specific STUDENT
-      .or(
-        `target_audience.eq.all,` +
-        `and(target_audience.eq.class_specific,target_class.eq.${student.class},target_medium.eq.${student.medium}),` +
-        `and(target_audience.eq.student_specific,target_student_sr_no.eq.${student.srNo})`
-      );
-
-    if (error) {
-      console.error("API Error fetching notifications:", error);
-      throw new Error("Failed to fetch personal notifications.");
+    // Safety check to ensure we have a valid student object
+    if (!student || !student.class || !student.medium || !student.srNo) {
+        console.warn("getNotifications called without complete student data. Returning empty array.");
+        return [];
     }
-    return data || [];
-  }
+
+    try {
+        // We will make three simple, separate queries and combine the results.
+        // This is much more reliable than one complex .or() filter.
+
+        // Query 1: Get notifications for 'all'
+        const allPromise = supabase
+            .from('notifications')
+            .select('*')
+            .eq('target_audience', 'all');
+
+        // Query 2: Get notifications for the student's specific class and medium
+        const classPromise = supabase
+            .from('notifications')
+            .select('*')
+            .eq('target_audience', 'class_specific')
+            .eq('target_class', student.class)
+            .eq('target_medium', student.medium);
+
+        // Query 3: Get notifications for this specific student by their SR number
+        const studentPromise = supabase
+            .from('notifications')
+            .select('*')
+            .eq('target_audience', 'student_specific')
+            .eq('target_student_sr_no', student.srNo);
+
+        // Run all three queries at the same time
+        const [allRes, classRes, studentRes] = await Promise.all([allPromise, classPromise, studentPromise]);
+
+        // Check for errors in any of the queries
+        if (allRes.error) throw allRes.error;
+        if (classRes.error) throw classRes.error;
+        if (studentRes.error) throw studentRes.error;
+
+        // Combine the results from all three queries
+        const combinedData = [
+            ...(allRes.data || []),
+            ...(classRes.data || []),
+            ...(studentRes.data || [])
+        ];
+
+        // Remove duplicate notifications (in case one was sent multiple ways)
+        const uniqueNotifications = Array.from(new Map(combinedData.map(item => [item.id, item])).values());
+        
+        // Sort by creation date
+        uniqueNotifications.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+        // Map the final, unique data to our frontend Notification type
+        return uniqueNotifications.map((n): Notification => ({
+            id: n.id,
+            title: n.title,
+            message: n.message,
+            type: n.type,
+            created_at: n.created_at,
+            read: false, // Default to unread
+            // Add other properties as needed
+        }));
+
+    } catch (error: any) {
+        console.error("API Error fetching notifications:", error);
+        throw new Error("Failed to fetch personal notifications.");
+    }
 }
 
 
