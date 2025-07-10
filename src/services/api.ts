@@ -108,37 +108,47 @@ class ApiService {
     }
   }
   async getNotifications(student: Student): Promise<Notification[]> {
+    // Safety check
     if (!student || !student.class || !student.medium || !student.srNo) {
         return [];
     }
-    
+
     try {
+        // --- THIS IS THE CORRECTED QUERY ---
         const { data, error } = await supabase
             .from('notifications')
             .select('*')
+            // The .or() filter finds rows that match ANY of these conditions:
             .or(
-                `target_audience.eq.all,` +
-                `and(target_audience.eq.class_specific,target_class.eq.${student.class},target_medium.eq.${student.medium}),` +
+                // 1. Where the audience is 'all'
+                'target_audience.eq.all',
+                // 2. OR where it's for this student's specific class AND medium
+                `and(target_audience.eq.class_specific,target_class.eq.${student.class},target_medium.eq.${student.medium})`,
+                // 3. OR where it's for this student's specific SR Number
                 `and(target_audience.eq.student_specific,target_student_sr_no.eq.${student.srNo})`
             )
             .order('created_at', { ascending: false });
 
-        if (error) throw error;
-        
-        return (data || []).map(n => ({
+        if (error) {
+            throw error;
+        }
+
+        // Map the data to your Notification type
+        return (data || []).map((n): Notification => ({
             id: n.id,
             title: n.title,
             message: n.message,
             type: n.type,
-            date: n.created_at,
-            read: false // Placeholder, implement read status later if needed
+            target_audience: n.target_audience,
+            created_at: n.created_at,
+            // Add other properties if they exist in your type/table
         }));
 
-    } catch (error) {
+    } catch (error: any) {
         console.error("API Error fetching notifications:", error);
         throw new Error("Failed to fetch personal notifications.");
     }
-  }
+}
 
 }
 // <-- The class now correctly ends here
