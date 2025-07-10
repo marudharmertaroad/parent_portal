@@ -45,24 +45,19 @@ const Dashboard: React.FC<DashboardProps> = ({
 
   return (
     <div className="space-y-8">
-      {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-2xl p-8 text-white relative overflow-hidden shadow-lg">
-        <div className="absolute -bottom-10 -right-10 opacity-10">
-          <School className="w-48 h-48" />
+      {/* --- FIX: New School-Focused Welcome Banner --- */}
+      <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-800 rounded-2xl p-8 text-white relative overflow-hidden shadow-2xl">
+        <div className="absolute -bottom-12 -right-12 opacity-10">
+          <School className="w-64 h-64" />
         </div>
         <div className="relative z-10">
-          <div className="flex items-center space-x-4">
-            <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center border-2 border-white/50">
-              <span className="text-3xl font-bold">{student.name.charAt(0)}</span>
-            </div>
-            <div>
-              <h2 className="text-3xl font-bold">Welcome, {student.name}</h2>
-              <p className="text-blue-100 text-lg mt-1">Class: {student.class} | SR Number: {student.srNo}</p>
-            </div>
-          </div>
+          <h2 className="text-4xl font-bold mb-3">Marudhar Defence School</h2>
+          <p className="text-blue-100 text-lg">Excellence in Education & Character - Welcome to the Parent Portal</p>
+          <p className="text-sm text-blue-200 mt-4 max-w-2xl">
+            Here you can track academic progress, view fee details, and stay updated with important school announcements. We are committed to a transparent and collaborative educational journey.
+          </p>
         </div>
       </div>
-
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {stats.map((stat, index) => (
