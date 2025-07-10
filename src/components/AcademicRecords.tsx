@@ -174,7 +174,9 @@ const AcademicRecords: React.FC<AcademicRecordsProps> = ({ student, examRecords 
   }, [examRecords]);
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+    <div className="space-y-8">
+      {/* --- RESPONSIVE FIX: Header now stacks on mobile --- */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center space-x-4">
           <div className="p-3 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl">
             <Award className="w-8 h-8 text-white" />
@@ -193,15 +195,16 @@ const AcademicRecords: React.FC<AcademicRecordsProps> = ({ student, examRecords 
         </button>
       </div>
 
+      {/* --- RESPONSIVE FIX: Stats cards now stack on mobile --- */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white rounded-xl p-6 shadow-md border">
           <p className="text-sm font-medium text-gray-600">Overall Percentage</p>
           <p className="text-3xl font-bold text-green-600">{stats.overallPercentage.toFixed(1)}%</p>
         </div>
-          <div className="bg-white rounded-xl p-6 shadow-md border">
+        <div className="bg-white rounded-xl p-6 shadow-md border">
           <p className="text-sm font-medium text-gray-600">Exams Appeared</p>
           <p className="text-3xl font-bold text-blue-600">{stats.examsTaken}</p>
-          </div>
+        </div>
         <div className="bg-white rounded-xl p-6 shadow-md border">
           <p className="text-sm font-medium text-gray-600">Best Subject</p>
           <p className="text-3xl font-bold text-purple-600">{stats.bestSubject}</p>
