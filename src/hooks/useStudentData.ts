@@ -56,12 +56,14 @@ console.log("🚀 Starting to fetch all student data...");
         noticesResponse,
         notificationsResponse,
       ] = await Promise.all([
-        apiService.getFeeRecords(student.id),
-        apiService.getExamRecords(student.id),
-apiService.getNotices(student.class),
-        apiService.getNotifications(student),
+        feesPromise,
+        examsPromise,
+        noticesPromise,
+        notificationsResponse,
       ]);
-
+      
+      console.log("✅ All data fetches completed.");
+      
       setFeeRecords(feesResponse);
       setExamRecords(examsResponse);
       setNotices(noticesResponse);
