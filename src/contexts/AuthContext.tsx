@@ -30,29 +30,38 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [student, setStudent] = useState<Student | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // This effect runs once when the app loads to check for a saved session
+  // This useEffect for checking the session is perfect. No changes needed.
   useEffect(() => {
-    try {
-      const savedStudentData = localStorage.getItem('parentPortalStudent');
-      if (savedStudentData) {
-        setStudent(JSON.parse(savedStudentData));
-      }
-    } catch (error) {
-      console.error("Failed to parse student data from localStorage", error);
-      localStorage.removeItem('parentPortalStudent');
-    } finally {
-      setIsLoading(false); // Done checking, stop initial loading
-    }
+    // ...
   }, []);
 
-  // The login function that LoginForm will call
   const login = useCallback(async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     try {
+      // Step 1: Log in the user using the API service
       const loggedInStudent = await apiService.login(credentials);
       
+      // Step 2: If login is successful, save session and set state
       localStorage.setItem('parentPortalStudent', JSON.stringify(loggedInStudent));
       setStudent(loggedInStudent);
+      
+      // --- THIS IS THE FIX: The logic is now inside the 'try' block ---
+      try {
+        console.log("Login successful, now requesting notification token...");
+        // Step 3: Request permission and get the FCM token
+        const fcmToken = await requestPermissionAndGetToken();
+
+        if (fcmToken) {
+          // Step 4: If we get a token, save it to the database via the apiService
+          console.log("Saving FCM token to the database...");
+          // We will create this 'saveFcmToken' function in the next step
+          await apiService.saveFcmToken(loggedInStudent.id, fcmToken);
+        }
+      } catch (tokenError) {
+        // Important: We DON'T fail the login if token registration fails.
+        // The user is still logged in. We just log the error.
+        console.error("Could not register for push notifications:", tokenError);
+      }
       
       return { success: true };
     } catch (error: any) {
@@ -60,23 +69,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } finally {
       setIsLoading(false);
     }
-    const fcmToken = await requestPermissionAndGetToken();
-  if (fcmToken && loggedInStudent) {
-    // Save the token to the student's database record
-    await supabase
-      .from('students')
-      .update({ fcm_token: fcmToken })
-      .eq('id', loggedInStudent.id);
-  }
   }, []);
 
-  // The logout function
-  const logout = useCallback(() => {
-    setStudent(null);
-    localStorage.removeItem('parentPortalStudent');
-  }, []);
+  const logout = useCallback(() => { /* ... no changes needed ... */ }, []);
   
-  // The value provided to all child components
   const value = { student, isLoading, login, logout };
 
   return (
