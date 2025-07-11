@@ -11,7 +11,6 @@ const firebaseConfig = {
   storageBucket: "parent-portal-ec72d.firebasestorage.app",
   messagingSenderId: "830523731757",
   appId: "1:830523731757:web:8032d84ae0c40050476da4",
-  appId: "YOUR_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
