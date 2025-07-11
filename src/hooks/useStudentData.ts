@@ -54,12 +54,12 @@ console.log("🚀 Starting to fetch all student data...");
         feesResponse,
         examsResponse,
         noticesResponse,
-        notificationsResponse,
+        notificationsResponse, // This now correctly receives the result of notificationsPromise
       ] = await Promise.all([
         feesPromise,
         examsPromise,
         noticesPromise,
-        notificationsResponse,
+        notificationsPromise, // --- THIS IS THE FIX ---
       ]);
       
       console.log("✅ All data fetches completed.");
