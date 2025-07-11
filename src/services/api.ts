@@ -83,6 +83,22 @@ class ApiService {
         }))
     }));
 }
+  async saveFcmToken(studentId: number, fcmToken: string): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('students')
+        .update({ fcm_token: fcmToken })
+        .eq('id', studentId);
+
+      if (error) {
+        throw error;
+      }
+      console.log(`FCM token saved successfully for student ID: ${studentId}`);
+    } catch (error) {
+      // Log the error but don't crash the app
+      console.error("Failed to save FCM token:", error);
+    }
+  }
   
   // --- FIX: This function is now correctly placed INSIDE the ApiService class ---
   async getNotices(studentClass: string, medium: string): Promise<Notice[]> {
