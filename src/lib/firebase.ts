@@ -1,7 +1,7 @@
-// src/lib/firebase.ts (SECURE VERSION)
+// src/lib/firebase.ts (CORRECTED IMPORTS)
 
 import { initializeApp } from 'firebase/app';
-import { getMessaging, getToken, onMessage } from 'firebase/app-compat';
+import { getMessaging, getToken, onMessage } from 'firebase/messaging'; // Corrected import path
 
 // Read configuration securely from environment variables
 const firebaseConfig = {
@@ -14,16 +14,23 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const messaging = getMessaging(app);
+// It's good practice to only initialize messaging if it's supported by the browser
+const messaging = typeof window !== 'undefined' && typeof window.navigator !== 'undefined' ? getMessaging(app) : null;
 
 export const requestPermissionAndGetToken = async () => {
+  // If messaging is not supported, we can't get a token
+  if (!messaging) {
+    console.log("Firebase messaging is not supported in this browser.");
+    return null;
+  }
+  
   console.log('Requesting notification permission...');
   try {
     const permission = await Notification.requestPermission();
     if (permission === 'granted') {
       console.log('Notification permission granted.');
       const currentToken = await getToken(messaging, {
-        vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY, // Use the key from .env
+        vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
       });
 
       if (currentToken) {
@@ -43,10 +50,13 @@ export const requestPermissionAndGetToken = async () => {
   }
 };
 
-onMessage(messaging, (payload) => {
-  console.log('Foreground message received.', payload);
-  const notification = new Notification(payload.notification.title, {
-    body: payload.notification.body,
-    icon: '/logo.png',
+// Only set up the onMessage listener if messaging is supported
+if (messaging) {
+  onMessage(messaging, (payload) => {
+    console.log('Foreground message received.', payload);
+    const notification = new Notification(payload.notification.title, {
+      body: payload.notification.body,
+      icon: '/logo.png',
+    });
   });
-});
+}
