@@ -21,6 +21,15 @@ class ApiService {
       console.error("Login API Error:", error);
       throw new Error("Invalid SR Number or Date of Birth.");
     }
+    if (!data) {
+      console.error('[API] Query succeeded but returned no data.');
+      throw new Error("No student record found for the provided credentials.");
+    }
+
+    console.log('[API] Successfully found student data:', data);
+    return data; // Return the raw database object
+  }
+}
 
     // Map database columns to our frontend Student type
     return {
