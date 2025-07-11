@@ -14,7 +14,11 @@ export interface Student {
   dob: string;
   bus_route?: string;
   isRte: boolean;
-  // Add any other fields you need from the 'students' table
+  
+  // --- ADDED MISSING FIELDS TO MATCH YOUR DATABASE ---
+  gender?: string;
+  religion?: string;
+  nicStudentId?: string;
 }
 
 // For the Parent Login Form
