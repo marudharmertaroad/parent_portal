@@ -60,6 +60,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } finally {
       setIsLoading(false);
     }
+    const fcmToken = await requestPermissionAndGetToken();
+  if (fcmToken && loggedInStudent) {
+    // Save the token to the student's database record
+    await supabase
+      .from('students')
+      .update({ fcm_token: fcmToken })
+      .eq('id', loggedInStudent.id);
+  }
   }, []);
 
   // The logout function
