@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { Student, LoginCredentials } from '../types';
 import { apiService } from '../services/api';
+import { requestPermissionAndGetToken } from '../lib/firebase';
 
 // Define the shape of the data the context will provide
 interface AuthContextType {
