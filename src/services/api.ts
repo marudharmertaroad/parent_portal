@@ -5,7 +5,7 @@ import { LoginCredentials, Student, FeeRecord, ExamRecord, Notice } from '../typ
 
 class ApiService {
   
-  async login(credentials: LoginCredentials): Promise<Student> {
+  async login(credentials: LoginCredentials): Promise<any> {
     const { rollNumber, dateOfBirth } = credentials;
     if (!rollNumber || !dateOfBirth) throw new Error("SR Number and Date of Birth are required.");
 
