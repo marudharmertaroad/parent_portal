@@ -1,55 +1,52 @@
-// src/lib/firebase.ts
+// src/lib/firebase.ts (SECURE VERSION)
 
 import { initializeApp } from 'firebase/app';
-import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+import { getMessaging, getToken, onMessage } from 'firebase/app-compat';
 
-// Your web app's Firebase configuration
+// Read configuration securely from environment variables
 const firebaseConfig = {
-  apiKey: "AIzaSyC89Z3czVHEfgAXAMAD3sGJNKz3OHYXOw4",
-  authDomain: "parent-portal-ec72d.firebaseapp.com",
-  projectId: "parent-portal-ec72d",
-  storageBucket: "parent-portal-ec72d.firebasestorage.app",
-  messagingSenderId: "830523731757",
-  appId: "1:830523731757:web:8032d84ae0c40050476da4",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
 const app = initializeApp(firebaseConfig);
 const messaging = getMessaging(app);
 
-// Function to request permission and get the FCM token
 export const requestPermissionAndGetToken = async () => {
   console.log('Requesting notification permission...');
-  const permission = await Notification.requestPermission();
-
-  if (permission === 'granted') {
-    console.log('Notification permission granted.');
-    try {
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission === 'granted') {
+      console.log('Notification permission granted.');
       const currentToken = await getToken(messaging, {
-        vapidKey: 'BBeF_czSvvuzRfYm7FFrTee4XqZ7iU1sF4Yavx0TJ5jx08SMOoqIhwYXoEtlPZd1vo7pbx5tkLx4zTVGIdd-HRI', // From Firebase Console -> Cloud Messaging settings
+        vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY, // Use the key from .env
       });
+
       if (currentToken) {
-        console.log('FCM Token:', currentToken);
+        console.log('FCM Token generated:', currentToken);
         return currentToken;
       } else {
-        console.log('No registration token available. Request permission to generate one.');
+        console.log('No registration token available.');
         return null;
       }
-    } catch (err) {
-      console.error('An error occurred while retrieving token. ', err);
+    } else {
+      console.log('Permission not granted.');
       return null;
     }
-  } else {
-    console.log('Unable to get permission to notify.');
+  } catch (err) {
+    console.error('An error occurred while retrieving token.', err);
     return null;
   }
 };
 
-// Listen for messages when the app is in the foreground
 onMessage(messaging, (payload) => {
-  console.log('Message received. ', payload);
-  // Create a beautiful, custom notification toast here
-  new Notification(payload.notification.title, {
+  console.log('Foreground message received.', payload);
+  const notification = new Notification(payload.notification.title, {
     body: payload.notification.body,
-    icon: '/logo.png' // Optional: your school logo
+    icon: '/logo.png',
   });
 });
