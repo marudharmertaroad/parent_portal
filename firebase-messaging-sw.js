@@ -5,12 +5,12 @@ importScripts("https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compa
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY_HERE",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyC89Z3czVHEfgAXAMAD3sGJNKz3OHYXOw4",
+  authDomain: "parent-portal-ec72d.firebaseapp.com",
+  projectId: "parent-portal-ec72d",
+  storageBucket: "parent-portal-ec72d.firebasestorage.app",
+  messagingSenderId: "830523731757",
+  appId: "1:830523731757:web:8032d84ae0c40050476da4",
 };
 
 firebase.initializeApp(firebaseConfig);
