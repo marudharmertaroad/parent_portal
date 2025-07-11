@@ -28,7 +28,6 @@ class ApiService {
 
     console.log('[API] Successfully found student data:', data);
     return data; // Return the raw database object
-  }
 
 
     // Map database columns to our frontend Student type
