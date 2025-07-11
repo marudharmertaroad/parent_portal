@@ -32,18 +32,48 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // This useEffect for checking the session is perfect. No changes needed.
   useEffect(() => {
-    // ...
+    try {
+      const savedStudentData = localStorage.getItem('parentPortalStudent');
+      if (savedStudentData) {
+        setStudent(JSON.parse(savedStudentData));
+      }
+    } catch (error) {
+      console.error("Failed to parse student data from localStorage", error);
+      localStorage.removeItem('parentPortalStudent');
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
+  // --- THIS IS THE SINGLE, COMBINED, AND CORRECT LOGIN FUNCTION ---
   const login = useCallback(async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     try {
-      // Step 1: Log in the user using the API service
-      const loggedInStudent = await apiService.login(credentials);
-      
-      // Step 2: If login is successful, save session and set state
-      localStorage.setItem('parentPortalStudent', JSON.stringify(loggedInStudent));
+      // Step 1: Log in and get the raw student data from the database
+      const studentDataFromDB = await apiService.login(credentials);
+
+      // Step 2: Map the raw data to our frontend Student type
+      const loggedInStudent: Student = {
+        id: studentDataFromDB.id,
+        name: studentDataFromDB.name,
+        class: studentDataFromDB.class,
+        srNo: studentDataFromDB.sr_no,
+        fatherName: studentDataFromDB.father_name,
+        motherName: studentDataFromDB.mother_name,
+        contact: studentDataFromDB.contact,
+        address: studentDataFromDB.address,
+        medium: studentDataFromDB.medium,
+        gender: studentDataFromDB.gender,
+        dob: studentDataFromDB.dob,
+        bus_route: studentDataFromDB.bus_route,
+        religion: studentDataFromDB.religion,
+        nicStudentId: studentDataFromDB.nic_student_id,
+        isRte: studentDataFromDB.is_rte,
+      };
+
+      // Step 3: Set the state and save the session to localStorage
       setStudent(loggedInStudent);
+      localStorage.setItem('parentPortalStudent', JSON.stringify(loggedInStudent));
       
       // --- THIS IS THE FIX: The logic is now inside the 'try' block ---
       try {
@@ -71,44 +101,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, []);
 
-  const login = useCallback(async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
-    setIsLoading(true);
-    console.log('[AUTH] Login function called.');
-    try {
-      const studentDataFromDB = await apiService.login(credentials);
-
-      // --- This is the critical mapping step ---
-      // We map the database object to the frontend Student type
-      const studentForState: Student = {
-        id: studentDataFromDB.id,
-        name: studentDataFromDB.name,
-        class: studentDataFromDB.class,
-        srNo: studentDataFromDB.sr_no,
-        fatherName: studentDataFromDB.father_name,
-        motherName: studentDataFromDB.mother_name,
-        contact: studentDataFromDB.contact,
-        address: studentDataFromDB.address,
-        medium: studentDataFromDB.medium,
-        gender: studentDataFromDB.gender,
-        dob: studentDataFromDB.dob,
-        bus_route: studentDataFromDB.bus_route,
-        religion: studentDataFromDB.religion,
-        nicStudentId: studentDataFromDB.nic_student_id,
-        isRte: studentDataFromDB.is_rte,
-      };
-
-      console.log('[AUTH] Data mapped successfully. Setting state and localStorage.');
-      localStorage.setItem('parentPortalStudent', JSON.stringify(studentForState));
-      setStudent(studentForState);
-      
-      return { success: true };
-    } catch (error: any) {
-      console.error('[AUTH] Login process failed:', error.message);
-      return { success: false, error: error.message };
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  
 
   const logout = useCallback(() => {
     console.log('[AUTH] Logging out.');
