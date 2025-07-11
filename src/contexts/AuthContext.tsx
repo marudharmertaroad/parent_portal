@@ -71,7 +71,50 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, []);
 
-  const logout = useCallback(() => { /* ... no changes needed ... */ }, []);
+  const login = useCallback(async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
+    setIsLoading(true);
+    console.log('[AUTH] Login function called.');
+    try {
+      const studentDataFromDB = await apiService.login(credentials);
+
+      // --- This is the critical mapping step ---
+      // We map the database object to the frontend Student type
+      const studentForState: Student = {
+        id: studentDataFromDB.id,
+        name: studentDataFromDB.name,
+        class: studentDataFromDB.class,
+        srNo: studentDataFromDB.sr_no,
+        fatherName: studentDataFromDB.father_name,
+        motherName: studentDataFromDB.mother_name,
+        contact: studentDataFromDB.contact,
+        address: studentDataFromDB.address,
+        medium: studentDataFromDB.medium,
+        gender: studentDataFromDB.gender,
+        dob: studentDataFromDB.dob,
+        bus_route: studentDataFromDB.bus_route,
+        religion: studentDataFromDB.religion,
+        nicStudentId: studentDataFromDB.nic_student_id,
+        isRte: studentDataFromDB.is_rte,
+      };
+
+      console.log('[AUTH] Data mapped successfully. Setting state and localStorage.');
+      localStorage.setItem('parentPortalStudent', JSON.stringify(studentForState));
+      setStudent(studentForState);
+      
+      return { success: true };
+    } catch (error: any) {
+      console.error('[AUTH] Login process failed:', error.message);
+      return { success: false, error: error.message };
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const logout = useCallback(() => {
+    console.log('[AUTH] Logging out.');
+    setStudent(null);
+    localStorage.removeItem('parentPortalStudent');
+  }, []);
   
   const value = { student, isLoading, login, logout };
 
