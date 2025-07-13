@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../utils/supabaseClient';
 import { Bell, Check, X } from 'lucide-react';
-
+import { messaging } from '../../utils/firebase-init';
 // Interface for a single notification in the parent view
 interface ParentNotification {
   id: number;
