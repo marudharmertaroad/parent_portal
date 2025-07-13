@@ -13,9 +13,9 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
-// It's good practice to only initialize messaging if it's supported by the browser
-const messaging = typeof window !== 'undefined' && typeof window.navigator !== 'undefined' ? getMessaging(app) : null;
+export const messaging = typeof window !== 'undefined' && typeof window.navigator !== 'undefined' 
+  ? getMessaging(app) 
+  : null;
 
 export const requestPermissionAndGetToken = async () => {
   // If messaging is not supported, we can't get a token
