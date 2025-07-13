@@ -12,7 +12,6 @@ interface DashboardProps {
   feeRecords: FeeRecord[];
   examRecords: ExamRecord[];
   notices: Notice[];
-  // We will need a function to open the profile modal from the parent
   onProfileClick: () => void;
 }
 
