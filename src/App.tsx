@@ -4,8 +4,7 @@ import React from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import LoginForm from './components/LoginForm';
 import StudentPortal from './components/StudentPortal'; // We will create this next
-import './firebase-messaging-sw.js';
-
+import './utils/firebase';
 // A small helper component to keep our App clean
 const AppContent: React.FC = () => {
   // Get the session state from our context
