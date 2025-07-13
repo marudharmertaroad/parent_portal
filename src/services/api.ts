@@ -168,22 +168,7 @@ class ApiService {
             ...(studentRes.data || [])
         ];
 
-        // Remove duplicate notifications (in case one was sent multiple ways)
-        const uniqueNotifications = Array.from(new Map(combinedData.map(item => [item.id, item])).values());
         
-        // Sort by creation date
-        uniqueNotifications.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-
-        // Map the final, unique data to our frontend Notification type
-        return uniqueNotifications.map((n): Notification => ({
-            id: n.id,
-            title: n.title,
-            message: n.message,
-            type: n.type,
-            created_at: n.created_at,
-            read: false, // Default to unread
-            // Add other properties as needed
-        }));
 
     } catch (error: any) {
         console.error("API Error fetching notifications:", error);
