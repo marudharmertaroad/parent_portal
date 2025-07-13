@@ -126,12 +126,7 @@ class ApiService {
   }
 
   // --- NEW, CORRECT getNotifications FUNCTION ---
-  async getNotifications(student: Student): Promise<Notification[]> {
-    // Safety check to ensure we have a valid student object
-    if (!student || !student.class || !student.medium || !student.srNo) {
-        console.warn("getNotifications called without complete student data. Returning empty array.");
-        return [];
-    }
+ 
 
     try {
         // We will make three simple, separate queries and combine the results.
