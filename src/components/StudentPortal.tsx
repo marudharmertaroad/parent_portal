@@ -16,7 +16,7 @@ import { X } from 'lucide-react';
 // NoticesAndNotifications and ProfileSection can be added later
 const StudentPortal: React.FC = () => {
   const { student, logout } = useAuth();
-  const { feeRecords, examRecords, notices, notifications, loading, error, refreshData } = useStudentData();
+  const { feeRecords, examRecords, notices, loading, error, refreshData } = useStudentData();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
