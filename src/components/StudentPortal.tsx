@@ -17,16 +17,9 @@ import { X } from 'lucide-react';
 const StudentPortal: React.FC = () => {
   const { student, logout } = useAuth();
   const { feeRecords, examRecords, notices, notifications, loading, error, refreshData } = useStudentData();
-
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
-  // These are the correct state variables
-  const [showNotificationModal, setShowNotificationModal] = useState(false); 
   const [showProfileModal, setShowProfileModal] = useState(false);
-  
-  const personalNotifications: Notification[] = []; 
-  const unreadCount = personalNotifications.filter(n => !n.read).length;
 
   if (!student) {
     return <div>Error: No student data found. Please log out and try again.</div>;
