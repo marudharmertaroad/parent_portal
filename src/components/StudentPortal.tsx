@@ -79,8 +79,6 @@ const StudentPortal: React.FC = () => {
         <Header
           onLogout={logout}
           onMenuClick={() => setIsMobileMenuOpen(true)}
-          onNotificationClick={() => setShowNotificationModal(true)}
-          unreadNotifications={unreadCount}
           onProfileClick={() => setShowProfileModal(true)}
         />
         
