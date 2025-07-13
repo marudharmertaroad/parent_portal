@@ -6,13 +6,12 @@ import { getMessaging } from "firebase/messaging";
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 const firebaseConfig = {
-  apiKey: "AIzaSy...YOUR_API_KEY",
-  authDomain: "your-project-id.firebaseapp.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project-id.appspot.com",
-  messagingSenderId: "1234567890",
-  appId: "1:1234567890:web:...",
-  measurementId: "G-..."
+  apiKey: "AIzaSyC89Z3czVHEfgAXAMAD3sGJNKz3OHYXOw4",
+  authDomain: "parent-portal-ec72d.firebaseapp.com",
+  projectId: "parent-portal-ec72d",
+  storageBucket: "parent-portal-ec72d.firebasestorage.app",
+  messagingSenderId: "830523731757",
+  appId: "1:830523731757:web:8032d84ae0c40050476da4",
 };
 
 // Initialize Firebase
