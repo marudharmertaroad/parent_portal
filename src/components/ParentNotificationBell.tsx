@@ -5,12 +5,19 @@ import { supabase } from '../utils/supabaseClient';
 import { Bell, Check } from 'lucide-react';
 
 // Interface for a notification in our list
-interface AppNotification {
+interface Notification {
   id: number;
   title: string;
   message: string;
+  type: 'general' | 'homework' | 'fee' | 'exam' | 'event' | 'urgent';
+  target_audience: 'all' | 'class' | 'student';
+  target_class?: string;
+  target_medium?: string;
+  target_student_sr_no?: string;
+  scheduled_at?: string;
+  sent_at?: string;
+  created_by: string;
   created_at: string;
-  read_at: string | null; // Tracks if the user has read this specific notification
 }
 
 // A simple helper to format dates (e.g., "5 minutes ago")
