@@ -7,8 +7,6 @@ import { Bell, Menu, LogOut } from 'lucide-react';
 interface HeaderProps {
   studentName: string;
   studentMedium?: string;
-  // unreadNotifications: number;  // <-- DELETE THIS LINE
-  // onNotificationClick: () => void; // <-- DELETE THIS LINE
   onProfileClick: () => void;
   onMenuClick: () => void;
   onLogout: () => void;
@@ -19,8 +17,6 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({
   studentName,
   studentMedium,
-  // unreadNotifications, // <-- DELETE THIS LINE
-  // onNotificationClick, // <-- DELETE THIS LINE
   onProfileClick,
   onMenuClick,
   onLogout,
