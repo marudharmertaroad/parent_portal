@@ -3,8 +3,10 @@
 import React from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import LoginForm from './components/LoginForm';
-import StudentPortal from './components/StudentPortal'; // We will create this next
-// A small helper component to keep our App clean
+import StudentPortal from './components/StudentPortal';
+import './lib/firebase.ts';
+
+
 const AppContent: React.FC = () => {
   // Get the session state from our context
   const { student, isLoading } = useAuth();
