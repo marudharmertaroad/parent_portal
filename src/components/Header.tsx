@@ -5,11 +5,16 @@ import { ParentNotificationBell } from './ParentNotificationBell';
 import { Bell, Menu, LogOut } from 'lucide-react';
 
 interface HeaderProps {
-  onLogout: () => void;
+  studentName: string;
+  studentMedium?: string;
+  // unreadNotifications: number;  // <-- DELETE THIS LINE
+  // onNotificationClick: () => void; // <-- DELETE THIS LINE
+  onProfileClick: () => void;
   onMenuClick: () => void;
-  onNotificationClick: () => void;
-  unreadNotifications: number;
+  onLogout: () => void;
+  isMobileMenuOpen: boolean;
 }
+
 
 const Header: React.FC<HeaderProps> = ({ onLogout, onMenuClick, onNotificationClick, unreadNotifications }) => {
   return (
