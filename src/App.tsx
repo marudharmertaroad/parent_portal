@@ -4,8 +4,6 @@ import React from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import LoginForm from './components/LoginForm';
 import StudentPortal from './components/StudentPortal';
-import './utils/firebase-init.ts';
-
 
 const AppContent: React.FC = () => {
   // Get the session state from our context
