@@ -1,6 +1,7 @@
 // src/components/Header.tsx (SIMPLIFIED)
 
 import React from 'react';
+import { ParentNotificationBell } from './ParentNotificationBell';
 import { Bell, Menu, LogOut } from 'lucide-react';
 
 interface HeaderProps {
