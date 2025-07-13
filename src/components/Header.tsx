@@ -16,7 +16,17 @@ interface HeaderProps {
 }
 
 
-const Header: React.FC<HeaderProps> = ({ onLogout, onMenuClick, onNotificationClick, unreadNotifications }) => {
+const Header: React.FC<HeaderProps> = ({
+  studentName,
+  studentMedium,
+  // unreadNotifications, // <-- DELETE THIS LINE
+  // onNotificationClick, // <-- DELETE THIS LINE
+  onProfileClick,
+  onMenuClick,
+  onLogout,
+  isMobileMenuOpen
+}) => {
+  
   return (
     <header className="bg-white shadow-sm border-b sticky top-0 z-10">
       <div className="flex items-center justify-between h-16 px-6">
