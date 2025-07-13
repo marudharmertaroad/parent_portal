@@ -12,7 +12,6 @@ import AcademicRecords from './AcademicRecords';
 import HomeworkSection from './HomeworkSection';
 import ProfileSection from './ProfileSection';
 import NoticeBoard from './NoticeBoard'; // <-- Import the new NoticeBoard
-import NotificationModal from './NotificationModal';
 import { X } from 'lucide-react';
 // NoticesAndNotifications and ProfileSection can be added later
 const StudentPortal: React.FC = () => {
