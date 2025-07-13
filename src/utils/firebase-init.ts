@@ -1,9 +1,7 @@
-// src/lib/firebase.ts (CORRECTED IMPORTS)
-
 import { initializeApp } from 'firebase/app';
-import { getMessaging, getToken, onMessage } from 'firebase/messaging'; // Corrected import path
+import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 
-// Read configuration securely from environment variables
+// Your configuration from environment variables is correct and secure.
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -13,12 +11,17 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
+// --- THIS IS THE MISSING LINE ---
+// Initialize the main Firebase application. This MUST come before 'messaging'.
+export const app = initializeApp(firebaseConfig);
+
+// Now that 'app' exists, we can safely use it to get the messaging service.
 export const messaging = typeof window !== 'undefined' && typeof window.navigator !== 'undefined' 
   ? getMessaging(app) 
   : null;
 
+// The rest of your functions are correct.
 export const requestPermissionAndGetToken = async () => {
-  // If messaging is not supported, we can't get a token
   if (!messaging) {
     console.log("Firebase messaging is not supported in this browser.");
     return null;
@@ -50,11 +53,11 @@ export const requestPermissionAndGetToken = async () => {
   }
 };
 
-// Only set up the onMessage listener if messaging is supported
 if (messaging) {
   onMessage(messaging, (payload) => {
     console.log('Foreground message received.', payload);
-    const notification = new Notification(payload.notification.title, {
+    // Add '!' to assert title exists, as it's required for a Notification.
+    const notification = new Notification(payload.notification.title!, { 
       body: payload.notification.body,
       icon: '/logo.png',
     });
