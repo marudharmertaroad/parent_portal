@@ -4,7 +4,7 @@ import React from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import LoginForm from './components/LoginForm';
 import StudentPortal from './components/StudentPortal';
-import './lib/firebase.ts';
+import './utils/firebase-init.ts';
 
 
 const AppContent: React.FC = () => {
