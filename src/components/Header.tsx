@@ -39,16 +39,7 @@ const Header: React.FC<HeaderProps> = ({
         </button>
         <div className="flex-1"></div> {/* This empty div pushes the icons to the right */}
         <div className="flex items-center space-x-2">
-          <button 
-            onClick={onNotificationClick}
-            className="relative p-2 rounded-full text-gray-500 hover:bg-gray-100" 
-            title="View Alerts"
-          >
-            <Bell size={22} />
-            {unreadNotifications > 0 && (
-              <span className="absolute top-1 right-1 block h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-white"></span>
-            )}
-          </button>
+          <ParentNotificationBell />
           <div className="border-l pl-2">
             <button
               onClick={onLogout}
