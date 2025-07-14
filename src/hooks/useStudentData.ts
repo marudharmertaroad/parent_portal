@@ -62,10 +62,9 @@ export const useStudentData = () => {
   return {
     feeRecords,
     examRecords,
-    notices,
-    notifications,
+    notices, // This is for the public notice board
     loading,
     error,
-    refreshData: fetchData, // A function to allow manual refresh
+    refreshData: fetchData,
   };
 };
