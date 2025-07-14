@@ -95,13 +95,14 @@ class ApiService {
       .from('notices')
       .select('*')
       .eq('is_active', true)
-      .or(`target_class.is.null,and(target_class.eq.${student.class},target_medium.eq.${student.medium})`);
+      // This is the corrected 'or' filter. It only checks for target_class.
+      .or(`target_class.is.null,target_class.eq.${student.class}`);
       
     if (error) {
       console.error("API Error fetching notices:", error);
       throw new Error("Failed to fetch school notices.");
     }
     return data || [];
-  }
+}
 }
 export const apiService = new ApiService();
