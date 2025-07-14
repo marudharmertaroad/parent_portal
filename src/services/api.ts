@@ -123,7 +123,7 @@ class ApiService {
       throw new Error("Failed to fetch school notices.");
     }
     return data || [];
-  };
+  }
   // --- NEW, CORRECT getNotifications FUNCTION ---
  
 
