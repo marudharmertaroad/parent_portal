@@ -1,7 +1,7 @@
 // src/services/api.ts (FINAL, CORRECTED VERSION)
 
 import { supabase } from '../lib/supabase';
-import { LoginCredentials, Student, FeeRecord, ExamRecord, Notice } from '../types';
+import { LoginCredentials, Student, FeeRecord, ExamRecord, Notice, Notifications} from '../types';
 
 class ApiService {
   
