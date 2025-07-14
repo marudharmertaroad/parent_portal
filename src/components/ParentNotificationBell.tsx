@@ -37,7 +37,7 @@ const timeAgo = (date: string): string => {
 };
 
 export const ParentNotificationBell: React.FC = () => {
-  const [notifications, setNotifications] = useState<AppNotification[]>([]);
+const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
 
