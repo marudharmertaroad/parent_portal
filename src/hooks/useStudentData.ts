@@ -45,24 +45,18 @@ export const useStudentData = () => {
       setExamRecords(examsResponse);
       setNotices(noticesResponse);
 
-      console.log("✅ All data fetches completed.");
-      
-      setFeeRecords(feesResponse);
-      setExamRecords(examsResponse);
-      setNotices(noticesResponse);
-      setNotifications(notificationsResponse);
-
-    } catch (err: any) {
+      } catch (err: any) {
       console.error("Error fetching student data:", err);
       setError("Could not load all student data. Please try refreshing.");
     } finally {
       setLoading(false);
     }
-  }, [student]); // This hook re-runs whenever the 'student' object changes (i.e., on login)
+  }, [student]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
 
   // Expose all the data and states for the components to use
   return {
