@@ -13,7 +13,7 @@ import HomeworkSection from './HomeworkSection';
 import ProfileSection from './ProfileSection';
 import NoticeBoard from './NoticeBoard'; // <-- Import the new NoticeBoard
 import { X } from 'lucide-react';
-// NoticesAndNotifications and ProfileSection can be added later
+
 const StudentPortal: React.FC = () => {
   const { student, logout } = useAuth();
   const { feeRecords, examRecords, notices, loading, error, refreshData } = useStudentData();
