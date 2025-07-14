@@ -103,34 +103,5 @@ class ApiService {
     }
     return data || [];
   }
-  async getNotifications(student: Student): Promise<Notification[]> {
-    // This function is for the personal notification bell
-    try {
-      const allPromise = supabase.from('notifications').select('*').eq('target_audience', 'all');
-      const classPromise = supabase.from('notifications').select('*').eq('target_audience', 'class').eq('target_class', student.class).eq('target_medium', student.medium);
-      const studentPromise = supabase.from('notifications').select('*').eq('target_audience', 'student').eq('target_student_sr_no', student.srNo);
-
-      const [allRes, classRes, studentRes] = await Promise.all([allPromise, classPromise, studentPromise]);
-
-      if (allRes.error) throw allRes.error;
-      if (classRes.error) throw classRes.error;
-      if (studentRes.error) throw studentRes.error;
-
-      // Combine the results from all three queries
-      const combinedData = [
-          ...(allRes.data || []),
-          ...(classRes.data || []),
-          ...(studentRes.data || [])
-      ];
-
-      return combinedData as Notification[];
-
-    } catch (error: any) {
-      console.error("API Error fetching notifications:", error);
-      throw new Error("Failed to fetch personal notifications.");
-    }
-  }
-
-
 }
 export const apiService = new ApiService();
