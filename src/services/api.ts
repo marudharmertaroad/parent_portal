@@ -2,7 +2,6 @@
 
 import { supabase } from '../lib/supabase';
 import { LoginCredentials, Student, FeeRecord, ExamRecord, Notice } from '../types';
-import { ParentNotificationBell } from './ParentNotificationBell';
 
 class ApiService {
   
