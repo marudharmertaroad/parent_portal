@@ -152,5 +152,5 @@ async getNotifications(student: Student): Promise<Notification[]> {
         throw new Error("Failed to fetch personal notifications.");
     }
 }
-
+}
 export const apiService = new ApiService();
