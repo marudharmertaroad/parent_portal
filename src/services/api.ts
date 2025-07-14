@@ -26,12 +26,7 @@ class ApiService {
       throw new Error("No student record found for the provided credentials.");
     }
 
-    console.log('[API] Successfully found student data:', data);
-    return data; // Return the raw database object
-
-
-    // Map database columns to our frontend Student type
-    return {
+    const mappedStudent: Student = {
       id: data.id,
       name: data.name,
       class: data.class,
@@ -48,6 +43,8 @@ class ApiService {
       nicStudentId: data.nic_student_id,
       isRte: data.is_rte,
     };
+    
+    return mappedStudent;
   }
 
   async getFeeRecords(studentId: number): Promise<FeeRecord[]> {
