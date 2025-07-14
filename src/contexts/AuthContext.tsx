@@ -50,7 +50,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // Step 1: Log in and get the student data
       const studentDataFromDB = await apiService.login(credentials);
 
-      // Step 2: Map the raw data to our frontend Student type
       const loggedInStudent: Student = {
         id: studentDataFromDB.id,
         name: studentDataFromDB.name,
