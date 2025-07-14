@@ -103,7 +103,31 @@ class ApiService {
     }
     return data || [];
   }
+async getNotifications(student: Student): Promise<Notification[]> {
+    try {
+      const allPromise = supabase.from('notifications').select('*').eq('target_audience', 'all');
+      const classPromise = supabase.from('notifications').select('*').eq('target_audience', 'class').eq('target_class', student.class).eq('target_medium', student.medium);
+      const studentPromise = supabase.from('notifications').select('*').eq('target_audience', 'student').eq('target_student_sr_no', student.srNo);
 
+      const [allRes, classRes, studentRes] = await Promise.all([allPromise, classPromise, studentPromise]);
+
+      if (allRes.error) throw allRes.error;
+      if (classRes.error) throw classRes.error;
+      if (studentRes.error) throw studentRes.error;
+
+      // Combine and return the data from all three queries
+      return [
+          ...(allRes.data || []),
+          ...(classRes.data || []),
+          ...(studentRes.data || [])
+      ];
+
+    } catch (error: any) {
+      console.error("API Error fetching notifications:", error);
+      throw new Error("Failed to fetch personal notifications.");
+    }
+  }
+}
     try {
         // We will make three simple, separate queries and combine the results.
         // This is much more reliable than one complex .or() filter.
