@@ -33,8 +33,7 @@ const Header: React.FC<HeaderProps> = ({
           <Menu size={24} />
         </button>
         <div className="flex-1"></div> {/* This empty div pushes the icons to the right */}
-        <div className="flex items-center space-x-2">
-          <ParentNotificationBell />
+        
           <div className="border-l pl-2">
             <button
               onClick={onLogout}
