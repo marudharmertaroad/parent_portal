@@ -48,7 +48,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setIsLoading(true);
     try {
       // Step 1: Log in and get the student data
-       const loggedInStudent = await apiService.login(credentials);
+       const loggedInStudent = await apiService.login(id: studentDataFromDB.id,
+        name: studentDataFromDB.name,
+        class: studentDataFromDB.class,
+        srNo: studentDataFromDB.sr_no,
+        fatherName: studentDataFromDB.father_name,
+        motherName: studentDataFromDB.mother_name,
+        contact: studentDataFromDB.contact,
+        address: studentDataFromDB.address,
+        medium: studentDataFromDB.medium,
+        gender: studentDataFromDB.gender,
+        dob: studentDataFromDB.dob,
+        bus_route: studentDataFromDB.bus_route,
+        religion: studentDataFromDB.religion,
+        nicStudentId: studentDataFromDB.nic_student_id,
+        isRte: studentDataFromDB.is_rte,);
 
       // Step 3: Set the state and save the session to localStorage
       setStudent(loggedInStudent);
