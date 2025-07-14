@@ -71,6 +71,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // Step 3: Set the state and save the session to localStorage
       setStudent(loggedInStudent);
       localStorage.setItem('parentPortalStudent', JSON.stringify(loggedInStudent));
+
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    } finally {
+      setIsLoading(false);
+    }
+}, []);
       
   const logout = useCallback(() => {
     console.log('[AUTH] Logging out.');
