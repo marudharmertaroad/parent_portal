@@ -105,25 +105,6 @@ class ApiService {
   }
 async getNotifications(student: Student): Promise<Notification[]> {
     try {
-      const allPromise = supabase.from('notifications').select('*').eq('target_audience', 'all');
-      const classPromise = supabase.from('notifications').select('*').eq('target_audience', 'class').eq('target_class', student.class).eq('target_medium', student.medium);
-      const studentPromise = supabase.from('notifications').select('*').eq('target_audience', 'student').eq('target_student_sr_no', student.srNo);
-
-      const [allRes, classRes, studentRes] = await Promise.all([allPromise, classPromise, studentPromise]);
-
-      if (allRes.error) throw allRes.error;
-      if (classRes.error) throw classRes.error;
-      if (studentRes.error) throw studentRes.error;
-
-      // Combine and return the data from all three queries
-      return [
-          ...(allRes.data || []),
-          ...(classRes.data || []),
-          ...(studentRes.data || [])
-      ];
-
-   
-    try {
         // We will make three simple, separate queries and combine the results.
         // This is much more reliable than one complex .or() filter.
 
@@ -137,7 +118,7 @@ async getNotifications(student: Student): Promise<Notification[]> {
         const classPromise = supabase
             .from('notifications')
             .select('*')
-            .eq('target_audience', 'class_specific')
+            .eq('target_audience', 'class') // Use 'class' as defined in your RLS
             .eq('target_class', student.class)
             .eq('target_medium', student.medium);
 
@@ -145,10 +126,10 @@ async getNotifications(student: Student): Promise<Notification[]> {
         const studentPromise = supabase
             .from('notifications')
             .select('*')
-            .eq('target_audience', 'student_specific')
+            .eq('target_audience', 'student') // Use 'student' as defined in your RLS
             .eq('target_student_sr_no', student.srNo);
 
-        // Run all three queries at the same time
+        // Run all three queries at the same time for efficiency
         const [allRes, classRes, studentRes] = await Promise.all([allPromise, classPromise, studentPromise]);
 
         // Check for errors in any of the queries
@@ -156,18 +137,20 @@ async getNotifications(student: Student): Promise<Notification[]> {
         if (classRes.error) throw classRes.error;
         if (studentRes.error) throw studentRes.error;
 
-        // Combine the results from all three queries
+        // Combine the results from all three successful queries into a single array
         const combinedData = [
             ...(allRes.data || []),
             ...(classRes.data || []),
             ...(studentRes.data || [])
         ];
-      
- } catch (error: any) {
-      console.error("API Error fetching notifications:", error);
-      throw new Error("Failed to fetch personal notifications.");
+        
+        // Ensure you import the Notification type at the top of the file
+        return combinedData as Notification[];
+
+    } catch (error: any) {
+        console.error("API Error fetching notifications:", error);
+        throw new Error("Failed to fetch personal notifications.");
     }
-  }
 }
 
 export const apiService = new ApiService();
