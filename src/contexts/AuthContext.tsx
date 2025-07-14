@@ -44,11 +44,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, []);
 
-  // --- THIS IS THE SINGLE, COMBINED, AND CORRECT LOGIN FUNCTION ---
   const login = useCallback(async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     try {
-      // Step 1: Log in and get the raw student data from the database
+      // Step 1: Log in and get the student data
       const studentDataFromDB = await apiService.login(credentials);
 
       // Step 2: Map the raw data to our frontend Student type
