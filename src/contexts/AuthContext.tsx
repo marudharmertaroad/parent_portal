@@ -74,34 +74,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setStudent(loggedInStudent);
       localStorage.setItem('parentPortalStudent', JSON.stringify(loggedInStudent));
       
-      // --- THIS IS THE FIX: The logic is now inside the 'try' block ---
-      try {
-        console.log("Login successful, now requesting notification token...");
-        // Step 3: Request permission and get the FCM token
-        const fcmToken = await requestPermissionAndGetToken();
-
-        if (fcmToken) {
-          // Step 4: If we get a token, save it to the database via the apiService
-          console.log("Saving FCM token to the database...");
-          // We will create this 'saveFcmToken' function in the next step
-          await apiService.saveFcmToken(loggedInStudent.id, fcmToken);
-        }
-      } catch (tokenError) {
-        // Important: We DON'T fail the login if token registration fails.
-        // The user is still logged in. We just log the error.
-        console.error("Could not register for push notifications:", tokenError);
-      }
-      
-      return { success: true };
-    } catch (error: any) {
-      return { success: false, error: error.message };
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  
-
   const logout = useCallback(() => {
     console.log('[AUTH] Logging out.');
     setStudent(null);
