@@ -35,14 +35,16 @@ export const useStudentData = () => {
         feesResponse,
         examsResponse,
         noticesResponse,
-        notificationsResponse, // This now correctly receives the result of notificationsPromise
       ] = await Promise.all([
         feesPromise,
         examsPromise,
         noticesPromise,
-        notificationsPromise, // --- THIS IS THE FIX ---
       ]);
       
+      setFeeRecords(feesResponse);
+      setExamRecords(examsResponse);
+      setNotices(noticesResponse);
+
       console.log("✅ All data fetches completed.");
       
       setFeeRecords(feesResponse);
