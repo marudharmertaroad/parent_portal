@@ -32,7 +32,6 @@ const Header: React.FC<HeaderProps> = ({
         >
           <Menu size={24} />
         </button>
-        <div className="flex-1"></div> {/* This empty div pushes the icons to the right */}
         
           <div className="border-l pl-2">
             <button
