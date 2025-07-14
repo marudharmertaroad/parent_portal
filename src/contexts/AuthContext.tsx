@@ -48,7 +48,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setIsLoading(true);
     try {
       // Step 1: Log in and get the student data
-      const studentDataFromDB = await apiService.login(credentials);
+       const loggedInStudent = await apiService.login(credentials);
 
       const loggedInStudent: Student = {
         id: studentDataFromDB.id,
