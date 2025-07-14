@@ -26,27 +26,6 @@ export const useStudentData = () => {
     setError(null);
 
     try {
-console.log("🚀 Starting to fetch all student data...");
-
-      const feesPromise = apiService.getFeeRecords(student.id).catch(err => {
-          console.error("❌ Fee records fetch failed:", err);
-          return []; // Return an empty array on failure
-      });
-      
-      const examsPromise = apiService.getExamRecords(student.id).catch(err => {
-          console.error("❌ Exam records fetch failed:", err);
-          return []; // Return an empty array on failure
-      });
-
-      const noticesPromise = apiService.getNotices(student.class, student.medium).catch(err => {
-          console.error("❌ Notices fetch failed:", err);
-          return []; // Return an empty array on failure
-      });
-
-      const notificationsPromise = apiService.getNotifications(student).catch(err => {
-          console.error("❌ Notifications fetch failed:", err);
-          return []; // Return an empty array on failure
-      });
       const [
         feesResponse,
         examsResponse,
