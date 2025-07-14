@@ -104,54 +104,6 @@ class ApiService {
     }
     return data || [];
   }
-async getNotifications(student: Student): Promise<Notification[]> {
-    try {
-        // We will make three simple, separate queries and combine the results.
-        // This is much more reliable than one complex .or() filter.
 
-        // Query 1: Get notifications for 'all'
-        const allPromise = supabase
-            .from('notifications')
-            .select('*')
-            .eq('target_audience', 'all');
-
-        // Query 2: Get notifications for the student's specific class and medium
-        const classPromise = supabase
-            .from('notifications')
-            .select('*')
-            .eq('target_audience', 'class') // Use 'class' as defined in your RLS
-            .eq('target_class', student.class)
-            .eq('target_medium', student.medium);
-
-        // Query 3: Get notifications for this specific student by their SR number
-        const studentPromise = supabase
-            .from('notifications')
-            .select('*')
-            .eq('target_audience', 'student') // Use 'student' as defined in your RLS
-            .eq('target_student_sr_no', student.srNo);
-
-        // Run all three queries at the same time for efficiency
-        const [allRes, classRes, studentRes] = await Promise.all([allPromise, classPromise, studentPromise]);
-
-        // Check for errors in any of the queries
-        if (allRes.error) throw allRes.error;
-        if (classRes.error) throw classRes.error;
-        if (studentRes.error) throw studentRes.error;
-
-        // Combine the results from all three successful queries into a single array
-        const combinedData = [
-            ...(allRes.data || []),
-            ...(classRes.data || []),
-            ...(studentRes.data || [])
-        ];
-        
-        // Ensure you import the Notification type at the top of the file
-        return combinedData as Notification[];
-
-    } catch (error: any) {
-        console.error("API Error fetching notifications:", error);
-        throw new Error("Failed to fetch personal notifications.");
-    }
-}
 }
 export const apiService = new ApiService();
