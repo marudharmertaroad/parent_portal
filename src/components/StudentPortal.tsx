@@ -40,7 +40,7 @@ const StudentPortal: React.FC = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <Dashboard student={student} feeRecords={feeRecords} examRecords={examRecords} notices={notices} onProfileClick={() => setShowProfileModal(true)} />;
+        return <Dashboard student={student} feeRecords={feeRecords} examRecords={examRecords} onProfileClick={() => setShowProfileModal(true)} />;
       case 'fees':
         return <FeesSection feeRecords={feeRecords} />;
       case 'academic':
