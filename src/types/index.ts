@@ -76,17 +76,3 @@ export interface Notice {
   content: string;
   created_at: string;
 }
-interface Notification {
-  id: number;
-  title: string;
-  message: string;
-  type: 'general' | 'homework' | 'fee' | 'exam' | 'event' | 'urgent';
-  target_audience: 'all' | 'class' | 'student';
-  target_class?: string;
-  target_medium?: string;
-  target_student_sr_no?: string;
-  scheduled_at?: string;
-  sent_at?: string;
-  created_by: string;
-  created_at: string;
-}
