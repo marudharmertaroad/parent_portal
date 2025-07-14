@@ -51,7 +51,7 @@ const StudentPortal: React.FC = () => {
         return <NoticeBoard notices={notices} />;
         
       default:
-        return <Dashboard student={student} feeRecords={feeRecords} examRecords={examRecords} notices={notices} />;
+        return <Dashboard student={student} feeRecords={feeRecords} examRecords={examRecords} />;
     }
   };
 
