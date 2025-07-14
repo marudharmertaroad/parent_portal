@@ -89,31 +89,13 @@ class ApiService {
         }))
     }));
 }
-  async saveFcmToken(studentId: number, fcmToken: string): Promise<void> {
-    try {
-      const { error } = await supabase
-        .from('students')
-        .update({ fcm_token: fcmToken })
-        .eq('id', studentId);
-
-      if (error) {
-        throw error;
-      }
-      console.log(`FCM token saved successfully for student ID: ${studentId}`);
-    } catch (error) {
-      // Log the error but don't crash the app
-      console.error("Failed to save FCM token:", error);
-    }
-  }
-  
-  // --- FIX: This function is now correctly placed INSIDE the ApiService class ---
-  async getNotices(studentClass: string, medium: string): Promise<Notice[]> {
+ 
+  async getNotices(student: Student): Promise<Notice[]> {
     const { data, error } = await supabase
       .from('notices')
       .select('*')
       .eq('is_active', true)
-      // This gets notices for ALL or for the student's SPECIFIC class.
-      .or(`target_class.is.null,target_class.eq.${studentClass}`);
+      .or(`target_class.is.null,and(target_class.eq.${student.class},target_medium.eq.${student.medium})`);
       
     if (error) {
       console.error("API Error fetching notices:", error);
@@ -121,8 +103,6 @@ class ApiService {
     }
     return data || [];
   }
-  // --- NEW, CORRECT getNotifications FUNCTION ---
- 
 
     try {
         // We will make three simple, separate queries and combine the results.
