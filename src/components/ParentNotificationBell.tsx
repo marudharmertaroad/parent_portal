@@ -77,7 +77,7 @@ const [notifications, setNotifications] = useState<Notification[]>([]);
     setUnreadCount(prev => prev + 1);
   }
 )
-      .subscribe();
+      .subscribe()
 
     // --- 3. Cleanup: Unsubscribe when the component is removed ---
     return () => {
