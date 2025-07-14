@@ -11,7 +11,8 @@ import FeesSection from './FeesSection';
 import AcademicRecords from './AcademicRecords';
 import HomeworkSection from './HomeworkSection';
 import ProfileSection from './ProfileSection';
-import NoticeBoard from './NoticeBoard'; // <-- Import the new NoticeBoard
+import NoticeBoard from './NoticeBoard';
+import { ParentNotificationBell } from './ParentNotificationBell';
 import { X } from 'lucide-react';
 
 const StudentPortal: React.FC = () => {
