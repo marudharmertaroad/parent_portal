@@ -122,12 +122,7 @@ async getNotifications(student: Student): Promise<Notification[]> {
           ...(studentRes.data || [])
       ];
 
-    } catch (error: any) {
-      console.error("API Error fetching notifications:", error);
-      throw new Error("Failed to fetch personal notifications.");
-    }
-  }
-}
+   
     try {
         // We will make three simple, separate queries and combine the results.
         // This is much more reliable than one complex .or() filter.
@@ -167,17 +162,12 @@ async getNotifications(student: Student): Promise<Notification[]> {
             ...(classRes.data || []),
             ...(studentRes.data || [])
         ];
-
-        
-
-    } catch (error: any) {
-        console.error("API Error fetching notifications:", error);
-        throw new Error("Failed to fetch personal notifications.");
+      
+ } catch (error: any) {
+      console.error("API Error fetching notifications:", error);
+      throw new Error("Failed to fetch personal notifications.");
     }
+  }
 }
 
-}
-// <-- The class now correctly ends here
-
-// Create and export a single instance of the service for the whole app to use
 export const apiService = new ApiService();
