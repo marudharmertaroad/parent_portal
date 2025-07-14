@@ -72,10 +72,11 @@ const [notifications, setNotifications] = useState<Notification[]>([]);
         (payload) => {
           console.log('New notification received!', payload.new);
           // When a new notification arrives, add it to the top of the list and increment the count
-          setNotifications(prev => [payload.new as AppNotification, ...prev]);
-          setUnreadCount(prev => prev + 1);
-        }
-      )
+          setNotifications(prev => [payload.new as Notification, ...prev]);
+
+    setUnreadCount(prev => prev + 1);
+  }
+)
       .subscribe();
 
     // --- 3. Cleanup: Unsubscribe when the component is removed ---
