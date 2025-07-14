@@ -26,6 +26,11 @@ export const useStudentData = () => {
     setError(null);
 
     try {
+      const feesPromise = apiService.getFeeRecords(student.id);
+      const examsPromise = apiService.getExamRecords(student.id);
+      // The 'getNotices' function is for the public notice board and should stay.
+      const noticesPromise = apiService.getNotices(student);
+
       const [
         feesResponse,
         examsResponse,
