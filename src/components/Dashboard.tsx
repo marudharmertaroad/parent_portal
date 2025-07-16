@@ -6,6 +6,8 @@ import {
   DollarSign, FileText, Bell, TrendingUp, Calendar, School, User, Phone
 } from 'lucide-react';
 import { formatDate, getGradeColor } from '../utils';
+import Sidebar from './Sidebar';
+import Header from './Header'; 
 
 interface DashboardProps {
   student: Student;
