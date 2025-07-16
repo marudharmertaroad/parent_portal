@@ -1,6 +1,6 @@
 // src/components/StudentPortal.tsx
 
-import React, { useState } from 'react';
+import React, { useState,useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Student, FeeRecord, ExamRecord, Notice } from '../types';
 
