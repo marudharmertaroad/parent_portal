@@ -92,7 +92,12 @@ const Dashboard: React.FC<DashboardProps> = ({
       </div>
 
       {/* Recent Activity Grids */}
-      {examRecords.length > 0 ? examRecords.slice(0, 3).map((exam) => (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200">
+          <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center"><FileText size={22} className="mr-3 text-blue-500" />Recent Exam Results</h3>
+          <div className="space-y-3">
+            {/* --- IMPROVEMENT: Added fallback message --- */}
+            {examRecords.length > 0 ? examRecords.slice(0, 3).map((exam) => (
               <div key={exam.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div>
                   <p className="font-semibold text-gray-800">{exam.examType}</p>
@@ -107,6 +112,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               <p className="text-center text-gray-500 py-6">No exam results available yet.</p>
             )}
           </div>
+        </div>
         <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200">
           <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center"><Calendar size={22} className="mr-3 text-purple-500" />Upcoming Fee Deadlines</h3>
           <div className="space-y-3">
