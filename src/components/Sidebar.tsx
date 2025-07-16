@@ -1,7 +1,7 @@
 // src/components/Sidebar.tsx
 
 import React from 'react';
-import { Home, CreditCard, Award, BookOpen, X , Megaphone} from 'lucide-react';
+import { Home, CreditCard, Award, BookOpen, X , Megaphone, LogOut} from 'lucide-react';
 
 interface SidebarProps {
   activeTab: string;
