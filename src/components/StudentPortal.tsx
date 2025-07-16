@@ -81,6 +81,7 @@ const StudentPortal: React.FC = () => {
         isOpen={showProfileModal}
         onClose={() => setShowProfileModal(false)}
         student={student}
+        onDataRefresh={refreshStudentData}
       />
     </div>
   );
