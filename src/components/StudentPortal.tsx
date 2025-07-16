@@ -72,11 +72,10 @@ const [showProfileModal, setShowProfileModal] = useState(false);
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Header is always visible */}
       <Header
         studentName={student.name}
-        // The onMenuClick can be used for a future notifications drawer, for example
-        onMenuClick={() => alert("Menu button clicked!")}
+        onMenuClick={() => alert("Menu button can be used for other features.")}
+        onProfileClick={() => setShowProfileModal(true)} // <-- Pass the function to open the modal
       />
       
       {/* Main content area */}
