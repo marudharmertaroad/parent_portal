@@ -49,7 +49,6 @@ const [showProfileModal, setShowProfileModal] = useState(false);
                   feeRecords={feeRecords} 
                   examRecords={examRecords}
                   notices={notices}
-                  onProfileClick={() => setShowProfileModal(true)}
                   onTabChange={setActiveTab} // Pass the setter to the dashboard
                />;
       case 'fees':
