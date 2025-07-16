@@ -17,7 +17,7 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({
-  student, feeRecords, examRecords, notices, onProfileClick, onTabChange
+  student, feeRecords, examRecords, notices, onTabChange
 }) => {
   const pendingFees = feeRecords.filter(fee => fee.status !== 'Paid');
   const averageScore = examRecords.length > 0 
