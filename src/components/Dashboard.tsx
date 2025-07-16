@@ -43,7 +43,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       {/* Welcome Banner */}
       <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-800 rounded-2xl p-8 text-white relative overflow-hidden shadow-2xl">
         <div className="absolute -bottom-16 -right-16 opacity-10">
-          <img src="/logo copy.png" alt="School Logo Background" className="w-64 h-64" />
+          <img src="/logo.png" alt="School Logo Background" className="w-64 h-64" />
         </div>
         <div className="relative z-10">
           <h2 className="text-4xl font-bold mb-3">Marudhar Defence School</h2>
