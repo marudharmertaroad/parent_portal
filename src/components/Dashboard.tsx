@@ -42,7 +42,7 @@ const Dashboard: React.FC<DashboardProps> = ({
     <div className="space-y-8">
       {/* --- NEW: School-Focused Welcome Banner --- */}
       <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-800 rounded-2xl p-8 text-white relative overflow-hidden shadow-2xl">
-        <div className="absolute -bottom-16 -right-16 opacity-10">
+        <div className="absolute -bottom-16 -right-20 opacity-10">
           {/* Replace the School icon with an img tag */}
           <img 
             src="/logo.png" // Make sure this path is correct
