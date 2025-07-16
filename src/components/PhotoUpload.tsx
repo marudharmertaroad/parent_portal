@@ -32,6 +32,9 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ student, onUploadComplete }) 
     const filePath = `${student.srNo}/${Date.now()}.${fileExt}`;
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("User session not found. Please log in again.");
+      
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('student-photos')
         .upload(filePath, selectedFile);
