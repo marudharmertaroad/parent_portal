@@ -35,8 +35,10 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, student })
             
             {/* Photo Upload Section (takes up less space) */}
             <div className="flex-shrink-0 lg:w-1/4">
-              <PhotoUpload student={student} onUploadComplete={onDataRefresh} />
-            </div>
+              <PhotoUpload 
+                student={student} 
+                onUploadComplete={handlePhotoUploadSuccess} 
+              />
 
             {/* Profile Details Section (takes up all remaining space) */}
             <div className="flex-grow bg-white p-6 rounded-2xl border shadow-sm">
