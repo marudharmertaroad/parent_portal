@@ -51,13 +51,13 @@ const LoginForm: React.FC = () => {
       <div className="relative w-full max-w-md z-10">
         {/* School Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-24 h-24 bg-white/90 border-2 border-white rounded-full mb-6 shadow-2xl overflow-hidden">
-            <img
-              src="/logo copy.png" 
-              alt="School Logo"
-              className="w-full h-full object-cover"
-            />
-          </div>
+          <div className="inline-flex items-center justify-center w-24 h-24 bg-white border-2 border-white rounded-full mb-6 shadow-2xl overflow-hidden">
+  <img
+    src="/logo copy.png" 
+    alt="School Logo"
+    className="w-full h-full object-cover"
+  />
+</div>
           <h1 className="text-4xl font-bold text-white mb-3">Marudhar Defence School</h1>
           <p className="text-blue-200 text-lg mb-4">Student & Parent Portal</p>
           
