@@ -1,4 +1,4 @@
-// src/components/Dashboard.tsx (Polished Parent Portal Version)
+// src/components/Dashboard.tsx
 
 import React from 'react';
 import { Student, FeeRecord, ExamRecord, Notice } from '../types';
@@ -8,14 +8,13 @@ import {
 } from 'lucide-react';
 import { formatDate, getGradeColor } from '../utils';
 
-// Define the props it expects from the parent
 interface DashboardProps {
   student: Student;
   feeRecords: FeeRecord[];
   examRecords: ExamRecord[];
   notices: Notice[];
   onProfileClick: () => void;
-  onTabChange: (tab: string) => void; // Function to change the page
+  onTabChange: (tab: string) => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({
@@ -42,7 +41,18 @@ const Dashboard: React.FC<DashboardProps> = ({
 
   return (
     <div className="space-y-8">
-      {/* Stats Grid */}
+      {/* --- NEW: School-Focused Welcome Banner --- */}
+      <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-800 rounded-2xl p-8 text-white relative overflow-hidden shadow-2xl">
+        <div className="absolute -bottom-12 -right-12 opacity-10">
+          <School className="w-64 h-64" />
+        </div>
+        <div className="relative z-10">
+          <h2 className="text-4xl font-bold mb-3">Marudhar Defence School</h2>
+          <p className="text-blue-100 text-lg">Welcome to the Parent & Student Portal</p>
+        </div>
+      </div>
+
+      {/* --- RESTYLED: Stats Grid --- */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {stats.map((stat, index) => (
           <div key={index} className="bg-white rounded-xl p-6 shadow-md border hover:shadow-lg transition-shadow">
@@ -53,7 +63,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   {stat.isCurrency ? `₹${pendingFees.reduce((sum, fee) => sum + fee.pendingFees, 0).toLocaleString('en-IN')}` : stat.value}
                 </p>
               </div>
-              <div className={`w-14 h-14 ${stat.color} rounded-xl flex items-center justify-center shadow-md`}>
+              <div className={`w-14 h-14 bg-gradient-to-br ${stat.color} rounded-xl flex items-center justify-center shadow-md`}>
                 <stat.icon size={28} className="text-white" />
               </div>
             </div>
@@ -61,28 +71,57 @@ const Dashboard: React.FC<DashboardProps> = ({
         ))}
       </div>
 
-      {/* --- NEW ICON-BASED NAVIGATION TABS --- */}
+      {/* --- NEW: Icon-Based Navigation Tabs --- */}
       <div className="bg-white p-4 rounded-xl shadow-md border">
-        <h3 className="font-semibold text-lg text-gray-800 mb-4 px-2">Navigate</h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
           {navItems.map(item => (
             <button
               key={item.id}
               onClick={() => onTabChange(item.id)}
-              className="flex flex-col items-center justify-center p-4 rounded-xl text-center transition-all duration-200 text-gray-700 hover:bg-blue-500 hover:text-white group"
+              // The 'dashboard' tab is highlighted differently to show it's the current page
+              className={`flex flex-col items-center justify-center p-4 rounded-xl text-center transition-all duration-200 border-2
+                ${item.id === 'dashboard'
+                  ? 'bg-blue-600 text-white border-blue-700 scale-105 shadow-lg'
+                  : 'bg-gray-50 text-gray-700 border-transparent hover:shadow-lg hover:bg-blue-500 hover:text-white'
+                }
+              `}
             >
-              <item.icon size={32} className="mb-2 transition-transform group-hover:scale-110" />
+              <item.icon size={28} className="mb-2" />
               <span className="font-semibold text-sm">{item.name}</span>
             </button>
           ))}
         </div>
       </div>
-      
-      {/* Recent Activity Grids */}
+
+      {/* --- NEW: Dedicated Student Profile Card --- */}
+      <div className="bg-white rounded-xl p-6 shadow-md border">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center space-x-4">
+                  <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-3xl">
+                      {student.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                      <h3 className="text-xl font-bold text-gray-800">{student.name}</h3>
+                      <p className="text-gray-500">Class: {student.class} | SR No: {student.srNo}</p>
+                  </div>
+              </div>
+              <button
+                  onClick={onProfileClick}
+                  className="mt-4 sm:mt-0 flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium text-sm transition-colors"
+              >
+                  <User size={16} className="mr-2" />
+                  View Full Profile
+              </button>
+          </div>
+      </div>
+
+      {/* Recent Activity & Upcoming Deadlines Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Exam Results */}
         <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200">
-          <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center"><FileText size={22} className="mr-3 text-blue-500" />Recent Exam Results</h3>
+          <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <FileText size={22} className="mr-3 text-blue-500" />
+            Recent Exam Results
+          </h3>
           <div className="space-y-3">
             {examRecords.length > 0 ? examRecords.slice(0, 3).map((exam) => (
               <div key={exam.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -95,12 +134,15 @@ const Dashboard: React.FC<DashboardProps> = ({
                   <p className={`text-sm font-medium ${getGradeColor(exam.grade)}`}>{exam.grade}</p>
                 </div>
               </div>
-            )) : <p className="text-center text-gray-500 py-6">No exam results available.</p>}
+            )) : <p className="text-center text-gray-500 py-6">No exam results available yet.</p>}
           </div>
         </div>
-        {/* Fee Deadlines */}
+
         <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200">
-          <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center"><Calendar size={22} className="mr-3 text-purple-500" />Upcoming Fee Deadlines</h3>
+          <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <Calendar size={22} className="mr-3 text-purple-500" />
+            Upcoming Fee Deadlines
+          </h3>
           <div className="space-y-3">
             {pendingFees.length > 0 ? pendingFees.slice(0, 2).map((fee) => (
               <div key={fee.recordId} className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
@@ -113,11 +155,12 @@ const Dashboard: React.FC<DashboardProps> = ({
                 </div>
                 <p className="font-bold text-red-600 text-lg">₹{fee.pendingFees.toLocaleString('en-IN')}</p>
               </div>
-            )) : <p className="text-center text-gray-500 py-6">No pending fees.</p>}
+            )) : <p className="text-center text-gray-500 py-6">No pending fees. You are all clear!</p>}
           </div>
         </div>
       </div>
     </div>
   );
 };
+
 export default Dashboard;
