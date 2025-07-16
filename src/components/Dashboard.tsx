@@ -34,6 +34,7 @@ const Dashboard: React.FC<DashboardProps> = ({
     { title: 'Average Score', value: `${averageScore.toFixed(1)}%`, icon: TrendingUp, color: 'from-green-500 to-emerald-600', textColor: 'text-green-600' },
     { title: 'School Notices', value: notices.length, icon: Bell, color: 'from-blue-500 to-indigo-600', textColor: 'text-blue-600' }
   ];
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
     <div className="space-y-8">
