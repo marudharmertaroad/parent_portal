@@ -59,6 +59,7 @@ const LoginForm: React.FC = () => {
   />
 </div>
           <h1 className="text-4xl font-bold text-white mb-3">Marudhar Defence School</h1>
+          <p className="text-blue-200 text-lg mb-4">Excellence in Education & Character</p>
           <p className="text-blue-200 text-lg mb-4">Student & Parent Portal</p>
           
           <div className="flex items-center justify-center space-x-8 text-blue-200">
