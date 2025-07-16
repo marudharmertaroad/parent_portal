@@ -74,7 +74,6 @@ const [showProfileModal, setShowProfileModal] = useState(false);
     <div className="min-h-screen bg-gray-100">
       <Header
         studentName={student.name}
-        onMenuClick={() => alert("Menu button can be used for other features.")}
         onProfileClick={() => setShowProfileModal(true)} // <-- Pass the function to open the modal
       />
       
