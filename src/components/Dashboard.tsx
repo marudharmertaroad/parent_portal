@@ -1,6 +1,6 @@
 // src/components/Dashboard.tsx (Polished Parent Portal Version)
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Student, FeeRecord, ExamRecord, Notice } from '../types';
 import { 
   DollarSign, FileText, Bell, TrendingUp, Calendar, School, User, Phone
