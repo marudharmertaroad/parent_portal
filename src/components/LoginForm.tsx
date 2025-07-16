@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { User, Calendar, AlertCircle } from 'lucide-react';
+import { User, Calendar, AlertCircle, Eye, EyeOff, BookOpen, Award, Users } from 'lucide-react';
 
 const LoginForm: React.FC = () => {
   // Get the login function and loading state from our context
