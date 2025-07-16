@@ -13,7 +13,6 @@ interface DashboardProps {
   feeRecords: FeeRecord[];
   examRecords: ExamRecord[];
   notices: Notice[];
-  onProfileClick: () => void;
   onTabChange: (tab: string) => void;
 }
 
