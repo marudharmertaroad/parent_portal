@@ -65,7 +65,6 @@ const StudentPortal: React.FC = () => {
                   feeRecords={feeRecords} 
                   examRecords={examRecords}
                   notices={notices}
-                  onProfileClick={() => setShowProfileModal(true)}
                   onTabChange={setActiveTab}
                />;
     }
