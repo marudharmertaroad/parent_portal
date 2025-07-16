@@ -51,6 +51,20 @@ const Dashboard: React.FC<DashboardProps> = ({
   }
 
   return (
+    <div className="flex h-screen bg-gray-100">
+      <Sidebar 
+        activeTab={activeTab} 
+        onTabChange={setActiveTab}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        studentName={student.name} // This is now safe
+      />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <Header 
+          studentName={student.name} // This is also now safe
+          onMenuClick={() => setIsSidebarOpen(true)}
+        />
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-200 p-6 md:p-8">
     <div className="space-y-8">
       {/* School-Focused Welcome Banner */}
       <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-800 rounded-2xl p-8 text-white relative overflow-hidden shadow-2xl">
@@ -149,11 +163,10 @@ const Dashboard: React.FC<DashboardProps> = ({
             )) : <p className="text-center text-gray-500 py-6">No pending fees. You are all clear!</p>}
           </div>
         </div>
+      </main>
       </div>
-      
-      
     </div>
   );
 };
-
+        
 export default Dashboard;
