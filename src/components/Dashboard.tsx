@@ -39,6 +39,16 @@ const Dashboard: React.FC<DashboardProps> = ({
     { title: 'School Notices', value: notices.length, icon: Bell, color: 'from-blue-500 to-indigo-600', textColor: 'text-blue-600' }
   ];
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  if (!student) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-lg font-semibold text-gray-700">Loading Student Portal...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
