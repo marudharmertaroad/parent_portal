@@ -7,6 +7,7 @@ import Header from './Header';
 import Dashboard from './Dashboard';
 import ProfileModal from './ProfileModal';
 import { X } from 'lucide-react';
+import ProfileSection from './ProfileSection';
 
 // --- Placeholder Components (You can replace these with your actual components) ---
 const FeesSection = () => <div className="bg-white p-8 rounded-xl shadow-md"><h2 className="text-2xl font-bold">Fee Details</h2></div>;
