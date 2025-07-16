@@ -1,85 +1,112 @@
 // src/components/Header.tsx (SIMPLIFIED)
 
-import React, { useState, useRef, useEffect } from 'react';
-import { Bell, Menu, LogOut, User as UserIcon } from 'lucide-react';
+import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { Student, FeeRecord, ExamRecord, Notice } from '../types'; // Assuming types are in a central file
 
-interface HeaderProps {
-  studentName: string;
-  onMenuClick: () => void; // Can be used to toggle any drawer/sidebar in the future
-}
+// --- Import all necessary components ---
+import Header from './Header'; 
+import Dashboard from './Dashboard';
+import ProfileSection from './ProfileSection';
+import { X } from 'lucide-react';
 
-const Header: React.FC<HeaderProps> = ({ studentName, onMenuClick }) => {
-  const { logout } = useAuth();
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const profileRef = useRef<HTMLDivElement>(null);
+// --- Placeholder Components (You can replace these with your actual components) ---
+const FeesSection = () => <div className="bg-white p-8 rounded-xl shadow-md"><h2 className="text-2xl font-bold">Fee Details</h2></div>;
+const AcademicRecords = () => <div className="bg-white p-8 rounded-xl shadow-md"><h2 className="text-2xl font-bold">Academic Records</h2></div>;
+const HomeworkSection = () => <div className="bg-white p-8 rounded-xl shadow-md"><h2 className="text-2xl font-bold">Homework</h2></div>;
+const NoticeBoard = () => <div className="bg-white p-8 rounded-xl shadow-md"><h2 className="text-2xl font-bold">Notice Board</h2></div>;
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
-        setIsProfileOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
-  return (
-    <header className="flex-shrink-0 bg-white shadow-md z-20 relative">
-      <div className="flex items-center justify-between h-16 px-4 md:px-6">
-        <button 
-          onClick={onMenuClick} 
-          className="p-2 rounded-full text-gray-500 hover:bg-gray-100"
-        >
-          <Menu size={24} />
-        </button>
+const StudentPortal: React.FC = () => {
+  const { student } = useAuth(); // Get the authenticated student
+  
+  // --- State Management for the entire portal ---
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
-        <div className="text-lg font-semibold text-gray-700">
-          Welcome, {studentName}!
-        </div>
+  // --- Mock data (in a real app, this would come from a hook like useStudentData) ---
+  const [feeRecords, setFeeRecords] = useState<FeeRecord[]>([]);
+  const [examRecords, setExamRecords] = useState<ExamRecord[]>([]);
+  const [notices, setNotices] = useState<Notice[]>([]);
 
-        <div className="flex items-center space-x-4">
-          <button className="p-2 rounded-full text-gray-500 hover:bg-gray-100" aria-label="Notifications">
-            <Bell size={20} />
-          </button>
-          
-          <div className="relative" ref={profileRef}>
-            <button
-              onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg"
-              aria-label="Open user menu"
-            >
-              {studentName ? studentName.charAt(0).toUpperCase() : '?'}
-            </button>
-            
-            {isProfileOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border origin-top-right z-30">
-                <div className="p-2">
-                  <div className="px-3 py-2 border-b">
-                    <p className="font-semibold text-sm text-gray-800 truncate">{studentName}</p>
-                    <p className="text-xs text-gray-500">Student Portal</p>
-                  </div>
-                  <div className="pt-2">
-                    <button onClick={() => alert("Profile page coming soon!")} className="flex items-center w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100">
-                      <UserIcon size={16} className="mr-3 text-gray-500" />
-                      View Profile
-                    </button>
-                    <button
-                      onClick={logout}
-                      className="flex items-center w-full text-left px-3 py-2 text-sm text-red-600 rounded-md hover:bg-red-50"
-                    >
-                      <LogOut size={16} className="mr-3" />
-                      Logout
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+  // --- Loading Guard ---
+  if (!student) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-lg font-semibold text-gray-700">Loading Portal...</p>
         </div>
       </div>
-    </header>
+    );
+  }
+
+  // --- Function to render the correct content based on the active tab ---
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'dashboard':
+        return <Dashboard 
+                  student={student} 
+                  feeRecords={feeRecords} 
+                  examRecords={examRecords}
+                  notices={notices}
+                  onProfileClick={() => setShowProfileModal(true)}
+                  onTabChange={setActiveTab} // Pass the setter to the dashboard
+               />;
+      case 'fees':
+        return <FeesSection />;
+      case 'academic':
+       return <AcademicRecords />;
+      case 'homework':
+        return <HomeworkSection />;
+      case 'notices':
+        return <NoticeBoard />;
+      default:
+        return <Dashboard 
+                  student={student} 
+                  feeRecords={feeRecords} 
+                  examRecords={examRecords}
+                  notices={notices}
+                  onProfileClick={() => setShowProfileModal(true)}
+                  onTabChange={setActiveTab}
+               />;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      {/* Header is always visible */}
+      <Header
+        studentName={student.name}
+        // The onMenuClick can be used for a future notifications drawer, for example
+        onMenuClick={() => alert("Menu button clicked!")}
+      />
+      
+      {/* Main content area */}
+      <main className="p-6 md:p-8">
+        <div className="max-w-7xl mx-auto">
+          {renderContent()}
+        </div>
+      </main>
+      
+      {/* Profile Modal */}
+      {showProfileModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-4xl w-full m-4 max-h-[90vh] flex flex-col">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h2 className="text-xl font-semibold">Student Profile</h2>
+              <button onClick={() => setShowProfileModal(false)} className="p-1 rounded-full hover:bg-gray-100">
+                <X size={24} />
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto">
+              <ProfileSection student={student} />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
-export default Header;
+export default StudentPortal;
