@@ -1,4 +1,4 @@
-// src/components/Header.tsx (SIMPLIFIED)
+// src/components/Header.tsx
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Bell, Menu, LogOut, User as UserIcon } from 'lucide-react';
@@ -6,9 +6,11 @@ import { useAuth } from '../contexts/AuthContext';
 
 interface HeaderProps {
   studentName: string;
-  onProfileClick: () => void;// Can be used to toggle any drawer/sidebar in the future
+  onMenuClick: () => void;
+  onProfileClick: () => void;
 }
-const Header: React.FC<HeaderProps> = ({ studentName, onProfileClick  }) => {
+
+const Header: React.FC<HeaderProps> = ({ studentName, onMenuClick, onProfileClick }) => {
   const { logout } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
@@ -26,7 +28,12 @@ const Header: React.FC<HeaderProps> = ({ studentName, onProfileClick  }) => {
   return (
     <header className="flex-shrink-0 bg-white shadow-md z-20 relative">
       <div className="flex items-center justify-between h-16 px-4 md:px-6">
-        
+        <button 
+          onClick={onMenuClick} 
+          className="p-2 rounded-full text-gray-500 hover:bg-gray-100"
+        >
+          <Menu size={24} />
+        </button>
 
         <div className="text-lg font-semibold text-gray-700">
           Welcome, {studentName}!
@@ -54,7 +61,6 @@ const Header: React.FC<HeaderProps> = ({ studentName, onProfileClick  }) => {
                     <p className="text-xs text-gray-500">Student Portal</p>
                   </div>
                   <div className="pt-2">
-                    {/* THIS BUTTON NOW USES THE PROP */}
                     <button onClick={onProfileClick} className="flex items-center w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100">
                       <UserIcon size={16} className="mr-3 text-gray-500" />
                       View Profile
