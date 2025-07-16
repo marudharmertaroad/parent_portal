@@ -54,7 +54,6 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ student }) => {
       <ProfileDetail icon={Heart} label="Religion" value={student.religion} />
       <ProfileDetail icon={Hash} label="NIC ID" value={student.nicStudentId} />
       <ProfileDetail icon={Home} label="Address" value={student.address} />
-      </div>
   );
 };
 
