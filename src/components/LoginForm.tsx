@@ -65,11 +65,11 @@ const LoginForm: React.FC = () => {
           <div className="flex items-center justify-center space-x-8 text-blue-200">
             <div className="flex items-center space-x-2">
               <BookOpen className="w-5 h-5" />
-              <span className="text-sm">Welcome</span>
+              <span className="text-sm">Est. 1991</span>
             </div>
             <div className="flex items-center space-x-2">
               <Users className="w-5 h-5" />
-              <span className="text-sm">Students</span>
+              <span className="text-sm">1200+ Students</span>
             </div>
             <div className="flex items-center space-x-2">
               <Award className="w-5 h-5" />
