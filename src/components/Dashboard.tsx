@@ -92,17 +92,39 @@ const Dashboard: React.FC<DashboardProps> = ({
       </div>
 
       {/* Recent Activity Grids */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200">
-          <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center"><FileText size={22} className="mr-3 text-blue-500" />Recent Exam Results</h3>
-          <div className="space-y-3">
-             {/* Exam results content here */}
+      {examRecords.length > 0 ? examRecords.slice(0, 3).map((exam) => (
+              <div key={exam.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-semibold text-gray-800">{exam.examType}</p>
+                  <p className="text-sm text-gray-500">Date: {formatDate(exam.examDate)}</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold text-gray-800">{exam.obtainedMarks}/{exam.totalMarks}</p>
+                  <p className={`text-sm font-medium ${getGradeColor(exam.grade)}`}>{exam.grade}</p>
+                </div>
+              </div>
+            )) : (
+              <p className="text-center text-gray-500 py-6">No exam results available yet.</p>
+            )}
           </div>
-        </div>
         <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200">
           <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center"><Calendar size={22} className="mr-3 text-purple-500" />Upcoming Fee Deadlines</h3>
           <div className="space-y-3">
-             {/* Fee deadlines content here */}
+            {/* --- IMPROVEMENT: Added fallback message --- */}
+            {pendingFees.length > 0 ? pendingFees.slice(0, 2).map((fee) => (
+              <div key={fee.recordId} className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <DollarSign size={18} className="text-red-600" />
+                  <div>
+                    <p className="font-semibold text-gray-800">Fee Payment Due</p>
+                    <p className="text-sm text-gray-600">Due Date: {formatDate(fee.dueDate)}</p>
+                  </div>
+                </div>
+                <p className="font-bold text-red-600 text-lg">₹{fee.pendingFees.toLocaleString('en-IN')}</p>
+              </div>
+            )) : (
+              <p className="text-center text-gray-500 py-6">No pending fees. You are all clear!</p>
+            )}
           </div>
         </div>
       </div>
