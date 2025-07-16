@@ -29,27 +29,25 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, student })
             <X size={24} />
           </button>
         </div>
-        <div className="p-6 md:p-8 overflow-y-auto bg-gray-50">
-          {/* Use flexbox for a more natural layout than a rigid grid */}
-          <div className="flex flex-col lg:flex-row gap-8">
+        <div className="p-6 md:p-8 overflow-y-auto">
+          {/* --- THIS IS THE NEW UNIFIED CARD LAYOUT --- */}
+          <div className="bg-white rounded-2xl shadow-lg border p-6 md:p-8 flex flex-col lg:flex-row gap-8">
             
-            {/* Photo Upload Section (takes up less space) */}
-            <div className="flex-shrink-0 lg:w-1/4">
+            {/* Photo Upload Column (takes up 1/4 of the space on large screens) */}
+            <div className="lg:w-1/4 flex-shrink-0">
               <PhotoUpload 
                 student={student} 
                 onUploadComplete={handlePhotoUploadSuccess} 
               />
             </div>
 
-            {/* Profile Details Section (takes up all remaining space) */}
-            <div className="flex-grow bg-white p-6 rounded-2xl border shadow-sm">
+            {/* Profile Details Column (takes up the remaining 3/4) */}
+            <div className="lg:w-3/4">
               <ProfileSection student={student} />
             </div>
 
           </div>
         </div>
-        {/* --- END OF CORRECTION --- */}
-
       </div>
     </div>
   );
