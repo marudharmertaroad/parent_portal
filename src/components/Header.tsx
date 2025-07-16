@@ -25,6 +25,8 @@ const Header: React.FC<HeaderProps> = ({ studentName,  }) => {
 
   return (
     <header className="flex-shrink-0 bg-white shadow-md z-20 relative">
+      <div className="flex items-center justify-between h-16 px-4 md:px-6">
+        
 
         <div className="text-lg font-semibold text-gray-700">
           Welcome, {studentName}!
