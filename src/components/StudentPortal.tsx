@@ -21,11 +21,11 @@ const PlaceholderComponent = ({ title }: { title: string }) => (
 
 const StudentPortal: React.FC = () => {
   const { student, logout } = useAuth();
-  const { feeRecords, examRecords, notices, loading, error, refreshData } = useStudentData();
+  const [feeRecords, setFeeRecords] = useState([]);
+  const [examRecords, setExamRecords] = useState([]);
+  const [notices, setNotices] = useState([]);
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [showProfileModal, setShowProfileModal] = useState(false);
-
+  
   if (!student) {
     return <div>Error: No student data found. Please log out and try again.</div>;
   }
