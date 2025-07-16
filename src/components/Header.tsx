@@ -6,7 +6,6 @@ import { useAuth } from '../contexts/AuthContext';
 
 interface HeaderProps {
   studentName: string;
-  onMenuClick: () => void;
   onProfileClick: () => void;// Can be used to toggle any drawer/sidebar in the future
 }
 const Header: React.FC<HeaderProps> = ({ studentName, onMenuClick }) => {
