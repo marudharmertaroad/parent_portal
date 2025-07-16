@@ -1,26 +1,25 @@
 // src/components/Dashboard.tsx (Polished Parent Portal Version)
 
-import React, { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import React from 'react';
 import { Student, FeeRecord, ExamRecord, Notice } from '../types';
 import { 
+  Home, CreditCard, Award, BookOpen, Megaphone,
   DollarSign, FileText, Bell, TrendingUp, Calendar, School, User
 } from 'lucide-react';
 import { formatDate, getGradeColor } from '../utils';
 
-import Header from './Header'; 
-import Sidebar from './Sidebar';
-
+// Define the props it expects from the parent
 interface DashboardProps {
   student: Student;
   feeRecords: FeeRecord[];
   examRecords: ExamRecord[];
   notices: Notice[];
   onProfileClick: () => void;
+  onTabChange: (tab: string) => void; // Function to change the page
 }
 
-const DashboardContent: React.FC<{ student: Student; feeRecords: FeeRecord[]; examRecords: ExamRecord[]; notices: Notice[]; onProfileClick: () => void; }> = ({
-  student, feeRecords, examRecords, notices, onProfileClick
+const Dashboard: React.FC<DashboardProps> = ({
+  student, feeRecords, examRecords, notices, onProfileClick, onTabChange
 }) => {
   const pendingFees = feeRecords.filter(fee => fee.status !== 'Paid');
   const averageScore = examRecords.length > 0 
@@ -32,17 +31,17 @@ const DashboardContent: React.FC<{ student: Student; feeRecords: FeeRecord[]; ex
     { title: 'Average Score', value: `${averageScore.toFixed(1)}%`, icon: TrendingUp, color: 'from-green-500 to-emerald-600', textColor: 'text-green-600' },
     { title: 'School Notices', value: notices.length, icon: Bell, color: 'from-blue-500 to-indigo-600', textColor: 'text-blue-600' }
   ];
+
+  const navItems = [
+    { id: 'dashboard', name: 'Dashboard', icon: Home },
+    { id: 'fees', name: 'Fee Details', icon: CreditCard },
+    { id: 'academic', name: 'Academic Records', icon: Award },
+    { id: 'homework', name: 'Homework', icon: BookOpen },
+    { id: 'notices', name: 'Notice Board', icon: Megaphone },
+  ];
+
   return (
     <div className="space-y-8">
-      {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-800 rounded-2xl p-8 text-white relative overflow-hidden shadow-2xl">
-        <div className="absolute -bottom-12 -right-12 opacity-10"><School className="w-64 h-64" /></div>
-        <div className="relative z-10">
-          <h2 className="text-4xl font-bold mb-3">Marudhar Defence School</h2>
-          <p className="text-blue-100 text-lg">Welcome to the Parent & Student Portal</p>
-        </div>
-      </div>
-
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {stats.map((stat, index) => (
@@ -62,21 +61,20 @@ const DashboardContent: React.FC<{ student: Student; feeRecords: FeeRecord[]; ex
         ))}
       </div>
 
-      {/* Student Profile Card */}
-      <div className="bg-white rounded-xl p-6 shadow-md border">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-3xl">
-              {student.name.charAt(0).toUpperCase()}
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-gray-800">{student.name}</h3>
-              <p className="text-gray-500">Class: {student.class} | SR No: {student.srNo}</p>
-            </div>
-          </div>
-          <button onClick={onProfileClick} className="mt-4 sm:mt-0 flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium text-sm transition-colors">
-            <User size={16} className="mr-2" /> View Full Profile
-          </button>
+      {/* --- NEW ICON-BASED NAVIGATION TABS --- */}
+      <div className="bg-white p-4 rounded-xl shadow-md border">
+        <h3 className="font-semibold text-lg text-gray-800 mb-4 px-2">Navigate</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+          {navItems.map(item => (
+            <button
+              key={item.id}
+              onClick={() => onTabChange(item.id)}
+              className="flex flex-col items-center justify-center p-4 rounded-xl text-center transition-all duration-200 text-gray-700 hover:bg-blue-500 hover:text-white group"
+            >
+              <item.icon size={32} className="mb-2 transition-transform group-hover:scale-110" />
+              <span className="font-semibold text-sm">{item.name}</span>
+            </button>
+          ))}
         </div>
       </div>
       
