@@ -1,246 +1,92 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Student } from '../types';
-import { User, Mail, Phone, MapPin, Calendar, Edit } from 'lucide-react';
+import { 
+    User, Cake, Phone, Home, Book, BookOpen, 
+    Bus, Hash, Users as UsersIcon, GraduationCap, Heart, Shield
+} from 'lucide-react';
+import { formatDate } from '../utils';
 
 interface ProfileSectionProps {
   student: Student;
 }
 
+// A more vibrant, reusable component for each piece of information
+const ProfileDetail: React.FC<{ icon: React.ElementType, label: string, value?: string | null, color: string }> = ({ 
+  icon: Icon, 
+  label, 
+  value,
+  color
+}) => (
+  <div className="flex items-center p-4 bg-white rounded-xl shadow-sm border">
+    <div className={`flex-shrink-0 flex h-12 w-12 items-center justify-center rounded-lg mr-4 ${color}`}>
+        <Icon className="w-6 h-6 text-white" />
+    </div>
+    <div>
+      <p className="text-sm font-medium text-gray-500">{label}</p>
+      <p className="text-lg font-semibold text-gray-800">{value || 'N/A'}</p>
+    </div>
+  </div>
+);
+
 const ProfileSection: React.FC<ProfileSectionProps> = ({ student }) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedStudent, setEditedStudent] = useState(student);
-
-  const handleSave = () => {
-    // Here you would typically make an API call to update the student information
-    console.log('Saving student data:', editedStudent);
-    setIsEditing(false);
-    alert('Profile updated successfully!');
-  };
-
-  const handleCancel = () => {
-    setEditedStudent(student);
-    setIsEditing(false);
-  };
+  if (!student) {
+    return <div>Loading profile...</div>;
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Profile Header */}
-      <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-6 text-white">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-6">
-            <div className="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-              {student.profileImage ? (
-                <img 
-                  src={student.profileImage} 
-                  alt={student.name}
-                  className="w-20 h-20 rounded-full object-cover"
-                />
-              ) : (
-                <span className="text-3xl font-bold">{student.name.charAt(0)}</span>
-              )}
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold">{student.name}</h2>
-              <p className="text-blue-100">Class {student.class} - Section {student.section}</p>
-              <p className="text-blue-100">Roll Number: {student.rollNumber}</p>
+    <div className="space-y-8">
+      {/* Header Profile Card */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-8 rounded-2xl shadow-lg text-white">
+        <div className="flex flex-col md:flex-row items-center gap-6">
+          <div className="relative">
+            <div className="w-24 h-24 md:w-32 md:h-32 bg-white/20 border-4 border-white/50 rounded-full flex items-center justify-center font-bold text-6xl">
+              {student.name.charAt(0).toUpperCase()}
             </div>
           </div>
-          <button
-            onClick={() => setIsEditing(!isEditing)}
-            className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg transition-all flex items-center space-x-2"
-          >
-            <Edit size={16} />
-            <span>{isEditing ? 'Cancel' : 'Edit Profile'}</span>
-          </button>
+          <div className="text-center md:text-left">
+            <h2 className="text-4xl font-bold">{student.name}</h2>
+            <p className="text-xl text-blue-200 mt-1">
+              Class: {student.class} | SR No: {student.srNo}
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Profile Details */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-6 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-            <User size={20} className="mr-2 text-blue-500" />
-            Personal Information
-          </h3>
+      {/* Main Details Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Column 1: Personal & Family */}
+        <div className="space-y-6 bg-white p-6 rounded-2xl shadow-md border">
+            <h3 className="text-xl font-bold text-gray-900 border-b pb-3 flex items-center gap-3">
+                <User size={24} className="text-blue-500" />
+                Personal & Family
+            </h3>
+            <ProfileDetail icon={User} label="Father's Name" value={student.fatherName} color="bg-blue-500" />
+            <ProfileDetail icon={User} label="Mother's Name" value={student.motherName} color="bg-pink-500" />
+            <ProfileDetail icon={Cake} label="Date of Birth" value={formatDate(student.dob)} color="bg-orange-500" />
+            <ProfileDetail icon={Heart} label="Religion" value={student.religion} color="bg-purple-500" />
+        </div>
+
+        {/* Column 2: Academic */}
+        <div className="space-y-6 bg-white p-6 rounded-2xl shadow-md border">
+            <h3 className="text-xl font-bold text-gray-900 border-b pb-3 flex items-center gap-3">
+                <GraduationCap size={24} className="text-green-500" />
+                Academic Details
+            </h3>
+            <ProfileDetail icon={Book} label="Class" value={student.class} color="bg-green-500" />
+            <ProfileDetail icon={BookOpen} label="Medium" value={student.medium} color="bg-teal-500" />
+            <ProfileDetail icon={Hash} label="NIC ID" value={student.nicStudentId} color="bg-gray-500" />
+            <ProfileDetail icon={Shield} label="RTE Status" value={student.isRte ? 'Yes' : 'No'} color={student.isRte ? 'bg-green-600' : 'bg-red-500'} />
         </div>
         
-        <div className="p-6 space-y-6">
-          {/* Basic Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Full Name
-              </label>
-              {isEditing ? (
-                <input
-                  type="text"
-                  value={editedStudent.name}
-                  onChange={(e) => setEditedStudent({...editedStudent, name: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              ) : (
-                <p className="text-gray-900 bg-gray-50 px-3 py-2 rounded-lg">{student.name}</p>
-              )}
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Date of Birth
-              </label>
-              {isEditing ? (
-                <input
-                  type="date"
-                  value={editedStudent.dateOfBirth}
-                  onChange={(e) => setEditedStudent({...editedStudent, dateOfBirth: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              ) : (
-                <p className="text-gray-900 bg-gray-50 px-3 py-2 rounded-lg flex items-center">
-                  <Calendar size={16} className="mr-2 text-gray-500" />
-                  {new Date(student.dateOfBirth).toLocaleDateString()}
-                </p>
-              )}
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Admission Number
-              </label>
-              <p className="text-gray-900 bg-gray-50 px-3 py-2 rounded-lg">{student.admissionNumber}</p>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Class & Section
-              </label>
-              <p className="text-gray-900 bg-gray-50 px-3 py-2 rounded-lg">
-                {student.class} - {student.section}
-              </p>
-            </div>
-          </div>
-
-          {/* Contact Information */}
-          <div className="pt-6 border-t border-gray-200">
-            <h4 className="text-md font-semibold text-gray-900 mb-4">Contact Information</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address
-                </label>
-                {isEditing ? (
-                  <input
-                    type="email"
-                    value={editedStudent.email}
-                    onChange={(e) => setEditedStudent({...editedStudent, email: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                ) : (
-                  <p className="text-gray-900 bg-gray-50 px-3 py-2 rounded-lg flex items-center">
-                    <Mail size={16} className="mr-2 text-gray-500" />
-                    {student.email}
-                  </p>
-                )}
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Contact Number
-                </label>
-                {isEditing ? (
-                  <input
-                    type="tel"
-                    value={editedStudent.contactNumber}
-                    onChange={(e) => setEditedStudent({...editedStudent, contactNumber: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                ) : (
-                  <p className="text-gray-900 bg-gray-50 px-3 py-2 rounded-lg flex items-center">
-                    <Phone size={16} className="mr-2 text-gray-500" />
-                    {student.contactNumber}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Parent Information */}
-          <div className="pt-6 border-t border-gray-200">
-            <h4 className="text-md font-semibold text-gray-900 mb-4">Parent Information</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Father's Name
-                </label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    value={editedStudent.fatherName}
-                    onChange={(e) => setEditedStudent({...editedStudent, fatherName: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                ) : (
-                  <p className="text-gray-900 bg-gray-50 px-3 py-2 rounded-lg">{student.fatherName}</p>
-                )}
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Mother's Name
-                </label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    value={editedStudent.motherName}
-                    onChange={(e) => setEditedStudent({...editedStudent, motherName: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                ) : (
-                  <p className="text-gray-900 bg-gray-50 px-3 py-2 rounded-lg">{student.motherName}</p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Address */}
-          <div className="pt-6 border-t border-gray-200">
-            <h4 className="text-md font-semibold text-gray-900 mb-4">Address</h4>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Home Address
-              </label>
-              {isEditing ? (
-                <textarea
-                  value={editedStudent.address}
-                  onChange={(e) => setEditedStudent({...editedStudent, address: e.target.value})}
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              ) : (
-                <p className="text-gray-900 bg-gray-50 px-3 py-2 rounded-lg flex items-start">
-                  <MapPin size={16} className="mr-2 text-gray-500 mt-0.5" />
-                  {student.address}
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* Save/Cancel Buttons */}
-          {isEditing && (
-            <div className="pt-6 border-t border-gray-200 flex justify-end space-x-4">
-              <button
-                onClick={handleCancel}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-              >
-                Save Changes
-              </button>
-            </div>
-          )}
+        {/* Column 3: Contact & Transport */}
+        <div className="space-y-6 bg-white p-6 rounded-2xl shadow-md border">
+            <h3 className="text-xl font-bold text-gray-900 border-b pb-3 flex items-center gap-3">
+                <Phone size={24} className="text-indigo-500" />
+                Contact & Transport
+            </h3>
+            <ProfileDetail icon={Phone} label="Contact Number" value={student.contact} color="bg-indigo-500" />
+            <ProfileDetail icon={Home} label="Address" value={student.address} color="bg-cyan-500" />
+            <ProfileDetail icon={Bus} label="Bus Route" value={student.bus_route} color="bg-yellow-500" />
         </div>
       </div>
     </div>
