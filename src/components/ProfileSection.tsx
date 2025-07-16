@@ -34,23 +34,6 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ student }) => {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Header Profile Card */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-8 rounded-2xl shadow-lg text-white">
-        <div className="flex flex-col md:flex-row items-center gap-6">
-          <div className="relative">
-            <div className="w-24 h-24 md:w-32 md:h-32 bg-white/20 border-4 border-white/50 rounded-full flex items-center justify-center font-bold text-6xl">
-              {student.name.charAt(0).toUpperCase()}
-            </div>
-          </div>
-          <div className="text-center md:text-left">
-            <h2 className="text-4xl font-bold">{student.name}</h2>
-            <p className="text-xl text-blue-200 mt-1">
-              Class: {student.class} | SR No: {student.srNo}
-            </p>
-          </div>
-        </div>
-      </div>
 
       {/* Main Details Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-2">
@@ -71,7 +54,6 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ student }) => {
       <ProfileDetail icon={Heart} label="Religion" value={student.religion} />
       <ProfileDetail icon={Hash} label="NIC ID" value={student.nicStudentId} />
       <ProfileDetail icon={Home} label="Address" value={student.address} />
-    </div>
       </div>
   );
 };
