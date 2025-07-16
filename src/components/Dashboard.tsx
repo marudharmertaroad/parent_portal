@@ -25,6 +25,9 @@ const Dashboard: React.FC<DashboardProps> = ({
   notices = [],
   onProfileClick // Receive the function as a prop
 }) => {
+  const { student } = useAuth(); // Get the student object
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const pendingFees = feeRecords.filter(fee => fee.status !== 'Paid');
   const averageScore = examRecords.length > 0 
     ? examRecords.reduce((sum, exam) => sum + exam.percentage, 0) / examRecords.length
