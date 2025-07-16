@@ -46,13 +46,15 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ student, onUploadComplete }) 
       if (updateError) throw updateError;
       
       alert('Photo updated successfully!');
-      onUploadComplete(); // Refresh parent data
+      window.location.reload();
+      
     } catch (error: any) {
       alert(`Error: ${error.message}`);
     } finally {
       setIsUploading(false);
     }
   };
+
 
   return (
     <div className="flex flex-col items-center gap-4 p-6 bg-gray-50 rounded-2xl border">
