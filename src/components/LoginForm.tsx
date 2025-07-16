@@ -43,10 +43,10 @@ const LoginForm: React.FC = () => {
       {/* --- THIS IS THE UPDATED BACKGROUND SECTION --- */}
       <div className="absolute inset-0 opacity-5 text-white">
         {/* We use flexbox and absolute positioning to place icons around the screen */}
-        <GraduationCap className="absolute top-20 left-20 w-32 h-32 animate-pulse" strokeWidth={5} />
-        <ShieldCheck className="absolute top-40 right-32 w-24 h-24 animate-pulse delay-300" strokeWidth={0.5} />
-        <Target className="absolute bottom-32 left-40 w-20 h-20 animate-pulse delay-700" strokeWidth={0.5} />
-        <Medal className="absolute bottom-20 right-20 w-28 h-28 animate-pulse delay-1000" strokeWidth={0.5} />
+        <GraduationCap className="absolute top-20 left-20 w-32 h-32 animate-pulse" strokeWidth={2} />
+        <ShieldCheck className="absolute top-40 right-32 w-24 h-24 animate-pulse delay-300" strokeWidth={2} />
+        <Target className="absolute bottom-32 left-40 w-20 h-20 animate-pulse delay-700" strokeWidth={2} />
+        <Medal className="absolute bottom-20 right-20 w-28 h-28 animate-pulse delay-1000" strokeWidth={2} />
       </div>
 
       <div className="relative w-full max-w-md z-10">
