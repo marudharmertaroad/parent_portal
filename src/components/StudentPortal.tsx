@@ -98,6 +98,7 @@ const [showProfileModal, setShowProfileModal] = useState(false);
         isOpen={showProfileModal}
         onClose={() => setShowProfileModal(false)}
         student={student}
+        onDataRefresh={refreshAllData}
       />
     </div>
   );
