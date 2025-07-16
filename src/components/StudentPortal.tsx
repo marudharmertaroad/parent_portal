@@ -5,7 +5,7 @@ import { Student, FeeRecord, ExamRecord, Notice } from '../types'; // Assuming t
 // --- Import all necessary components ---
 import Header from './Header'; 
 import Dashboard from './Dashboard';
-import ProfileSection from './ProfileSection';
+import ProfileModal from './ProfileModal';
 import { X } from 'lucide-react';
 
 // --- Placeholder Components (You can replace these with your actual components) ---
