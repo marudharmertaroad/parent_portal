@@ -27,19 +27,15 @@ const StudentPortal: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   
   if (!student) {
-    return <div>Error: No student data found. Please log out and try again.</div>;
-  }
-  if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-center text-gray-600">
+      <div className="flex items-center justify-center h-screen bg-gray-100">
+        <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p>Loading {student.name}'s Dashboard...</p>
+          <p className="text-lg font-semibold text-gray-700">Loading Portal...</p>
         </div>
       </div>
     );
   }
-  if (error) { /* ... error UI ... */ }
 
   const renderContent = () => {
     switch (activeTab) {
