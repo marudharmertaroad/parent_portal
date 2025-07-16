@@ -70,13 +70,11 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ student }) => {
       </div>
 
       {/* --- THIS IS THE NEW, UNIFIED DETAILS SECTION --- */}
-      <div className="bg-white p-6 rounded-2xl shadow-md border">
+      <div>
         <h3 className="text-xl font-bold text-gray-900 border-b pb-3 mb-4 flex items-center gap-3">
             <GraduationCap size={24} className="text-gray-700" />
             Student Information
         </h3>
-        
-        {/* A more spacious and responsive grid. Max 3 columns on large screens. */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
             {allDetails.map(detail => <ProfileDetail key={detail.label} {...detail} />)}
         </div>
