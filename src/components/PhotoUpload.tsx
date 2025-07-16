@@ -52,6 +52,8 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ student, onUploadComplete }) 
       
       alert('Photo updated successfully!');
       window.location.reload();
+            onUploadComplete();
+
       
     } catch (error: any) {
       alert(`Error: ${error.message}`);
