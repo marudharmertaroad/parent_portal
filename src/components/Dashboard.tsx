@@ -28,17 +28,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   const { student } = useAuth(); // Get the student object
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const pendingFees = feeRecords.filter(fee => fee.status !== 'Paid');
-  const averageScore = examRecords.length > 0 
-    ? examRecords.reduce((sum, exam) => sum + exam.percentage, 0) / examRecords.length
-    : 0;
 
-  const stats = [
-    { title: 'Pending Dues', value: pendingFees.length, icon: DollarSign, color: 'from-red-500 to-orange-500', textColor: 'text-red-600', isCurrency: true },
-    { title: 'Average Score', value: `${averageScore.toFixed(1)}%`, icon: TrendingUp, color: 'from-green-500 to-emerald-600', textColor: 'text-green-600' },
-    { title: 'School Notices', value: notices.length, icon: Bell, color: 'from-blue-500 to-indigo-600', textColor: 'text-blue-600' }
-  ];
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   if (!student) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-100">
@@ -49,7 +39,16 @@ const Dashboard: React.FC<DashboardProps> = ({
       </div>
     );
   }
+  const pendingFees = feeRecords.filter(fee => fee.status !== 'Paid');
+  const averageScore = examRecords.length > 0 
+    ? examRecords.reduce((sum, exam) => sum + exam.percentage, 0) / examRecords.length
+    : 0;
 
+  const stats = [
+    { title: 'Pending Dues', value: pendingFees.length, icon: DollarSign, color: 'from-red-500 to-orange-500', textColor: 'text-red-600', isCurrency: true },
+    { title: 'Average Score', value: `${averageScore.toFixed(1)}%`, icon: TrendingUp, color: 'from-green-500 to-emerald-600', textColor: 'text-green-600' },
+    { title: 'School Notices', value: notices.length, icon: Bell, color: 'from-blue-500 to-indigo-600', textColor: 'text-blue-600' }
+  ];
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar 
