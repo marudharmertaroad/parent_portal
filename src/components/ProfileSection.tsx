@@ -34,9 +34,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ student }) => {
   }
 
   return (
-
-      {/* Main Details Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-2">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-2">
       {/* Group 1 */}
       <ProfileDetail icon={User} label="Father's Name" value={student.fatherName} />
       <ProfileDetail icon={User} label="Mother's Name" value={student.motherName} />
@@ -54,7 +52,9 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ student }) => {
       <ProfileDetail icon={Heart} label="Religion" value={student.religion} />
       <ProfileDetail icon={Hash} label="NIC ID" value={student.nicStudentId} />
       <ProfileDetail icon={Home} label="Address" value={student.address} />
+    </div>
   );
 };
 
 export default ProfileSection;
+
