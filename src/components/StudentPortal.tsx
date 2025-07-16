@@ -13,6 +13,12 @@ import ProfileSection from './ProfileSection';
 import NoticeBoard from './NoticeBoard';
 import { X } from 'lucide-react';
 
+const PlaceholderComponent = ({ title }: { title: string }) => (
+  <div className="bg-white p-8 rounded-xl shadow-md">
+    <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
+  </div>
+);
+
 const StudentPortal: React.FC = () => {
   const { student, logout } = useAuth();
   const { feeRecords, examRecords, notices, loading, error, refreshData } = useStudentData();
