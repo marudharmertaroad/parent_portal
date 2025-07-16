@@ -53,7 +53,7 @@ const LoginForm: React.FC = () => {
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-24 h-24 bg-white border-2 border-white rounded-full mb-6 shadow-2xl overflow-hidden">
   <img
-    src="/logo copy.png" 
+    src="/logo.png" 
     alt="School Logo"
     className="w-full h-full object-cover"
   />
