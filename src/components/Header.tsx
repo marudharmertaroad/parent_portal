@@ -8,7 +8,7 @@ interface HeaderProps {
   studentName: string;
   onProfileClick: () => void;// Can be used to toggle any drawer/sidebar in the future
 }
-const Header: React.FC<HeaderProps> = ({ studentName, onMenuClick }) => {
+const Header: React.FC<HeaderProps> = ({ studentName,  }) => {
   const { logout } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
@@ -25,13 +25,6 @@ const Header: React.FC<HeaderProps> = ({ studentName, onMenuClick }) => {
 
   return (
     <header className="flex-shrink-0 bg-white shadow-md z-20 relative">
-      <div className="flex items-center justify-between h-16 px-4 md:px-6">
-        <button 
-          onClick={onMenuClick} 
-          className="p-2 rounded-full text-gray-500 hover:bg-gray-100"
-        >
-          <Menu size={24} />
-        </button>
 
         <div className="text-lg font-semibold text-gray-700">
           Welcome, {studentName}!
