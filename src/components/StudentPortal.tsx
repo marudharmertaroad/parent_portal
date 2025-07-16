@@ -28,15 +28,8 @@ const [showProfileModal, setShowProfileModal] = useState(false);
   const [examRecords, setExamRecords] = useState<ExamRecord[]>([]);
   const [notices, setNotices] = useState<Notice[]>([]);
   const refreshAllData = async () => {
-    // This is where you would re-fetch student data, fee records, etc.
-    // For now, we'll just log it.
     console.log("Refreshing all portal data...");
-    // In a real app, you would also update the student object in your AuthContext
-    // For example:
-    // const { data: updatedStudent } = await supabase.from('students')...
-    // setStudent(updatedStudent);
   };
-
   // --- Loading Guard ---
   if (!student) {
     return (
