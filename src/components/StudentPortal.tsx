@@ -31,6 +31,7 @@ const StudentPortal: React.FC = () => {
     // For now, we'll just show an alert and reload as a fallback.
     alert("Photo updated successfully! The portal will now refresh.");
     window.location.reload();
+    }, [student]);
 
   // Loading Guard: Prevents rendering until the student object is ready
   if (!student) {
