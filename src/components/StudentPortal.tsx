@@ -20,8 +20,8 @@ const StudentPortal: React.FC = () => {
   
   // --- State Management for the entire portal ---
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [showProfileModal, setShowProfileModal] = useState(false);
-
+const [showProfileModal, setShowProfileModal] = useState(false);
+  
   // --- Mock data (in a real app, this would come from a hook like useStudentData) ---
   const [feeRecords, setFeeRecords] = useState<FeeRecord[]>([]);
   const [examRecords, setExamRecords] = useState<ExamRecord[]>([]);
