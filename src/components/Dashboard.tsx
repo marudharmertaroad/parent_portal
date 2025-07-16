@@ -92,28 +92,6 @@ const Dashboard: React.FC<DashboardProps> = ({
         </div>
       </div>
 
-      {/* --- NEW: Dedicated Student Profile Card --- */}
-      <div className="bg-white rounded-xl p-6 shadow-md border">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center space-x-4">
-                  <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-3xl">
-                      {student.name.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                      <h3 className="text-xl font-bold text-gray-800">{student.name}</h3>
-                      <p className="text-gray-500">Class: {student.class} | SR No: {student.srNo}</p>
-                  </div>
-              </div>
-              <button
-                  onClick={onProfileClick}
-                  className="mt-4 sm:mt-0 flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium text-sm transition-colors"
-              >
-                  <User size={16} className="mr-2" />
-                  View Full Profile
-              </button>
-          </div>
-      </div>
-
       {/* Recent Activity & Upcoming Deadlines Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200">
