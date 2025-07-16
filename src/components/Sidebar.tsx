@@ -28,46 +28,59 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, isOpen, onClo
   return (
     <>
       <div className={sidebarClasses}>
-        {/* --- FIX: New Sidebar Header --- */}
-        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
-          <div className="flex items-center space-x-3">
-            <img className="h-10 w-10 rounded-full" src="/logo.png" alt="School Logo" />
+        {/* --- Sidebar Header --- */}
+        <div className="flex items-center justify-between h-20 px-6 border-b border-gray-700">
+          <div className="flex items-center space-x-4">
+            <img className="h-12 w-12 rounded-full border-2 border-white/50" src="/logo.png" alt="School Logo" />
             <div className="flex flex-col">
-              <span className="font-semibold text-sm text-gray-800">{studentName}</span>
-              <span className="text-xs text-gray-500">Student</span>
+              <span className="font-semibold text-lg text-white">{studentName}</span>
+              <span className="text-sm text-gray-400">Student Portal</span>
             </div>
           </div>
-          <button onClick={onClose} className="lg:hidden p-2 rounded-full text-gray-500 hover:bg-gray-100">
+          <button onClick={onClose} className="lg:hidden p-2 rounded-full text-gray-400 hover:bg-white/10">
             <X size={24} />
           </button>
         </div>
 
-        <nav className="mt-6 px-3">
-          {navItems.map((item) => (
+        {/* --- Navigation --- */}
+        <nav className="flex flex-col justify-between flex-1 mt-6 px-4">
+          <div>
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => {
+                  onTabChange(item.id);
+                  onClose();
+                }}
+                className={`w-full flex items-center px-4 py-3.5 text-left rounded-xl mb-2 transition-all duration-200 group
+                  ${activeTab === item.id 
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg' 
+                    : 'text-gray-300 hover:bg-white/10 hover:text-white'
+                  }
+                `}
+              >
+                <item.icon className={`w-6 h-6 mr-4 transition-transform group-hover:scale-110 ${activeTab === item.id ? '' : 'text-gray-400 group-hover:text-white'}`} />
+                <span className="font-medium text-md">{item.name}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* --- Logout Button at the bottom --- */}
+          <div className="mb-6">
             <button
-              key={item.id}
-              onClick={() => {
-                onTabChange(item.id);
-                onClose();
-              }}
-              className={`w-full flex items-center px-4 py-3 text-left rounded-xl mb-2 transition-all duration-200
-                ${activeTab === item.id 
-                  ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg' 
-                  : 'text-gray-700 hover:bg-gray-100'
-                }
-              `}
+              className="w-full flex items-center px-4 py-3.5 text-left rounded-xl text-gray-400 hover:bg-red-500/20 hover:text-red-400"
             >
-              <item.icon className="w-5 h-5 mr-3" />
-              <span className="font-medium">{item.name}</span>
+              <LogOut className="w-6 h-6 mr-4" />
+              <span className="font-medium text-md">Logout</span>
             </button>
-          ))}
+          </div>
         </nav>
       </div>
+
       {/* Mobile overlay */}
-      {isOpen && <div className="fixed inset-0 bg-black opacity-50 z-30 lg:hidden" onClick={onClose}></div>}
+      {isOpen && <div className="fixed inset-0 bg-black/60 z-30 lg:hidden" onClick={onClose}></div>}
     </>
   );
 };
-
 
 export default Sidebar;
