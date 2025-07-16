@@ -47,7 +47,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           <img 
             src="/logo.png" // Make sure this path is correct
             alt="School Logo Background" 
-            className="w-64 h-64" 
+            className="w-34 h-34" 
           />
         </div>
         <div className="relative z-10">
