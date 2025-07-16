@@ -33,29 +33,26 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ student }) => {
     return <div>Loading profile...</div>;
   }
 
-  const personalDetails = [
+  const allDetails = [
     { icon: User, label: "Father's Name", value: student.fatherName, color: 'bg-blue-500' },
     { icon: User, label: "Mother's Name", value: student.motherName, color: 'bg-pink-500' },
     { icon: Cake, label: 'Date of Birth', value: formatDate(student.dob), color: 'bg-orange-500' },
-    { icon: Heart, label: 'Religion', value: student.religion, color: 'bg-purple-500' },
-  ];
-
-  const academicDetails = [
+    { icon: Phone, label: 'Contact Number', value: student.contact, color: 'bg-indigo-500' },
+    
     { icon: Book, label: 'Class', value: student.class, color: 'bg-green-500' },
     { icon: BookOpen, label: 'Medium', value: student.medium, color: 'bg-teal-500' },
+    { icon: Hash, label: 'SR Number', value: student.srNo, color: 'bg-slate-500' },
     { icon: Hash, label: 'NIC ID', value: student.nicStudentId, color: 'bg-gray-500' },
+
     { icon: Shield, label: 'RTE Status', value: student.isRte ? 'Yes' : 'No', color: student.isRte ? 'bg-green-600' : 'bg-red-500' },
-  ];
-  
-  const contactDetails = [
-    { icon: Phone, label: 'Contact Number', value: student.contact, color: 'bg-indigo-500' },
     { icon: Bus, label: 'Bus Route', value: student.bus_route, color: 'bg-yellow-500' },
+    { icon: Heart, label: 'Religion', value: student.religion, color: 'bg-purple-500' },
     { icon: Home, label: 'Address', value: student.address, color: 'bg-cyan-500' },
   ];
 
   return (
     <div className="space-y-8">
-      {/* Header Profile Card */}
+      {/* Header Profile Card - Stays the same */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-8 rounded-2xl shadow-lg text-white">
         <div className="flex flex-col md:flex-row items-center gap-6">
           <div className="relative">
@@ -72,45 +69,19 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ student }) => {
         </div>
       </div>
 
-      {/* --- THIS IS THE RESTORED 3-BOX LAYOUT --- */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* Column 1: Personal & Family */}
-        <div className="space-y-6 bg-white p-6 rounded-2xl shadow-md border">
-            <h3 className="text-xl font-bold text-gray-900 border-b pb-3 flex items-center gap-3">
-                <UsersIcon size={24} className="text-blue-500" />
-                Personal & Family
-            </h3>
-            <ProfileDetail icon={User} label="Father's Name" value={student.fatherName} color="bg-blue-500" />
-            <ProfileDetail icon={User} label="Mother's Name" value={student.motherName} color="bg-pink-500" />
-            <ProfileDetail icon={Cake} label="Date of Birth" value={formatDate(student.dob)} color="bg-orange-500" />
-            <ProfileDetail icon={Heart} label="Religion" value={student.religion} color="bg-purple-500" />
-        </div>
-
-        {/* Column 2: Academic */}
-        <div className="space-y-6 bg-white p-6 rounded-2xl shadow-md border">
-            <h3 className="text-xl font-bold text-gray-900 border-b pb-3 flex items-center gap-3">
-                <GraduationCap size={24} className="text-green-500" />
-                Academic Details
-            </h3>
-            <ProfileDetail icon={Book} label="Class" value={student.class} color="bg-green-500" />
-            <ProfileDetail icon={BookOpen} label="Medium" value={student.medium} color="bg-teal-500" />
-            <ProfileDetail icon={Hash} label="NIC ID" value={student.nicStudentId} color="bg-gray-500" />
-            <ProfileDetail icon={Shield} label="RTE Status" value={student.isRte ? 'Yes' : 'No'} color={student.isRte ? 'bg-green-600' : 'bg-red-500'} />
-        </div>
-        
-        {/* Column 3: Contact & Transport */}
-        <div className="space-y-6 bg-white p-6 rounded-2xl shadow-md border">
-            <h3 className="text-xl font-bold text-gray-900 border-b pb-3 flex items-center gap-3">
-                <Phone size={24} className="text-indigo-500" />
-                Contact & Transport
-            </h3>
-            <ProfileDetail icon={Phone} label="Contact Number" value={student.contact} color="bg-indigo-500" />
-            <ProfileDetail icon={Home} label="Address" value={student.address} color="bg-cyan-500" />
-            <ProfileDetail icon={Bus} label="Bus Route" value={student.bus_route} color="bg-yellow-500" />
+      {/* --- THIS IS THE NEW, UNIFIED DETAILS SECTION --- */}
+      <div className="bg-white p-6 rounded-2xl shadow-md border">
+        <h3 className="text-xl font-bold text-gray-900 border-b pb-3 mb-4 flex items-center gap-3">
+            <GraduationCap size={24} className="text-gray-700" />
+            Student Information
+        </h3>
+        {/* A single responsive grid for all details */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {allDetails.map(detail => <ProfileDetail key={detail.label} {...detail} />)}
         </div>
       </div>
     </div>
   );
 };
+
 export default ProfileSection;
