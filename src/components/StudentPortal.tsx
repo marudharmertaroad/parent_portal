@@ -5,7 +5,6 @@ import { useAuth } from '../contexts/AuthContext';
 import { useStudentData } from '../hooks/useStudentData';
 
 import Header from './Header';
-import Sidebar from './Sidebar';
 import Dashboard from './Dashboard';
 import FeesSection from './FeesSection';
 import AcademicRecords from './AcademicRecords';
