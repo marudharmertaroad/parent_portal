@@ -31,7 +31,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, student })
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Photo Upload Section */}
             <div className="lg:col-span-1">
-              <PhotoUpload student={student} onUploadComplete={onDataRefresh} />
+              <PhotoUpload student={student} />
             </div>
             {/* Profile Details Section */}
             <div className="lg:col-span-3 bg-white p-6 rounded-2xl border shadow-sm">
