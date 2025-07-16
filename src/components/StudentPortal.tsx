@@ -85,21 +85,11 @@ const [showProfileModal, setShowProfileModal] = useState(false);
       </main>
       
       {/* Profile Modal */}
-      {showProfileModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-4xl w-full m-4 max-h-[90vh] flex flex-col">
-            <div className="p-4 border-b flex justify-between items-center">
-              <h2 className="text-xl font-semibold">Student Profile</h2>
-              <button onClick={() => setShowProfileModal(false)} className="p-1 rounded-full hover:bg-gray-100">
-                <X size={24} />
-              </button>
-            </div>
-            <div className="p-6 overflow-y-auto">
-              <ProfileSection student={student} />
-            </div>
-          </div>
-        </div>
-      )}
+      <ProfileModal
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+        student={student}
+      />
     </div>
   );
 };
