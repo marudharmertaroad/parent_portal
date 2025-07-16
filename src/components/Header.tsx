@@ -4,10 +4,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Bell, Menu, LogOut, User as UserIcon } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
-// Define a single, clear interface for the props this component needs.
 interface HeaderProps {
   studentName: string;
-  onMenuClick: () => void;
+  onMenuClick: () => void; // Can be used to toggle any drawer/sidebar in the future
 }
 
 const Header: React.FC<HeaderProps> = ({ studentName, onMenuClick }) => {
@@ -15,7 +14,6 @@ const Header: React.FC<HeaderProps> = ({ studentName, onMenuClick }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
 
-  // Effect to close the dropdown if the user clicks outside of it.
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
@@ -23,41 +21,34 @@ const Header: React.FC<HeaderProps> = ({ studentName, onMenuClick }) => {
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   return (
     <header className="flex-shrink-0 bg-white shadow-md z-20 relative">
       <div className="flex items-center justify-between h-16 px-4 md:px-6">
-        {/* Hamburger menu button for mobile view */}
         <button 
           onClick={onMenuClick} 
-          className="lg:hidden p-2 rounded-full text-gray-500 hover:bg-gray-100"
+          className="p-2 rounded-full text-gray-500 hover:bg-gray-100"
         >
           <Menu size={24} />
         </button>
 
-        {/* Welcome message on larger screens */}
-        <div className="hidden lg:block text-lg font-semibold text-gray-700">
+        <div className="text-lg font-semibold text-gray-700">
           Welcome, {studentName}!
         </div>
 
-        {/* Right-side action icons */}
         <div className="flex items-center space-x-4">
           <button className="p-2 rounded-full text-gray-500 hover:bg-gray-100" aria-label="Notifications">
             <Bell size={20} />
           </button>
           
-          {/* Profile Dropdown */}
           <div className="relative" ref={profileRef}>
             <button
               onClick={() => setIsProfileOpen(!isProfileOpen)}
               className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg"
               aria-label="Open user menu"
             >
-              {/* Safety Check: Ensure studentName exists before calling charAt */}
               {studentName ? studentName.charAt(0).toUpperCase() : '?'}
             </button>
             
