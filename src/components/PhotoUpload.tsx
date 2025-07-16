@@ -7,6 +7,8 @@ import { Camera, User, Loader2 } from 'lucide-react';
 
 interface PhotoUploadProps {
   student: Student;
+    onUploadComplete: () => void;
+
 }
 
 const PhotoUpload: React.FC<PhotoUploadProps> = ({ student, onUploadComplete }) => {
