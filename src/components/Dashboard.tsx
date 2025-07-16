@@ -59,3 +59,4 @@ const Dashboard: React.FC<DashboardProps> = ({ /* ... your existing props ... */
     </div>
   );
 };
+export default Dashboard;
