@@ -32,7 +32,6 @@ const Dashboard: React.FC<DashboardProps> = ({
 
   const navItems = [
     { id: 'dashboard', name: 'Dashboard', icon: Home },
-    { id: 'profile', name: 'My Profile', icon: User },
     { id: 'fees', name: 'Fee Details', icon: CreditCard },
     { id: 'academic', name: 'Academic Records', icon: Award },
     { id: 'homework', name: 'Homework', icon: BookOpen },
