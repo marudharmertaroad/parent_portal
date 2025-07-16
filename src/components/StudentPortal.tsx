@@ -24,6 +24,14 @@ const StudentPortal: React.FC = () => {
   const [examRecords, setExamRecords] = useState<ExamRecord[]>([]);
   const [notices, setNotices] = useState<Notice[]>([]);
 
+  const refreshStudentData = useCallback(async () => {
+    if (!student) return;
+    // This is where you would re-fetch the student's data from Supabase
+    // to get the new photo URL and then update the auth context.
+    // For now, we'll just show an alert and reload as a fallback.
+    alert("Photo updated successfully! The portal will now refresh.");
+    window.location.reload();
+
   // Loading Guard: Prevents rendering until the student object is ready
   if (!student) {
     return (
