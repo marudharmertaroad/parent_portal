@@ -1,14 +1,15 @@
 // src/components/Dashboard.tsx (Polished Parent Portal Version)
 
 import React, { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import { Student, FeeRecord, ExamRecord, Notice } from '../types';
 import { 
-  DollarSign, FileText, Bell, TrendingUp, Calendar, School, User, Phone
+  DollarSign, FileText, Bell, TrendingUp, Calendar, School, User
 } from 'lucide-react';
 import { formatDate, getGradeColor } from '../utils';
-import Sidebar from './Sidebar';
+
 import Header from './Header'; 
-import { useAuth } from '../contexts/AuthContext';
+import Sidebar from './Sidebar';
 
 interface DashboardProps {
   student: Student;
