@@ -1,7 +1,8 @@
 // src/components/Header.tsx (SIMPLIFIED)
 
-import React from 'react';
-import { Bell, Menu, LogOut,User } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Bell, Menu, LogOut, User as UserIcon } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 interface HeaderProps {
   studentName: string;
