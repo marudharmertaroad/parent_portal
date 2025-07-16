@@ -40,24 +40,25 @@ const LoginForm: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-yellow-900 to-blue-900 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Animated Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-20 left-20 w-32 h-32 border-2 border-white rounded-full animate-pulse"></div>
-        <div className="absolute top-40 right-32 w-24 h-24 border-2 border-white rounded-full animate-pulse delay-300"></div>
-        <div className="absolute bottom-32 left-40 w-20 h-20 border-2 border-white rounded-full animate-pulse delay-700"></div>
-        <div className="absolute bottom-20 right-20 w-28 h-28 border-2 border-white rounded-full animate-pulse delay-1000"></div>
+      {/* --- THIS IS THE UPDATED BACKGROUND SECTION --- */}
+      <div className="absolute inset-0 opacity-5 text-white">
+        {/* We use flexbox and absolute positioning to place icons around the screen */}
+        <GraduationCap className="absolute top-20 left-20 w-32 h-32 animate-pulse" strokeWidth={0.5} />
+        <ShieldCheck className="absolute top-40 right-32 w-24 h-24 animate-pulse delay-300" strokeWidth={0.5} />
+        <Target className="absolute bottom-32 left-40 w-20 h-20 animate-pulse delay-700" strokeWidth={0.5} />
+        <Medal className="absolute bottom-20 right-20 w-28 h-28 animate-pulse delay-1000" strokeWidth={0.5} />
       </div>
 
       <div className="relative w-full max-w-md z-10">
         {/* School Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-24 h-24 bg-white border-2 border-white rounded-full mb-6 shadow-2xl overflow-hidden">
-  <img
-    src="/logo.png" 
-    alt="School Logo"
-    className="w-full h-full object-cover"
-  />
-</div>
+            <img
+              src="/logo.png" 
+              alt="School Logo"
+              className="w-full h-full object-cover"
+            />
+          </div>
           <h1 className="text-4xl font-bold text-white mb-3">Marudhar Defence School</h1>
           <p className="text-blue-200 text-lg mb-4">Excellence in Education & Character</p>
           <p className="text-blue-200 text-lg mb-4">Student & Parent Portal</p>
