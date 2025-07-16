@@ -19,27 +19,9 @@ interface DashboardProps {
   onProfileClick: () => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({
-  student,
-  feeRecords = [],
-  examRecords = [],
-  notices = [],
-  onProfileClick // Receive the function as a prop
+const DashboardContent: React.FC<{ student: Student; feeRecords: FeeRecord[]; examRecords: ExamRecord[]; notices: Notice[]; onProfileClick: () => void; }> = ({
+  student, feeRecords, examRecords, notices, onProfileClick
 }) => {
-  const { student } = useAuth(); // Get the student object
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  if (!student) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-gray-100">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-lg font-semibold text-gray-700">Loading Student Portal...</p>
-        </div>
-      </div>
-    );
-  }
   const pendingFees = feeRecords.filter(fee => fee.status !== 'Paid');
   const averageScore = examRecords.length > 0 
     ? examRecords.reduce((sum, exam) => sum + exam.percentage, 0) / examRecords.length
