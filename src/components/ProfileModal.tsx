@@ -2,10 +2,9 @@
 
 import React from 'react';
 import { X } from 'lucide-react';
-import { Student } from '../types'; // Adjust path if needed
+import { Student } from '../types';
 import ProfileSection from './ProfileSection';
 import PhotoUpload from './PhotoUpload';
-
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -14,9 +13,12 @@ interface ProfileModalProps {
 }
 
 const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, student }) => {
-  if (!isOpen) {
-    return null;
-  }
+  if (!isOpen) return null;
+
+  // This function will simply reload the page to get the latest student data (including photo)
+  const handlePhotoUploadSuccess = () => {
+    window.location.reload();
+  };
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
@@ -29,11 +31,9 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, student })
         </div>
         <div className="p-6 md:p-8 overflow-y-auto bg-gray-50">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Photo Upload Section */}
             <div className="lg:col-span-1">
-              <PhotoUpload student={student} />
+              <PhotoUpload student={student} onUploadComplete={handlePhotoUploadSuccess} />
             </div>
-            {/* Profile Details Section */}
             <div className="lg:col-span-3 bg-white p-6 rounded-2xl border shadow-sm">
               <ProfileSection student={student} />
             </div>
