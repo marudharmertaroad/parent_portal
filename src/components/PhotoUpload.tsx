@@ -64,7 +64,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ student, onUploadComplete }) 
 
 
   return (
-    <div className="flex flex-col items-center gap-4 p-6 bg-gray-50 rounded-2xl border">
+    <div className="flex flex-col items-center gap-4">
       <div className="relative w-32 h-32 md:w-40 md:h-40">
         <div className="w-full h-full rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border-4 border-white shadow-lg">
           {previewUrl ? (
