@@ -8,7 +8,7 @@ interface HeaderProps {
   studentName: string;
   onProfileClick: () => void;// Can be used to toggle any drawer/sidebar in the future
 }
-const Header: React.FC<HeaderProps> = ({ studentName,  }) => {
+const Header: React.FC<HeaderProps> = ({ studentName, onProfileClick  }) => {
   const { logout } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
