@@ -30,15 +30,23 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, student })
           </button>
         </div>
         <div className="p-6 md:p-8 overflow-y-auto bg-gray-50">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <div className="lg:col-span-1">
-              <PhotoUpload student={student} onUploadComplete={handlePhotoUploadSuccess} />
+          {/* Use flexbox for a more natural layout than a rigid grid */}
+          <div className="flex flex-col lg:flex-row gap-8">
+            
+            {/* Photo Upload Section (takes up less space) */}
+            <div className="flex-shrink-0 lg:w-1/4">
+              <PhotoUpload student={student} onUploadComplete={onDataRefresh} />
             </div>
-            <div className="lg:col-span-3 bg-white p-6 rounded-2xl border shadow-sm">
+
+            {/* Profile Details Section (takes up all remaining space) */}
+            <div className="flex-grow bg-white p-6 rounded-2xl border shadow-sm">
               <ProfileSection student={student} />
             </div>
+
           </div>
         </div>
+        {/* --- END OF CORRECTION --- */}
+
       </div>
     </div>
   );
