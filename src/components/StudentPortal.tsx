@@ -1,36 +1,30 @@
+// src/components/StudentPortal.tsx
+
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Student, FeeRecord, ExamRecord, Notice } from '../types'; // Assuming types are in a central file
+import { Student, FeeRecord, ExamRecord, Notice } from '../types';
 
-// --- Import all necessary components ---
-import Header from './Header'; 
+import Header from './Header';
 import Dashboard from './Dashboard';
 import ProfileModal from './ProfileModal';
-import { X } from 'lucide-react';
-import ProfileSection from './ProfileSection';
 
-// --- Placeholder Components (You can replace these with your actual components) ---
+// Placeholders for other pages
 const FeesSection = () => <div className="bg-white p-8 rounded-xl shadow-md"><h2 className="text-2xl font-bold">Fee Details</h2></div>;
 const AcademicRecords = () => <div className="bg-white p-8 rounded-xl shadow-md"><h2 className="text-2xl font-bold">Academic Records</h2></div>;
 const HomeworkSection = () => <div className="bg-white p-8 rounded-xl shadow-md"><h2 className="text-2xl font-bold">Homework</h2></div>;
 const NoticeBoard = () => <div className="bg-white p-8 rounded-xl shadow-md"><h2 className="text-2xl font-bold">Notice Board</h2></div>;
 
-
 const StudentPortal: React.FC = () => {
-  const { student } = useAuth(); // Get the authenticated student
-  
-  // --- State Management for the entire portal ---
+  const { student } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
-const [showProfileModal, setShowProfileModal] = useState(false);
-  
-  // --- Mock data (in a real app, this would come from a hook like useStudentData) ---
+  const [showProfileModal, setShowProfileModal] = useState(false);
+
+  // Mock data - in a real app, this would be fetched based on the student
   const [feeRecords, setFeeRecords] = useState<FeeRecord[]>([]);
   const [examRecords, setExamRecords] = useState<ExamRecord[]>([]);
   const [notices, setNotices] = useState<Notice[]>([]);
-  const refreshAllData = async () => {
-    console.log("Refreshing all portal data...");
-  };
-  // --- Loading Guard ---
+
+  // Loading Guard: Prevents rendering until the student object is ready
   if (!student) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-100">
@@ -42,7 +36,6 @@ const [showProfileModal, setShowProfileModal] = useState(false);
     );
   }
 
-  // --- Function to render the correct content based on the active tab ---
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
@@ -51,24 +44,13 @@ const [showProfileModal, setShowProfileModal] = useState(false);
                   feeRecords={feeRecords} 
                   examRecords={examRecords}
                   notices={notices}
-                  onTabChange={setActiveTab} // Pass the setter to the dashboard
-               />;
-      case 'fees':
-        return <FeesSection />;
-      case 'academic':
-       return <AcademicRecords />;
-      case 'homework':
-        return <HomeworkSection />;
-      case 'notices':
-        return <NoticeBoard />;
-      default:
-        return <Dashboard 
-                  student={student} 
-                  feeRecords={feeRecords} 
-                  examRecords={examRecords}
-                  notices={notices}
                   onTabChange={setActiveTab}
                />;
+      case 'fees': return <FeesSection />;
+      case 'academic': return <AcademicRecords />;
+      case 'homework': return <HomeworkSection />;
+      case 'notices': return <NoticeBoard />;
+      default: return <Dashboard student={student} feeRecords={feeRecords} examRecords={examRecords} notices={notices} onTabChange={setActiveTab} />;
     }
   };
 
@@ -76,17 +58,16 @@ const [showProfileModal, setShowProfileModal] = useState(false);
     <div className="min-h-screen bg-gray-100">
       <Header
         studentName={student.name}
-        onProfileClick={() => setShowProfileModal(true)} // <-- Pass the function to open the modal
+        onMenuClick={() => alert("Menu button can be used for other features.")}
+        onProfileClick={() => setShowProfileModal(true)}
       />
       
-      {/* Main content area */}
       <main className="p-6 md:p-8">
         <div className="max-w-7xl mx-auto">
           {renderContent()}
         </div>
       </main>
       
-      {/* Profile Modal */}
       <ProfileModal
         isOpen={showProfileModal}
         onClose={() => setShowProfileModal(false)}
