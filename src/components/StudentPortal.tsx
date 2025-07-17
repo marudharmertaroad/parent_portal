@@ -282,6 +282,9 @@ const StudentPortal: React.FC = () => {
       }));
       setExamRecords(mappedExamRecords);
     }
+  const { data: hwData, error: hwError } = homeworkResponse;
+    if (hwError) console.error("Error fetching homework:", hwError);
+    else setHomework(hwData || []);
     
     setIsLoadingData(false);
   }, [student]);
