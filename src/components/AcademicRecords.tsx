@@ -1,286 +1,272 @@
-// src/components/AcademicRecords.tsx
+// src/components/StudentPortal.tsx
 
-import React, { useState, useMemo } from 'react';
-import { supabase } from '../lib/supabase';
-import { ExamRecord, SubjectMark } from '../types';
-import { formatDate, getGradeColor, calculateGrade } from '../utils'; // Make sure these are in your utils file
-import { Award, TrendingUp, Book, Printer, FileText, X } from 'lucide-react';
-const AdmitCardModal: React.FC<{ isOpen: boolean; onClose: () => void; student: Student }> = ({ isOpen, onClose, student }) => {
-  // This modal will have its own logic to fetch the datesheet
-  const [datesheet, setDatesheet] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+import React, { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { Student, FeeRecord, ExamRecord, Notice, SubjectMark } from '../types';
+import { supabase } from '../utils/supabaseClient';
+import { X, Printer, Settings } from 'lucide-react';
+import { formatDate, getGradeColor, calculateGrade } from '../utils';
 
-  React.useEffect(() => {
-    if (isOpen) {
-      const fetchDatesheet = async () => {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from('datesheets')
-          .select('exam_title, schedule')
-          .eq('class_name', student.class)
-          .eq('medium', student.medium)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .single();
-        
-        if (data) setDatesheet(data);
-        setLoading(false);
-      };
-      fetchDatesheet();
-    }
-  }, [isOpen, student.class, student.medium]);
+// Import all necessary components
+import Header from './Header';
+import Dashboard from './Dashboard';
+import FeesSection from './FeesSection';
+import AcademicRecords from './AcademicRecords';
+import ProfileModal from './ProfileModal';
+
+// --- Report Card Modal (Corrected and Self-Contained) ---
+const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { student: Student, examRecords: ExamRecord[], onClose: () => void, settings: any }) => {
+  if (!student) return null;
 
   const handlePrint = () => window.print();
 
-  if (!isOpen) return null;
+  // --- SAFE & CORRECTED CALCULATIONS ---
+  const safeExamRecords = Array.isArray(examRecords) ? examRecords : [];
+  const reportTitle = "PROGRESS REPORT - CONSOLIDATED";
+  
+  const allSubjectsForStudent = safeExamRecords.flatMap(exam => exam.subjects || []);
+  const mainSubjectNames = Array.from(new Set(allSubjectsForStudent.filter(s => !s.isComplementary).map(s => s.subject))).sort();
+  
+  const totalObtained = safeExamRecords.reduce((sum, exam) => sum + (exam.obtainedMarks || 0), 0);
+  const totalMax = safeExamRecords.reduce((sum, exam) => sum + (exam.totalMarks || 0), 0);
+  
+  const overallPercentage = totalMax > 0 ? (totalObtained / totalMax) * 100 : 0;
+  const overallGrade = calculateGrade(overallPercentage);
+  const overallResult = overallPercentage >= settings.passingMarks ? 'PASS' : 'FAIL';
+
+  const examOrder = ['Unit Test 1', 'Unit Test 2', 'Unit Test 3', 'Quarterly', 'Half Yearly', 'Yearly Exam', 'Pre-Board'];
+  const uniqueExamTypes = Array.from(new Set(safeExamRecords.map(e => e.examType))).sort((a, b) => examOrder.indexOf(a) - examOrder.indexOf(b));
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-      <style>{`@media print { .no-print { display: none; } #printable-admit-card { margin: 0; padding: 0; border: none; box-shadow: none; } }`}</style>
-      <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] flex flex-col">
-        <div id="printable-admit-card" className="p-8 overflow-y-auto">
-          {loading ? (
-            <p>Loading Exam Schedule...</p>
-          ) : datesheet ? (
-            <>
-              <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold">MARUDHAR DEFENCE SCHOOL</h2>
-                <h3 className="text-lg font-semibold text-gray-700">{datesheet.exam_title}</h3>
-                <h4 className="text-md text-gray-600">ADMIT CARD</h4>
-              </div>
-              <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
-                <div><p><strong>Student:</strong> {student.name}</p><p><strong>Class:</strong> {student.class} ({student.medium})</p></div>
-                <div className="text-right"><p><strong>SR No:</strong> {student.srNo}</p><p><strong>Father's Name:</strong> {student.fatherName}</p></div>
-              </div>
-              <table className="w-full border-collapse">
-                <thead className="bg-gray-100"><tr><th className="border p-2">Date</th><th className="border p-2">Day</th><th className="border p-2">Subject</th><th className="border p-2">Time</th></tr></thead>
-                <tbody>
-                  {datesheet.schedule.map((row: any) => (
-                    <tr key={row.subject}><td className="border p-2">{formatDate(row.date)}</td><td className="border p-2">{row.day}</td><td className="border p-2 font-medium">{row.subject}</td><td className="border p-2">{row.time}</td></tr>
-                  ))}
-                </tbody>
-              </table>
-            </>
-          ) : (
-            <p className="text-center text-red-500">No admit card or exam schedule has been published for your class yet.</p>
-          )}
-        </div>
-        <div className="p-4 border-t flex justify-end space-x-3 no-print">
-          <button onClick={onClose} className="px-4 py-2 border rounded-lg hover:bg-gray-100">Close</button>
-          <button onClick={handlePrint} disabled={!datesheet} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
-            <Printer size={16} className="inline mr-2" />Print Admit Card
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-
-interface AcademicRecordsProps {
-  student: Student;
-  examRecords: ExamRecord[];
-}
-
-// --- A new modal to show subject-wise details for a single exam ---
-const ExamDetailsModal: React.FC<{ exam: ExamRecord | null, onClose: () => void }> = ({ exam, onClose }) => {
-  if (!exam) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl">
-        <div className="p-6 border-b flex justify-between items-center">
-          <h3 className="text-xl font-bold text-gray-800">{exam.examType} - Detailed Marks</h3>
-          <button onClick={onClose} className="p-2 rounded-full text-gray-400 hover:bg-gray-100">
-            <X size={24} />
-          </button>
-        </div>
-        <div className="p-6 overflow-y-auto">
-          <table className="w-full text-left">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="p-3 font-semibold text-sm">Subject</th>
-                <th className="p-3 font-semibold text-sm text-center">Max Marks</th>
-                <th className="p-3 font-semibold text-sm text-center">Obtained Marks</th>
-                <th className="p-3 font-semibold text-sm text-center">Grade</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {exam.subjects.map(subject => (
-                <tr key={subject.subject}>
-                  <td className="p-3 font-medium">{subject.subject}</td>
-                  <td className="p-3 text-center">{subject.maxMarks}</td>
-                  <td className="p-3 text-center font-bold">{subject.obtainedMarks}</td>
-                  <td className="p-3 text-center">
-                    <span className={`px-2 py-1 text-xs font-bold rounded-full ${getGradeColor(subject.grade)}`}>
-                      {subject.grade}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="p-4 bg-gray-50 border-t flex justify-end">
-           <button onClick={onClose} className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 font-medium">
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-
-const AcademicRecords: React.FC<AcademicRecordsProps> = ({ student, examRecords = [] }) => {
-  const [showAdmitCard, setShowAdmitCard] = useState(false);
-  const [selectedExam, setSelectedExam] = useState<ExamRecord | null>(null);
-
-  // --- Calculate Stats using useMemo for performance ---
-  const stats = useMemo(() => {
-    if (examRecords.length === 0) {
-      return { overallPercentage: 0, examsTaken: 0, bestSubject: 'N/A' };
-    }
-
-    const totalPercentage = examRecords.reduce((sum, exam) => sum + exam.percentage, 0);
-    const overallPercentage = totalPercentage / examRecords.length;
-
-    const allSubjectMarks: { [subject: string]: { total: number, count: number } } = {};
-    examRecords.forEach(exam => {
-      exam.subjects.forEach(subject => {
-        if (!allSubjectMarks[subject.subject]) {
-          allSubjectMarks[subject.subject] = { total: 0, count: 0 };
-        }
-        allSubjectMarks[subject.subject].total += (subject.obtainedMarks / subject.maxMarks) * 100;
-        allSubjectMarks[subject.subject].count += 1;
-      });
-    });
-
-    let bestSubject = 'N/A';
-    let highestAvg = 0;
-    for (const subject in allSubjectMarks) {
-      const avg = allSubjectMarks[subject].total / allSubjectMarks[subject].count;
-      if (avg > highestAvg) {
-        highestAvg = avg;
-        bestSubject = subject;
-      }
-    }
-
-    return {
-      overallPercentage,
-      examsTaken: examRecords.length,
-      bestSubject,
-    };
-  }, [examRecords]);
-
-  return (
-    <div className="space-y-8">
-      {/* --- RESPONSIVE FIX: Header now stacks on mobile --- */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center space-x-4">
-          <div className="p-3 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl">
-            <Award className="w-8 h-8 text-white" />
-          </div>
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Academic Records</h1>
-            <p className="text-gray-600 mt-1">View results and print your admit card.</p>
-          </div>
-        </div>
-        <button
-          onClick={() => setShowAdmitCard(true)}
-          className="mt-4 sm:mt-0 w-full sm:w-auto flex items-center justify-center px-5 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-medium shadow-lg"
-        >
-          <FileText size={18} className="mr-2" />
-          View / Print Admit Card
-        </button>
-      </div>
-
-      {/* --- RESPONSIVE FIX: Stats cards now stack on mobile --- */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-xl p-6 shadow-md border">
-          <p className="text-sm font-medium text-gray-600">Overall Percentage</p>
-          <p className="text-3xl font-bold text-green-600">{stats.overallPercentage.toFixed(1)}%</p>
-        </div>
-        <div className="bg-white rounded-xl p-6 shadow-md border">
-          <p className="text-sm font-medium text-gray-600">Exams Appeared</p>
-          <p className="text-3xl font-bold text-blue-600">{stats.examsTaken}</p>
-        </div>
-        <div className="bg-white rounded-xl p-6 shadow-md border">
-          <p className="text-sm font-medium text-gray-600">Best Subject</p>
-          <p className="text-3xl font-bold text-purple-600">{stats.bestSubject}</p>
-        </div>
-      </div>
-
-      {/* --- RESPONSIVE FIX: Table layout adjusted for mobile --- */}
-      <div className="bg-white rounded-xl shadow-md border overflow-hidden">
-        <div className="p-6 border-b">
-          <h3 className="text-lg font-semibold text-gray-800">Exam-wise Performance</h3>
-        </div>
-        
-        {/* --- On small screens, we show a card list. On medium screens and up, we show a table. --- */}
-        <div className="divide-y divide-gray-200">
-          {examRecords.length > 0 ? examRecords.map(exam => (
-            <div key={exam.id} className="p-4 md:hidden"> {/* This view is for mobile (hidden on md and up) */}
-              <div className="flex justify-between items-center mb-2">
-                <p className="font-semibold text-gray-800">{exam.examType}</p>
-                <span className={`px-2 py-1 text-xs font-bold rounded-full ${getGradeColor(exam.grade)}`}>
-                  {exam.grade}
-                </span>
-              </div>
-              <p className="text-sm text-gray-500">Date: {formatDate(exam.examDate)}</p>
-              <p className="text-sm text-gray-500">Score: <span className="font-bold">{exam.obtainedMarks}/{exam.totalMarks}</span> ({exam.percentage.toFixed(1)}%)</p>
-              <button
-                onClick={() => setSelectedExam(exam)}
-                className="mt-3 w-full px-3 py-2 bg-blue-100 text-blue-800 text-sm font-semibold rounded-lg hover:bg-blue-200"
-              >
-                View Subject Details
-              </button>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4 print:p-0 print:bg-white">
+      <style>{`@page{size:landscape;margin:1cm}@media print{*{box-sizing:border-box!important}html,body{width:100%;height:100%;margin:0!important;padding:0!important;overflow:hidden!important}body *{visibility:hidden}#report-card-wrapper,#report-card-wrapper *{visibility:visible}#report-card-wrapper{position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden!important}.no-print{display:none!important}#report-card{width:100%;height:100%;border:2px solid black!important;box-shadow:none!important;border-radius:0;font-size:10pt;overflow:hidden!important;display:flex;flex-direction:column}#report-card table{font-size:9pt}#report-card main{flex-grow:1;flex-shrink:1;overflow:hidden}}`}</style>
+      <div className="bg-white rounded-2xl w-full max-w-7xl max-h-[95vh] overflow-auto shadow-2xl">
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-4 no-print">
+            <h3 className="text-xl font-bold text-gray-800">Student Report Card</h3>
+            <div className="flex space-x-3">
+              <button onClick={handlePrint} className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"><Printer className="w-4 h-4 mr-2" />Print</button>
+              <button onClick={onClose} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Close</button>
             </div>
-          )) : (
-            <div className="p-8 text-center text-gray-500 md:hidden">No exam records to display.</div>
-          )}
-        </div>
-        
-        {/* This table is hidden on mobile and appears on medium screens and up */}
-        <div className="overflow-x-auto hidden md:block">
-          <table className="w-full text-left">
-            {/* ... The table head `<thead>` remains the same ... */}
-            <tbody className="divide-y">
-              {examRecords.length > 0 ? examRecords.map(exam => (
-                <tr key={exam.id} className="hover:bg-gray-50">
-                  <td className="p-4 font-medium">{exam.examType}</td>
-                  <td className="p-4">{formatDate(exam.examDate)}</td>
-                  <td className="p-4 text-right font-semibold">{exam.percentage.toFixed(2)}%</td>
-                  <td className="p-4 text-center">
-                    <span className={`px-2 py-1 text-xs font-bold rounded-full ${getGradeColor(exam.grade)}`}>
-                      {exam.grade}
-                    </span>
-                  </td>
-                  <td className="p-4 text-center">
-                    <button
-                      onClick={() => setSelectedExam(exam)}
-                      className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-semibold rounded-lg hover:bg-blue-200"
-                    >
-                      View Details
-                    </button>
-                  </td>
-                </tr>
-              )) : (
-                <tr><td colSpan={5} className="text-center p-8 text-gray-500">No exam records to display.</td></tr>
-              )}
-            </tbody>
-          </table>
+          </div>
+          <div id="report-card-wrapper">
+            <div className="border-2 border-black p-4 bg-white rounded-lg flex flex-col h-full relative" id="report-card">
+              <header className="flex items-center justify-between mb-2">
+                <div className="flex items-center space-x-4">
+                  <img src="/logo copy.png" alt="School Logo" className="h-20 w-20 object-contain" />
+                  <div>
+                    <h1 className="text-3xl font-bold text-blue-800">{settings.schoolName}</h1>
+                    <p className="text-sm text-gray-500">{settings.schoolAddress}</p>
+                  </div>
+                </div>
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-blue-800">{reportTitle}</h2>
+                  <p className="text-lg text-blue-600">Session: {settings.session}</p>
+                </div>
+                <div className="w-24 h-28 border-2 border-gray-400 rounded-lg p-1 bg-white flex items-center justify-center">
+                  {student.photoUrl ? <img src={student.photoUrl} alt="Student" className="w-full h-full object-cover"/> : <span className="text-xs text-gray-400">Photo</span>}
+                </div>
+              </header>
+              <section className="grid grid-cols-2 gap-x-4">
+                <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                  <h3 className="font-bold text-md mb-2 text-blue-800">Student Information</h3>
+                  <div className="text-xs grid grid-cols-2 gap-x-4 gap-y-1">
+                    <p><strong>Name:</strong> {student.name}</p>
+                    <p><strong>SR No:</strong> {student.srNo}</p>
+                    <p><strong>Father's Name:</strong> {student.fatherName}</p>
+                    <p><strong>D.O.B:</strong> {formatDate(student.dob)}</p>
+                    <p className="col-span-2"><strong>Class:</strong> {student.class}</p>
+                  </div>
+                </div>
+                <div className="bg-green-50 rounded-lg p-3 border border-green-200">
+                  <h3 className="font-bold text-md mb-2 text-green-800">Performance Summary</h3>
+                  <div className="text-xs grid grid-cols-2 gap-x-4 gap-y-1">
+                    <p><strong>Total Marks:</strong> {totalMax}</p>
+                    <p><strong>Marks Obt:</strong> {totalObtained}</p>
+                    <p><strong>Percentage:</strong> {overallPercentage.toFixed(1)}%</p>
+                    <p><strong>Grade:</strong> <span className={`px-2 py-0.5 rounded-full font-bold ${getGradeColor(overallGrade)}`}>{overallGrade}</span></p>
+                    <p className="col-span-2"><strong>Result:</strong><span className={`px-2 py-0.5 rounded-full font-bold ${overallResult === 'PASS' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{overallResult}</span></p>
+                  </div>
+                </div>
+              </section>
+              <main className="flex-grow mt-4">
+                <table className="w-full border-collapse border border-gray-400 text-xs">
+                  <thead className="font-bold">
+                    <tr className="bg-blue-100"><th rowSpan={2} className="border p-1">Subject</th>{uniqueExamTypes.map(et => (<th key={et} colSpan={3} className="border p-1">{et}</th>))}<th colSpan={3} className="border p-1 bg-green-200">Total</th></tr>
+                    <tr className="bg-blue-50">{uniqueExamTypes.flatMap(() => ['Max', 'Obt.', 'Grd.']).map((h, i) => <th key={i} className="border p-1">{h}</th>)}<th className="border p-1 bg-green-100">Marks</th><th className="border p-1 bg-green-100">Grade</th><th className="border p-1 bg-green-100">%</th></tr>
+                  </thead>
+                  <tbody>
+                    {mainSubjectNames.map(subjectName => {
+                      let totalSubObtained = 0;
+                      let totalSubMax = 0;
+                      safeExamRecords.forEach(exam => {
+                        const subject = exam.subjects?.find(s => s.subject === subjectName);
+                        if (subject) {
+                          totalSubObtained += (subject.obtainedMarks || 0);
+                          totalSubMax += (subject.maxMarks || 0);
+                        }
+                      });
+                      const subjectPercentage = totalSubMax > 0 ? (totalSubObtained / totalSubMax) * 100 : 0;
+                      return (
+                        <tr key={subjectName} className="text-center">
+                          <td className="border p-1 font-medium text-left">{subjectName}</td>
+                          {uniqueExamTypes.map(examType => {
+                            const subject = safeExamRecords.find(e => e.examType === examType)?.subjects?.find(s => s.subject === subjectName);
+                            return <React.Fragment key={examType}><td className="border p-1">{subject?.maxMarks ?? '-'}</td><td className="border p-1">{subject?.obtainedMarks ?? '-'}</td><td className="border p-1">{subject?.grade ?? '-'}</td></React.Fragment>;
+                          })}
+                          <td className="border p-1 font-bold bg-green-50">{totalSubObtained}/{totalSubMax}</td>
+                          <td className="border p-1 font-bold bg-green-50">{calculateGrade(subjectPercentage)}</td>
+                          <td className="border p-1 font-bold bg-green-50">{subjectPercentage.toFixed(1)}%</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </main>
+            </div>
+          </div>
         </div>
       </div>
-
-      <ExamDetailsModal exam={selectedExam} onClose={() => setSelectedExam(null)} />
-      <AdmitCardModal 
-        isOpen={showAdmitCard}
-        onClose={() => setShowAdmitCard(false)}
-        student={student}
-      />
     </div>
   );
 };
 
-export default AcademicRecords;
+
+// Placeholders
+const HomeworkSection = () => <div className="bg-white p-8 rounded-xl shadow-md"><h2 className="text-2xl font-bold">Homework</h2></div>;
+const NoticeBoard = () => <div className="bg-white p-8 rounded-xl shadow-md"><h2 className="text-2xl font-bold">Notice Board</h2></div>;
+
+const StudentPortal: React.FC = () => {
+  const { student } = useAuth();
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [isLoadingData, setIsLoadingData] = useState(true);
+  const [showReportCard, setShowReportCard] = useState(false);
+
+  const [feeRecords, setFeeRecords] = useState<FeeRecord[]>([]);
+  const [examRecords, setExamRecords] = useState<ExamRecord[]>([]);
+  const [notices, setNotices] = useState<Notice[]>([]);
+
+  const [reportSettings, setReportSettings] = useState({
+    schoolName: 'MARUDHAR DEFENCE SCHOOL',
+    schoolAddress: 'Merta Road, Nagaur, Rajasthan - 341511',
+    passingMarks: 35,
+    session: '2024-25',
+  });
+
+  const fetchStudentData = useCallback(async () => {
+    if (!student) return;
+    setIsLoadingData(true);
+
+    const [feeResponse, examResponse] = await Promise.all([
+      supabase.from('fee_records').select('*, student:students!inner(name, father_name, medium)').eq('student_id', student.srNo).eq('students.medium', student.medium),
+      supabase.from('exam_records').select(`*, students!inner(medium), subjects:subject_marks(*)`).eq('student_id', student.srNo).eq('students.medium', student.medium).order('exam_date', { ascending: false })
+    ]);
+
+    const { data: feeData, error: feeError } = feeResponse;
+    if (feeError) console.error("Error fetching fees:", feeError);
+    else {
+      const mappedFeeRecords = (feeData || []).map((r: any) => ({
+        recordId: r.id, studentId: r.student_id, studentName: r.student?.name, fatherName: r.student?.father_name, class: r.class, totalFees: r.total_fees || 0, paidFees: r.paid_fees || 0,
+        pendingFees: r.pending_fees || 0, discountFees: r.discount_fees || 0, busFees: r.bus_fees || 0, dueDate: r.due_date, lastPaymentDate: r.last_payment_date,
+      }));
+      setFeeRecords(mappedFeeRecords);
+    }
+
+    const { data: examData, error: examError } = examResponse;
+    if (examError) console.error("Error fetching exams:", examError);
+    else {
+      const mappedExamRecords = (examData || []).map((exam: any) => ({
+        id: exam.id, studentId: exam.student_id, examType: exam.exam_type, examDate: exam.exam_date,
+        totalMarks: exam.total_marks || 0, obtainedMarks: exam.obtained_marks || 0, percentage: exam.percentage || 0,
+        grade: exam.grade || 'N/A',
+        subjects: (exam.subjects || []).map((sub: any): SubjectMark => ({
+          subject: sub.subject, maxMarks: sub.max_marks || 0, obtainedMarks: sub.obtained_marks || 0,
+          grade: sub.grade || 'N/A', isComplementary: sub.is_complementary || false,
+        })),
+      }));
+      setExamRecords(mappedExamRecords);
+    }
+    
+    setIsLoadingData(false);
+  }, [student]);
+
+  useEffect(() => {
+    fetchStudentData();
+  }, [fetchStudentData]);
+
+  const refreshStudentData = () => {
+    alert("Photo updated successfully! The portal will now refresh.");
+    window.location.reload();
+  };
+
+  if (!student) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-lg font-semibold text-gray-700">Loading Portal...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const renderContent = () => {
+    if (isLoadingData) {
+      return (
+        <div className="text-center p-10">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading student records...</p>
+        </div>
+      );
+    }
+    
+    switch (activeTab) {
+      case 'dashboard':
+        return <Dashboard student={student} feeRecords={feeRecords} examRecords={examRecords} notices={notices} onTabChange={setActiveTab} />;
+      case 'fees':
+        return <FeesSection feeRecords={feeRecords} studentName={student.name} />;
+      case 'academic':
+        return <AcademicRecords student={student} examRecords={examRecords} onViewReport={() => setShowReportCard(true)} />;
+      case 'homework':
+        return <HomeworkSection />;
+      case 'notices':
+        return <NoticeBoard />;
+      default:
+        return <Dashboard student={student} feeRecords={feeRecords} examRecords={examRecords} notices={notices} onTabChange={setActiveTab} />;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <Header
+        studentName={student.name}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        onProfileClick={() => setShowProfileModal(true)}
+      />
+      <main className="p-6 md:p-8">
+        <div className="max-w-7xl mx-auto">
+          {renderContent()}
+        </div>
+      </main>
+      
+      <ProfileModal
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+        student={student}
+        onDataRefresh={refreshStudentData}
+      />
+      {showReportCard && (
+        <EnhancedReportCardModal
+          student={student}
+          examRecords={examRecords}
+          onClose={() => setShowReportCard(false)}
+          settings={reportSettings}
+        />
+      )}
+    </div>
+  );
+};
+
+export default StudentPortal;
