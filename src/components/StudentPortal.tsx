@@ -389,6 +389,8 @@ const StudentPortal: React.FC = () => {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         onProfileClick={() => setShowProfileModal(true)}
+        unreadCount={unreadCount} // Pass the count
+        onBellClick={handleBellClick}
       />
       <main className="p-6 md:p-8">
         <div className="max-w-7xl mx-auto">
