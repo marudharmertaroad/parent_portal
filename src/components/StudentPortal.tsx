@@ -290,7 +290,13 @@ const StudentPortal: React.FC = () => {
     if (hwError) console.error("Error fetching homework:", hwError);
     else setHomework(hwData || []);
     
-    const { data: noticeData, error: noticeError } = noticeResponse;
+    const { data: noticeData, error: noticeError } = await supabase
+        .from('notices')
+        .select('*')
+        .or(`target_class.is.null,target_class.eq.all,target_class.eq.${student.class}`)
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+
     if (noticeError) console.error("Error fetching notices:", noticeError);
     else setNotices(noticeData || []);
     
