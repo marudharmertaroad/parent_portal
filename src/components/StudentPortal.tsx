@@ -14,8 +14,9 @@ import FeesSection from './FeesSection';
 import AcademicRecords from './AcademicRecords';
 import ProfileModal from './ProfileModal';
 import HomeworkSection from './HomeworkSection';
-import NotificationDrawer from './NotificationDrawer';
-import NoticeBoard from './NoticeBoard';
+const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [showNotificationDrawer, setShowNotificationDrawer] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
 // --- Report Card Modal (Corrected and Self-Contained) ---
 const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { student: Student, examRecords: ExamRecord[], onClose: () => void, settings: any }) => {
