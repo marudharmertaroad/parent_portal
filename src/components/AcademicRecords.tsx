@@ -53,7 +53,7 @@ const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { 
             <div className="border-2 border-black p-4 bg-white rounded-lg flex flex-col h-full relative" id="report-card">
               <header className="flex items-center justify-between mb-2">
                 <div className="flex items-center space-x-4">
-                  <img src="/logo copy.png" alt="School Logo" className="h-20 w-20 object-contain" />
+                  <img src="/logo.png" alt="School Logo" className="h-20 w-20 object-contain" />
                   <div>
                     <h1 className="text-3xl font-bold text-blue-800">{settings.schoolName}</h1>
                     <p className="text-sm text-gray-500">{settings.schoolAddress}</p>
