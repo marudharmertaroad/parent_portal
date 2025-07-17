@@ -14,9 +14,7 @@ import FeesSection from './FeesSection';
 import AcademicRecords from './AcademicRecords';
 import ProfileModal from './ProfileModal';
 import HomeworkSection from './HomeworkSection';
-const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [showNotificationDrawer, setShowNotificationDrawer] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
+import NoticeBoard from './NoticeBoard';
 
 // --- Report Card Modal (Corrected and Self-Contained) ---
 const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { student: Student, examRecords: ExamRecord[], onClose: () => void, settings: any }) => {
@@ -242,8 +240,6 @@ const StudentPortal: React.FC = () => {
   const [examRecords, setExamRecords] = useState<ExamRecord[]>([]);
   const [notices, setNotices] = useState<Notice[]>([]);
   const [homework, setHomework] = useState<Homework[]>([]);
-  const [showNotificationDrawer, setShowNotificationDrawer] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
 
   const [reportSettings, setReportSettings] = useState({
     schoolName: 'MARUDHAR DEFENCE SCHOOL',
@@ -291,13 +287,7 @@ const StudentPortal: React.FC = () => {
     if (hwError) console.error("Error fetching homework:", hwError);
     else setHomework(hwData || []);
     
-    const { data: noticeData, error: noticeError } = await supabase
-        .from('notices')
-        .select('*')
-        .or(`target_class.is.null,target_class.eq.all,target_class.eq.${student.class}`)
-        .eq('is_active', true)
-        .order('created_at', { ascending: false });
-
+    const { data: noticeData, error: noticeError } = noticeResponse;
     if (noticeError) console.error("Error fetching notices:", noticeError);
     else setNotices(noticeData || []);
     
@@ -307,39 +297,6 @@ const StudentPortal: React.FC = () => {
   useEffect(() => {
     fetchStudentData();
   }, [fetchStudentData]);
-  useEffect(() => {
-    if (!student) return;
-
-    const channel = supabase
-      .channel('public:notices')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notices' }, (payload) => {
-        const newNotice = payload.new as Notice;
-
-        // Check if the new notice is for this student
-        const isTargeted = !newNotice.target_class || newNotice.target_class === 'all' || newNotice.target_class === student.class;
-
-        if (isTargeted) {
-          console.log('New notice received!', newNotice);
-          // Add the new notice to the top of the list
-          setNotices(prevNotices => [newNotice, ...prevNotices]);
-          // Increment the unread count
-          setUnreadCount(prev => prev + 1);
-          // Optional: Show a browser notification
-          new Notification('New School Notice!', { body: newNotice.title });
-        }
-      })
-      .subscribe();
-
-    // Cleanup subscription on component unmount
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [student]);
-
-  const handleBellClick = () => {
-    setShowNotificationDrawer(true);
-    setUnreadCount(0); // Reset count when the drawer is opened
-  };
 
   const refreshStudentData = () => {
     alert("Photo updated successfully! The portal will now refresh.");
@@ -390,8 +347,6 @@ const StudentPortal: React.FC = () => {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         onProfileClick={() => setShowProfileModal(true)}
-        unreadCount={unreadCount} // Pass the count
-        onBellClick={handleBellClick}
       />
       <main className="p-6 md:p-8">
         <div className="max-w-7xl mx-auto">
@@ -413,11 +368,6 @@ const StudentPortal: React.FC = () => {
           settings={reportSettings}
         />
       )}
-      <NotificationDrawer 
-        isOpen={showNotificationDrawer}
-        onClose={() => setShowNotificationDrawer(false)}
-        notices={notices}
-      />
     </div>
   );
 };
