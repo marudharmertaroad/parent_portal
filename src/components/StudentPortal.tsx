@@ -228,11 +228,6 @@ const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { 
   );
 };
 
-
-// Placeholders
-const HomeworkSection = () => <div className="bg-white p-8 rounded-xl shadow-md"><h2 className="text-2xl font-bold">Homework</h2></div>;
-const NoticeBoard = () => <div className="bg-white p-8 rounded-xl shadow-md"><h2 className="text-2xl font-bold">Notice Board</h2></div>;
-
 const StudentPortal: React.FC = () => {
   const { student } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
