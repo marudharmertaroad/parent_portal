@@ -12,7 +12,7 @@ interface HeaderProps {
   onBellClick: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ studentName, activeTab, onTabChange, onProfileClick }) => {
+const Header: React.FC<HeaderProps> = ({ studentName, activeTab, onTabChange, onProfileClick, onBellClick }) => {
   const { logout } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
