@@ -66,7 +66,7 @@ const NoticeBoard: React.FC<NoticeBoardProps> = ({ notices = [], studentClass })
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <div className="hidden sm:block p-3 bg-gray-100 rounded-full">
-                        <ScrollText size={24} className="text-gray-600" />
+                        <ScrollText size={55} className="text-gray-600" />
                       </div>
                       <div>
                         <h3 className="text-xl font-bold text-gray-900">{notice.title}</h3>
