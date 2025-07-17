@@ -241,6 +241,8 @@ const StudentPortal: React.FC = () => {
   const [examRecords, setExamRecords] = useState<ExamRecord[]>([]);
   const [notices, setNotices] = useState<Notice[]>([]);
   const [homework, setHomework] = useState<Homework[]>([]);
+  const [showNotificationDrawer, setShowNotificationDrawer] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const [reportSettings, setReportSettings] = useState({
     schoolName: 'MARUDHAR DEFENCE SCHOOL',
