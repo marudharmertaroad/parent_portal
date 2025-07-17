@@ -146,7 +146,7 @@ interface AcademicRecordsProps {
   onViewReport: () => void;
 }
 
-const AcademicRecords: React.FC<AcademicRecordsProps> = ({ student, examRecords = [] }) => {
+const AcademicRecords: React.FC<AcademicRecordsProps> = ({ student, examRecords = [], onViewReport }) => {
   const [showAdmitCard, setShowAdmitCard] = useState(false);
   const [selectedExam, setSelectedExam] = useState<ExamRecord | null>(null);
 
