@@ -65,6 +65,9 @@ const NoticeBoard: React.FC<NoticeBoardProps> = ({ notices = [], studentClass })
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
+                      <div className="hidden sm:block p-3 bg-gray-100 rounded-full">
+                        <ScrollText size={24} className="text-gray-600" />
+                      </div>
                       <h3 className="text-xl font-bold text-gray-900">{notice.title}</h3>
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
                         isClassSpecific ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
