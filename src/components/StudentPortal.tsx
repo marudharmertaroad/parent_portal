@@ -311,6 +311,49 @@ const StudentPortal: React.FC = () => {
     fetchStudentData();
   }, [fetchStudentData]);
 
+  useEffect(() => {
+    if (!student) return;
+
+    const channel = supabase
+      .channel('public:notifications')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, (payload) => {
+        const newNotification = payload.new as Notification;
+
+        const isForEveryone = newNotification.target_audience === 'all';
+        const isForMyClass = newNotification.target_audience === 'class' && newNotification.target_class === student.class;
+        const isForMe = newNotification.target_audience === 'student' && newNotification.target_student_sr_no === student.srNo;
+
+        if (isForEveryone || isForMyClass || isForMe) {
+          console.log('New push notification received!', newNotification);
+          setNotifications(prev => [newNotification, ...prev]);
+          setUnreadCount(prev => prev + 1);
+          
+          // Trigger a browser notification if permission is granted
+          if (Notification.permission === "granted") {
+            new window.Notification('New School Notice!', { body: newNotification.title });
+          }
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [student]);
+
+  // Request notification permission on component mount
+  useEffect(() => {
+    if ("Notification" in window && Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  const handleBellClick = () => {
+    setShowNotificationDrawer(true);
+    setUnreadCount(0);
+  };
+  
+
   const refreshStudentData = () => {
     alert("Photo updated successfully! The portal will now refresh.");
     window.location.reload();
