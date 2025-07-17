@@ -12,6 +12,7 @@ interface NoticeBoardProps {
 
 const NoticeBoard: React.FC<NoticeBoardProps> = ({ notices = [], studentClass }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [expandedNoticeId, setExpandedNoticeId] = useState<number | null>(null);
 
   // Filter notices to show only active ones and those targeted to the student
   const activeNotices = notices.filter(notice => {
