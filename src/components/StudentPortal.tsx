@@ -14,6 +14,7 @@ import FeesSection from './FeesSection';
 import AcademicRecords from './AcademicRecords';
 import ProfileModal from './ProfileModal';
 import HomeworkSection from './HomeworkSection';
+import NotificationDrawer from './NotificationDrawer';
 import NoticeBoard from './NoticeBoard';
 
 // --- Report Card Modal (Corrected and Self-Contained) ---
