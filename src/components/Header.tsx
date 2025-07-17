@@ -9,6 +9,7 @@ interface HeaderProps {
   activeTab: string; // <-- NEW: To know which tab is active
   onTabChange: (tab: string) => void; // <-- NEW: To switch tabs
   onProfileClick: () => void;
+  onBellClick: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({ studentName, activeTab, onTabChange, onProfileClick }) => {
