@@ -1,151 +1,143 @@
 // src/components/FeesSection.tsx
 
 import React from 'react';
-import { FeeRecord } from '../types'; // Make sure this path is correct
-import { formatDate } from '../utils'; // Make sure this path is correct
-import { DollarSign, CheckCircle, Clock, AlertCircle, CreditCard, TrendingUp } from 'lucide-react';
+import { FeeRecord } from '../types';
+import { formatDate } from '../utils';
+import { 
+  DollarSign, CheckCircle, Clock, AlertCircle, CreditCard, 
+  TrendingUp, TrendingDown, ArrowLeft, FileText
+} from 'lucide-react';
 
-// Define the props the component will accept
 interface FeesSectionProps {
   feeRecords: FeeRecord[];
+  studentName: string;
 }
 
-const FeesSection: React.FC<FeesSectionProps> = ({ feeRecords = [] }) => {
+// A more vibrant, reusable card for the summary stats
+const StatCard: React.FC<{ title: string; amount: number; icon: React.ElementType; color: string; }> = ({ title, amount, icon: Icon, color }) => (
+  <div className={`relative p-6 rounded-2xl overflow-hidden text-white shadow-lg ${color}`}>
+    <div className="absolute -right-4 -bottom-4 opacity-20">
+      <Icon size={80} />
+    </div>
+    <div className="relative z-10">
+      <p className="text-sm font-medium opacity-80">{title}</p>
+      <p className="text-3xl font-bold mt-1">
+        {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount)}
+      </p>
+    </div>
+  </div>
+);
 
-  // --- Calculations for the Stat Cards ---
-  const totalDue = feeRecords.reduce((sum, record) => sum + record.totalFees + record.busFees, 0);
-  const totalPaid = feeRecords.reduce((sum, record) => sum + record.paidFees, 0);
-  const totalPending = feeRecords.reduce((sum, record) => sum + record.pendingFees, 0);
+const FeesSection: React.FC<FeesSectionProps> = ({ feeRecords = [], studentName}) => {
+  const safeFeeRecords = Array.isArray(feeRecords) ? feeRecords : [];
 
-  const formatCurrency = (amount: number) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount);
+  // Safe Calculations
+  const totalBillable = safeFeeRecords.reduce((sum, r) => sum + (r.totalFees || 0) + (r.busFees || 0), 0);
+  const totalPaid = safeFeeRecords.reduce((sum, r) => sum + (r.paidFees || 0), 0);
+  const totalDue = safeFeeRecords.reduce((sum, r) => sum + (r.pendingFees || 0), 0);
+
+  const formatCurrency = (amount: number) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount || 0);
 
   const handlePayNow = (amount: number) => {
-    // In a real application, this would open a payment gateway modal (e.g., Stripe, Razorpay)
-    alert(`Simulating payment process...\nOpening payment gateway to pay ${formatCurrency(amount)}.`);
+    alert(`This would integrate with a payment gateway to pay ${formatCurrency(amount)}.`);
+  };
+  
+  const handleViewReceipt = (recordId: number) => {
+    alert(`This would open a receipt modal for record ID: ${recordId}.`);
   };
 
-  const getStatusInfo = (status: 'Paid' | 'Pending' | 'Overdue') => {
-    switch (status) {
-      case 'Paid':
-        return { icon: CheckCircle, color: 'text-green-600 bg-green-100', text: 'Paid' };
-      case 'Pending':
-        return { icon: Clock, color: 'text-yellow-600 bg-yellow-100', text: 'Pending' };
-      case 'Overdue':
-        return { icon: AlertCircle, color: 'text-red-600 bg-red-100', text: 'Overdue' };
-      default:
-        return { icon: Clock, color: 'text-gray-600 bg-gray-100', text: 'Unknown' };
+  const getStatusInfo = (record: FeeRecord) => {
+    if ((record.pendingFees || 0) <= 0) {
+      return { text: 'Paid', icon: CheckCircle, color: 'text-green-600', bgColor: 'bg-green-50' };
     }
+    if (new Date(record.dueDate) < new Date()) {
+      return { text: 'Overdue', icon: AlertCircle, color: 'text-red-600', bgColor: 'bg-red-50' };
+    }
+    return { text: 'Pending', icon: Clock, color: 'text-amber-600', bgColor: 'bg-amber-50' };
   };
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center space-x-3">
-        <CreditCard className="w-8 h-8 text-blue-600" />
-        <h1 className="text-3xl font-bold text-gray-800">Fee Details</h1>
-      </div>
-
-      {/* --- RESPONSIVE FIX: Stats cards now stack on mobile --- */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="bg-white rounded-xl p-6 shadow-md border">
-            <p className="text-sm font-medium text-gray-600">Total Billable Amount</p>
-            <p className="text-2xl font-bold text-blue-700">{formatCurrency(totalDue)}</p>
-        </div>
-        <div className="bg-white rounded-xl p-6 shadow-md border">
-            <p className="text-sm font-medium text-gray-600">Total Paid</p>
-            <p className="text-2xl font-bold text-green-600">{formatCurrency(totalPaid)}</p>
-        </div>
-        <div className="bg-white rounded-xl p-6 shadow-md border">
-            <p className="text-sm font-medium text-gray-600">Current Balance Due</p>
-            <p className="text-2xl font-bold text-red-600">{formatCurrency(totalPending)}</p>
+      {/* Header */}
+      
+      <div className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-2xl p-8 shadow-lg">
+        <div className="flex items-center space-x-4">
+          <div className="p-4 bg-white/20 rounded-xl">
+            <CreditCard className="w-8 h-8 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold">Fee Status for {studentName}</h1>
+            <p className="text-cyan-100 mt-1">Your complete payment history and outstanding dues.</p>
+          </div>
         </div>
       </div>
+      
+      {/* Summary Stat Cards with new colors */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <StatCard title="Total Fees Generated" amount={totalBillable} icon={FileText} color="bg-blue-500" />
+        <StatCard title="Total Amount Paid" amount={totalPaid} icon={CheckCircle} color="bg-green-500" />
+        <StatCard title="Total Balance Due" amount={totalDue} icon={DollarSign} color="bg-red-500" />
+      </div>
 
-      <div className="bg-white rounded-xl shadow-md border overflow-hidden">
+      {/* Fee Records List with Detailed Breakdown */}
+      <div className="bg-white rounded-xl shadow-md border">
         <div className="p-6 border-b">
-          <h3 className="text-lg font-semibold text-gray-800">Payment History & Dues</h3>
+          <h3 className="text-lg font-semibold text-gray-800">Transaction History</h3>
         </div>
-        
-        {/* --- RESPONSIVE FIX: Mobile Card View --- */}
-        {/* This view is ONLY visible on small screens (hidden on md and up) */}
-        <div className="divide-y divide-gray-200 md:hidden">
-          {feeRecords.length > 0 ? feeRecords.map(record => {
-            const statusInfo = getStatusInfo(record.status);
+        <div className="divide-y divide-gray-200">
+          {safeFeeRecords.length > 0 ? safeFeeRecords.map((record) => {
+            const status = getStatusInfo(record);
+            const isPaid = status.text === 'Paid';
             return (
-              <div key={record.recordId} className="p-4 space-y-3">
-                <div>
-                  <p className="font-semibold text-gray-800">Tuition & Other Fees</p>
-                  {record.busFees > 0 && <p className="text-xs text-gray-500">+ Bus Fee: {formatCurrency(record.busFees)}</p>}
+              <div key={record.recordId} className={`p-4 md:p-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-center ${isPaid ? 'bg-green-50/50' : ''}`}>
+                
+                {/* Column 1: Fee Breakdown */}
+                <div className="md:col-span-1 space-y-2">
+                  <p className="font-bold text-gray-800">Academic Year Invoice</p>
+                  <div className="text-sm text-gray-600 border-l-2 pl-3 space-y-1">
+                    <p>Tuition Fee: {formatCurrency(record.totalFees)}</p>
+                    {record.busFees > 0 && <p>Bus Fee: {formatCurrency(record.busFees)}</p>}
+                    {record.discountFees > 0 && <p className="text-green-600">Discount Applied: -{formatCurrency(record.discountFees)}</p>}
+                  </div>
                 </div>
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray-500">Due Date:</span>
-                  <span className="font-medium">{formatDate(record.dueDate)}</span>
+
+                {/* Column 2: Status and Dates */}
+                <div className="md:col-span-1 flex flex-col items-start md:items-center">
+                   <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${status.color} ${status.bgColor}`}>
+                    <status.icon size={16} className="mr-2" />
+                    {status.text}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">Due Date: {formatDate(record.dueDate)}</p>
                 </div>
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray-500">Status:</span>
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${statusInfo.color}`}>
-                    <statusInfo.icon size={14} className="mr-1" />{statusInfo.text}
-                  </span>
+                
+                {/* Column 3: Amount and Actions */}
+                <div className="md:col-span-1 flex items-center justify-between md:justify-end gap-4">
+                   <div className="text-right">
+                    <p className="text-sm text-gray-500">{isPaid ? 'Amount Paid' : 'Amount Due'}</p>
+                    <p className={`text-2xl font-bold ${isPaid ? 'text-green-600' : 'text-red-600'}`}>
+                      {formatCurrency(isPaid ? record.paidFees : record.pendingFees)}
+                    </p>
+                  </div>
+                  
+                  {isPaid ? (
+                    <button onClick={() => handleViewReceipt(record.recordId)} className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg text-sm font-semibold hover:bg-gray-300">
+                      <Receipt size={16} />
+                      Receipt
+                    </button>
+                  ) : (
+                    <button onClick={() => handlePayNow(record.pendingFees)} className="px-6 py-3 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 shadow-sm">
+                      Pay Now
+                    </button>
+                  )}
                 </div>
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray-500">Amount Due:</span>
-                  <span className="font-bold text-lg text-red-600">{formatCurrency(record.pendingFees)}</span>
-                </div>
-                {record.status !== 'Paid' && (
-                  <button
-                    onClick={() => handlePayNow(record.pendingFees)}
-                    className="w-full mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700"
-                  >
-                    Pay Now
-                  </button>
-                )}
               </div>
             );
-          }) : <div className="text-center p-8 text-gray-500">No fee records found.</div>}
-        </div>
-        
-        {/* --- RESPONSIVE FIX: Desktop Table View --- */}
-        {/* This table is HIDDEN on small screens and visible on md and up */}
-        <div className="overflow-x-auto hidden md:block">
-          <table className="w-full text-left">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="p-4 font-medium text-sm">Due Date</th>
-                <th className="p-4 font-medium text-sm">Description</th>
-                <th className="p-4 font-medium text-sm text-right">Amount Due</th>
-                <th className="p-4 font-medium text-sm text-center">Status</th>
-                <th className="p-4 font-medium text-sm text-center">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {feeRecords.length > 0 ? feeRecords.map(record => {
-                const statusInfo = getStatusInfo(record.status);
-                return (
-                  <tr key={record.recordId} className="hover:bg-gray-50">
-                    <td className="p-4">{formatDate(record.dueDate)}</td>
-                    <td className="p-4">
-                      <p className="font-medium text-gray-800">Tuition & Other Fees</p>
-                      {record.busFees > 0 && <p className="text-xs text-gray-500">+ Bus Fee: {formatCurrency(record.busFees)}</p>}
-                    </td>
-                    <td className="p-4 text-right font-mono font-semibold">{formatCurrency(record.pendingFees)}</td>
-                    <td className="p-4 text-center">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${statusInfo.color}`}>
-                        <statusInfo.icon size={14} className="mr-1.5" />{statusInfo.text}
-                      </span>
-                    </td>
-                    <td className="p-4 text-center">
-                      {record.status !== 'Paid' ? (
-                        <button onClick={() => handlePayNow(record.pendingFees)} className="...">Pay Now</button>
-                      ) : (
-                        <span className="text-green-600 font-semibold text-sm">Cleared</span>
-                      )}
-                    </td>
-                  </tr>
-                )
-              }) : (
-                <tr><td colSpan={5} className="text-center p-8 text-gray-500">No fee records found.</td></tr>
-              )}
-            </tbody>
-          </table>
+          }) : (
+            <div className="text-center p-12 text-gray-500">
+              <p className="font-semibold">No fee records found.</p>
+              <p className="text-sm mt-1">Your payment history will appear here.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
