@@ -261,7 +261,7 @@ const StudentPortal: React.FC = () => {
       supabase.from('exam_records').select(`*, students!inner(medium), subjects:subject_marks(*)`).eq('student_id', student.srNo).eq('students.medium', student.medium).order('exam_date', { ascending: false }),
     supabase.from('notices').select('*').or(`target_class.is.null,target_class.eq.all,target_class.eq.${student.class}`).eq('is_active', true),
       supabase.from('homework_assignments').select('*').eq('class', student.class).eq('medium', student.medium).eq('is_active', true),
-      supabase.from('notifications').select('*').or(`target_audience.eq.all,target_class.eq.${student.class},target_student_sr_no.eq.${student.srNo}`).order('created_at', { ascending: false }).limit(50)
+     supabase.from('notifications').select('*').or(`target_audience.eq.all,target_class.eq.${student.class},target_student_sr_no.eq.${student.srNo}`).order('created_at', { ascending: false }).limit(50)
     ]);
 
     const { data: feeData, error: feeError } = feeResponse;
