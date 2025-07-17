@@ -255,6 +255,8 @@ const StudentPortal: React.FC = () => {
       supabase.from('fee_records').select('*, student:students!inner(name, father_name, medium)').eq('student_id', student.srNo).eq('students.medium', student.medium),
       supabase.from('exam_records').select(`*, students!inner(medium), subjects:subject_marks(*)`).eq('student_id', student.srNo).eq('students.medium', student.medium).order('exam_date', { ascending: false })
     ]);
+    supabase.from('homework_assignments').select('*').eq('class', student.class).eq('medium', student.medium).eq('is_active', true)
+    ]);
 
     const { data: feeData, error: feeError } = feeResponse;
     if (feeError) console.error("Error fetching fees:", feeError);
