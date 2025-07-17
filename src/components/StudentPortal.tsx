@@ -13,6 +13,7 @@ import Dashboard from './Dashboard';
 import FeesSection from './FeesSection';
 import AcademicRecords from './AcademicRecords';
 import ProfileModal from './ProfileModal';
+import HomeworkSection from './HomeworkSection';
 
 // --- Report Card Modal (Corrected and Self-Contained) ---
 const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { student: Student, examRecords: ExamRecord[], onClose: () => void, settings: any }) => {
