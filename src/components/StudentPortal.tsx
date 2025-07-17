@@ -287,6 +287,10 @@ const StudentPortal: React.FC = () => {
     if (hwError) console.error("Error fetching homework:", hwError);
     else setHomework(hwData || []);
     
+    const { data: noticeData, error: noticeError } = noticeResponse;
+    if (noticeError) console.error("Error fetching notices:", noticeError);
+    else setNotices(noticeData || []);
+    
     setIsLoadingData(false);
   }, [student]);
 
