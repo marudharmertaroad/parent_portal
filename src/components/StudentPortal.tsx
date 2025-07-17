@@ -421,6 +421,7 @@ const StudentPortal: React.FC = () => {
           settings={reportSettings}
         />
       )}
+      <NotificationDrawer isOpen={showNotificationDrawer} onClose={() => setShowNotificationDrawer(false)} notifications={notifications} />
     </div>
   );
 };
