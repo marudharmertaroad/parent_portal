@@ -143,6 +143,7 @@ const StatCard: React.FC<{ title: string; value: string | number; icon: React.El
 interface AcademicRecordsProps {
   student: Student;
   examRecords: ExamRecord[];
+  onViewReport: () => void;
 }
 
 const AcademicRecords: React.FC<AcademicRecordsProps> = ({ student, examRecords = [] }) => {
