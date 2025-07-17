@@ -74,7 +74,7 @@ const HomeworkSection: React.FC<HomeworkSectionProps> = ({ homeworkList = [], st
                 <div key={hw.id} className={`p-6 hover:bg-gray-50 transition-colors`}>
                   <div className="grid grid-cols-1 md:grid-cols-10 gap-4 items-start">
                     <div className="md:col-span-1 flex justify-center pt-1">
-                      <statusIcon size={24} className={iconColor} />
+                      <FileText size={24} className={iconColor} />
                     </div>
 
                     <div className="md:col-span-6">
