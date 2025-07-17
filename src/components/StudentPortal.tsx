@@ -299,6 +299,10 @@ const StudentPortal: React.FC = () => {
     const { data: noticeData, error: noticeError } = noticeResponse;
     if (noticeError) console.error("Error fetching notices:", noticeError);
     else setNotices(noticeData || []);
+
+    if (notificationRes.error) console.error("Error fetching notifications:", notificationRes.error);
+    else setNotifications(notificationRes.data || []);
+    
     
     setIsLoadingData(false);
   }, [student]);
