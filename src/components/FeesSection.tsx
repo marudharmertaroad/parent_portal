@@ -15,18 +15,19 @@ interface FeesSectionProps {
 
 // A more vibrant, reusable card for the summary stats
 const StatCard: React.FC<{ title: string; amount: number; icon: React.ElementType; color: string; }> = ({ title, amount, icon: Icon, color }) => (
-  <div className={`relative p-6 rounded-2xl overflow-hidden text-white shadow-lg ${color}`}>
-    <div className="absolute -right-4 -bottom-4 opacity-20">
-      <Icon size={80} />
+  <div className="bg-white rounded-xl p-6 shadow-md border flex items-center gap-4">
+    <div className={`w-12 h-12 ${color} rounded-lg flex items-center justify-center`}>
+      <Icon size={24} className="text-white" />
     </div>
-    <div className="relative z-10">
-      <p className="text-sm font-medium opacity-80">{title}</p>
-      <p className="text-3xl font-bold mt-1">
+    <div>
+      <p className="text-sm font-medium text-gray-600">{title}</p>
+      <p className="text-2xl font-bold text-gray-900">
         {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount)}
       </p>
     </div>
   </div>
 );
+
 
 const FeesSection: React.FC<FeesSectionProps> = ({ feeRecords = [], studentName}) => {
   const safeFeeRecords = Array.isArray(feeRecords) ? feeRecords : [];
