@@ -3,6 +3,7 @@ import { ExamRecord, Student } from '../types';
 import { formatDate, getGradeColor } from '../utils';
 import { Award, TrendingUp, Book, Printer, FileText, X, Check, Star as StarIcon } from 'lucide-react';
 import { supabase } from '../utils/supabaseClient';
+import { FileText as ReportIcon } from 'lucide-react';
 
 const AdmitCardModal: React.FC<{ isOpen: boolean; onClose: () => void; student: Student }> = ({ isOpen, onClose, student }) => {
   // This modal will have its own logic to fetch the datesheet
