@@ -205,6 +205,19 @@ const AcademicRecords: React.FC<AcademicRecordsProps> = ({ student, examRecords 
           View / Print Admit Card
         </button>
       </div>
+      <div className="bg-white p-6 rounded-2xl shadow-md border flex flex-col md:flex-row items-center justify-between gap-4">
+        <div>
+          <h3 className="text-xl font-bold text-gray-800">Consolidated Performance</h3>
+          <p className="text-gray-500 mt-1">View a summary of all exam results for the entire academic year.</p>
+        </div>
+        <button
+          onClick={onViewReport} // <-- Use the prop here
+          className="w-full md:w-auto flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 font-medium shadow-lg transition-transform hover:scale-105"
+        >
+          <ReportIcon size={18} className="mr-2" />
+          View Consolidated Report
+        </button>
+      </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
