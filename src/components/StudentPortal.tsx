@@ -306,6 +306,39 @@ const StudentPortal: React.FC = () => {
   useEffect(() => {
     fetchStudentData();
   }, [fetchStudentData]);
+  useEffect(() => {
+    if (!student) return;
+
+    const channel = supabase
+      .channel('public:notices')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notices' }, (payload) => {
+        const newNotice = payload.new as Notice;
+
+        // Check if the new notice is for this student
+        const isTargeted = !newNotice.target_class || newNotice.target_class === 'all' || newNotice.target_class === student.class;
+
+        if (isTargeted) {
+          console.log('New notice received!', newNotice);
+          // Add the new notice to the top of the list
+          setNotices(prevNotices => [newNotice, ...prevNotices]);
+          // Increment the unread count
+          setUnreadCount(prev => prev + 1);
+          // Optional: Show a browser notification
+          new Notification('New School Notice!', { body: newNotice.title });
+        }
+      })
+      .subscribe();
+
+    // Cleanup subscription on component unmount
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [student]);
+
+  const handleBellClick = () => {
+    setShowNotificationDrawer(true);
+    setUnreadCount(0); // Reset count when the drawer is opened
+  };
 
   const refreshStudentData = () => {
     alert("Photo updated successfully! The portal will now refresh.");
