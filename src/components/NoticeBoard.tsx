@@ -28,6 +28,10 @@ const NoticeBoard: React.FC<NoticeBoardProps> = ({ notices = [], studentClass })
     notice.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     notice.content.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  const handleToggleNotice = (noticeId: number) => {
+    // If the clicked notice is already open, close it. Otherwise, open it.
+    setExpandedNoticeId(prevId => (prevId === noticeId ? null : noticeId));
+  };
 
   return (
     <div className="space-y-8">
