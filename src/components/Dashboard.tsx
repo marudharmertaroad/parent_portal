@@ -56,7 +56,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         </div>
         <div className="relative z-10">
           <h2 className="text-3xl font-bold mb-3">Welcome to Marudhar Defence School Student ERP</h2>
-          <p className="text-blue-100 text-lg">Excellence in Education & Character - Manage your Ward's Profile</p>
+          <p className="text-blue-100 text-lg">Excellence in Education & Character - Manage your ward's Profile</p>
           <div className="mt-4 flex items-center space-x-6 text-blue-200">
             <div className="flex items-center space-x-2">
               <BookOpen className="w-5 h-5" />
