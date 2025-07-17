@@ -39,7 +39,103 @@ const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { 
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4 print:p-0 print:bg-white">
-      <style>{`@page{size:landscape;margin:1cm}@media print{*{box-sizing:border-box!important}html,body{width:100%;height:100%;margin:0!important;padding:0!important;overflow:hidden!important}body *{visibility:hidden}#report-card-wrapper,#report-card-wrapper *{visibility:visible}#report-card-wrapper{position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden!important}.no-print{display:none!important}#report-card{width:100%;height:100%;border:2px solid black!important;box-shadow:none!important;border-radius:0;font-size:10pt;overflow:hidden!important;display:flex;flex-direction:column}#report-card table{font-size:9pt}#report-card main{flex-grow:1;flex-shrink:1;overflow:hidden}}`}</style>
+       <style>
+    {`
+      /* --- Watermark & Print Preparation --- */
+      #report-card {
+        position: relative; 
+      }
+      * {
+        -webkit-print-color-adjust: exact !important; /* For older Safari/Chrome */
+        print-color-adjust: exact !important;        /* The standard */
+        box-sizing: border-box !important;
+      }
+      #report-card::after {
+        content: '';
+        background: url('/logo.png') center/contain no-repeat;
+        position: absolute;
+        inset: 0;
+        opacity: 0.08;
+        z-index: 0;
+      }
+      
+      #report-card > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      /* --- Print-specific Styles --- */
+      @page {
+        size: landscape;
+        margin: 1cm;
+      }
+      
+      @media print {
+        /* A universal fix for many layout issues */
+        * {
+          box-sizing: border-box !important;
+        }
+
+        /* Reset body and hide overflow */
+        html, body {
+          width: 100%;
+          height: 100%;
+          margin: 0 !important;
+          padding: 0 !important;
+          overflow: hidden !important; /* CRUCIAL: Prevents scrollbars/overflow from creating a second page */
+        }
+        
+        /* Hide EVERYTHING on the page by default */
+        body * {
+          visibility: hidden;
+        }
+        
+        /* Make ONLY the report card wrapper and its contents visible */
+        #report-card-wrapper, #report-card-wrapper * {
+          visibility: visible;
+        }
+        
+        /* Position the wrapper to fill the entire print page */
+        #report-card-wrapper {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          overflow: hidden !important; /* Double-down on preventing overflow */
+        }
+      
+        /* Hide elements not meant for printing */
+        .no-print { 
+          display: none !important; 
+        }
+        
+        /* Style the report card itself for the page */
+        #report-card {
+          width: 100%;
+          height: 100%;
+          border: 2px solid black !important;
+          box-shadow: none !important;
+          border-radius: 0;
+          font-size: 10pt;
+          overflow: hidden !important; /* TRIPLE-down: no content can spill out */
+          display: flex;
+          flex-direction: column;
+        }
+        
+        #report-card table { 
+          font-size: 9pt; 
+        }
+
+        /* Ensure main content does not try to grow past the page height */
+        #report-card main {
+          flex-grow: 1;
+          flex-shrink: 1; /* Allow shrinking if needed */
+          overflow: hidden; /* Hide any internal overflow in the main section */
+        }
+      }
+    `}
+  </style>
       <div className="bg-white rounded-2xl w-full max-w-7xl max-h-[95vh] overflow-auto shadow-2xl">
         <div className="p-6">
           <div className="flex justify-between items-center mb-4 no-print">
