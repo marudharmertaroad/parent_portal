@@ -52,8 +52,16 @@ const Header: React.FC<HeaderProps> = ({ studentName, activeTab, onTabChange, on
           )}
 
         <div className="flex items-center space-x-4">
-          <button className="p-2 rounded-full text-gray-500 hover:bg-gray-100" aria-label="Notifications">
+          <button onClick={onBellClick} className="relative p-2 rounded-full text-gray-500 hover:bg-gray-100" aria-label="Notifications">
             <Bell size={20} />
+            {unreadCount > 0 && (
+              <span className="absolute top-0 right-0 flex h-5 w-5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-5 w-5 bg-red-500 text-white text-xs items-center justify-center">
+                  {unreadCount}
+                </span>
+              </span>
+            )}
           </button>
           
           <div className="relative" ref={profileRef}>
