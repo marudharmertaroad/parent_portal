@@ -61,13 +61,14 @@ const NoticeBoard: React.FC<NoticeBoardProps> = ({ notices = [], studentClass })
       {/* Notice List */}
       <div className="space-y-4">
         {filteredNotices.length > 0 ? (
-          filteredNotices.map((notice) => {
+          filteredNotices.map((notice, index) => {
             const isExpanded = expandedNoticeId === notice.id;
             const isClassSpecific = !!notice.target_class && notice.target_class !== 'all';
+            const noticeColor = isClassSpecific ? 'border-purple-500' : 'border-blue-500';
             
             return (
-              <div key={notice.id} className="bg-white rounded-2xl shadow-md border overflow-hidden transition-all duration-300">
-                {/* Notice Header (Always Visible & Clickable) */}
+              <div key={notice.id} className={`bg-white rounded-2xl shadow-md border-l-4 ${noticeColor} overflow-hidden transition-all duration-300`}>
+                {/* Clickable Header */}
                 <button
                   onClick={() => handleToggleNotice(notice.id)}
                   className="w-full flex items-center justify-between p-6 text-left hover:bg-gray-50"
@@ -78,45 +79,45 @@ const NoticeBoard: React.FC<NoticeBoardProps> = ({ notices = [], studentClass })
                     </div>
                     <div>
                       <h3 className="text-lg font-bold text-gray-900">{notice.title}</h3>
-                      <div className="flex items-center gap-3 text-xs text-gray-500 mt-1">
-                        <span className="flex items-center gap-1.5">
-                          {isClassSpecific ? <User size={12} /> : <Users size={12} />}
-                          {isClassSpecific ? `For Class ${notice.target_class}` : 'For All'}
-                        </span>
-                        <span>•</span>
-                        <span className="flex items-center gap-1.5">
-                          <Calendar size={12} />
-                          Posted: {formatDate(notice.created_at)}
-                        </span>
-                      </div>
+                      <p className="text-sm text-gray-500 mt-1">Posted: {formatDate(notice.created_at)}</p>
                     </div>
                   </div>
-                  <ChevronDown 
-                    size={24} 
-                    className={`text-gray-400 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} 
-                  />
+                  <div className="flex items-center gap-4">
+                    <span className={`hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                      isClassSpecific ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
+                    }`}>
+                      {isClassSpecific ? <User size={12} /> : <Users size={12} />}
+                      {isClassSpecific ? `For Class ${notice.target_class}` : 'For All'}
+                    </span>
+                    <ChevronDown 
+                      size={24} 
+                      className={`text-gray-400 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} 
+                    />
+                  </div>
                 </button>
 
-                {/* Notice Body (Collapsible Content) */}
-                {isExpanded && (
-                  <div className="px-6 pb-6 border-t pt-4">
-                    {notice.expires_at && (
-                      <div className="mb-4 flex-shrink-0 flex items-center gap-2 text-sm font-semibold bg-red-50 text-red-700 px-3 py-1.5 rounded-lg">
-                        <AlertTriangle size={16} />
-                        Expires on: {formatDate(notice.expires_at)}
-                      </div>
-                    )}
-                    <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
-                      {notice.content}
-                    </p>
+                {/* Collapsible Body with Animation */}
+                <div className={`transition-all duration-500 ease-in-out grid ${isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                  <div className="overflow-hidden">
+                    <div className="px-6 pb-6 border-t pt-4">
+                      {notice.expires_at && (
+                        <div className="mb-4 inline-flex items-center gap-2 text-sm font-semibold bg-red-50 text-red-700 px-3 py-1.5 rounded-lg">
+                          <AlertTriangle size={16} />
+                          Expires on: {formatDate(notice.expires_at)}
+                        </div>
+                      )}
+                      <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+                        {notice.content}
+                      </p>
+                    </div>
                   </div>
-                )}
+                </div>
               </div>
             );
           })
         ) : (
           <div className="text-center py-16 bg-white rounded-lg shadow-sm border">
-            <Check size={48} className="mx-auto text-green-400 mb-4" />
+            <CheckCircle size={48} className="mx-auto text-green-400 mb-4" />
             <p className="text-gray-600 font-medium">No new notices for you.</p>
             <p className="text-gray-400 text-sm mt-1">You're all caught up!</p>
           </div>
