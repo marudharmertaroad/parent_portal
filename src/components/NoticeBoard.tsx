@@ -68,19 +68,24 @@ const NoticeBoard: React.FC<NoticeBoardProps> = ({ notices = [], studentClass })
                       <div className="hidden sm:block p-3 bg-gray-100 rounded-full">
                         <ScrollText size={24} className="text-gray-600" />
                       </div>
-                      <h3 className="text-xl font-bold text-gray-900">{notice.title}</h3>
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
-                        isClassSpecific ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
-                      }`}>
-                        {isClassSpecific ? <User size={12} /> : <Users size={12} />}
-                        {isClassSpecific ? `For Class ${notice.target_class}` : 'For All'}
-                      </span>
-                    </div>
-                    <div className="flex items-center text-sm text-gray-500">
-                      <Calendar size={14} className="mr-2" />
-                      <span>Posted on: {formatDate(notice.created_at)}</span>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900">{notice.title}</h3>
+                        <div className="flex items-center gap-3 mt-1">
+                           <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                            isClassSpecific ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
+                          }`}>
+                            {isClassSpecific ? <User size={12} /> : <Users size={12} />}
+                            {isClassSpecific ? `For Class ${notice.target_class}` : 'For All'}
+                          </span>
+                           <div className="flex items-center text-xs text-gray-500">
+                            <Calendar size={12} className="mr-1.5" />
+                            <span>Posted: {formatDate(notice.created_at)}</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
+
                   {notice.expires_at && (
                     <div className="flex-shrink-0 flex items-center gap-2 text-sm font-semibold bg-red-50 text-red-700 px-3 py-1.5 rounded-lg">
                       <AlertTriangle size={16} />
