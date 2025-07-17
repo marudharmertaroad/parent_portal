@@ -10,9 +10,10 @@ interface HeaderProps {
   onTabChange: (tab: string) => void; // <-- NEW: To switch tabs
   onProfileClick: () => void;
   onBellClick: () => void;
+  unreadCount: number;
 }
 
-const Header: React.FC<HeaderProps> = ({ studentName, activeTab, onTabChange, onProfileClick, onBellClick }) => {
+const Header: React.FC<HeaderProps> = ({ studentName, activeTab, onTabChange, onProfileClick, unreadCount, onBellClick }) => {
   const { logout } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
