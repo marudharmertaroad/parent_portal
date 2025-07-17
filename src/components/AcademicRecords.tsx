@@ -159,7 +159,8 @@ const AcademicRecords: React.FC<AcademicRecordsProps> = ({ student, examRecords 
 
     const allSubjectMarks: { [subject: string]: { total: number; count: number } } = {};
     safeExamRecords.forEach(exam => {
-      exam.subjects?.forEach(subject => {
+       const safeSubjects = Array.isArray(exam.subjects) ? exam.subjects : [];
+      safeSubjects.forEach(subject => {
         if (!allSubjectMarks[subject.subject]) {
           allSubjectMarks[subject.subject] = { total: 0, count: 0 };
         }
