@@ -1,3 +1,5 @@
+// src/components/Dashboard.tsx
+
 import React from 'react';
 import { Student, FeeRecord, ExamRecord, Notice } from '../types';
 import { 
@@ -22,7 +24,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   onTabChange
 }) => {
 
-  // --- SAFE & EFFICIENT CALCULATIONS ---
+  // Safe & Efficient Calculations
   const safeFeeRecords = Array.isArray(feeRecords) ? feeRecords : [];
   const safeExamRecords = Array.isArray(examRecords) ? examRecords : [];
   const safeNotices = Array.isArray(notices) ? notices : [];
@@ -34,12 +36,12 @@ const Dashboard: React.FC<DashboardProps> = ({
     ? safeExamRecords.reduce((sum, exam) => sum + (exam.percentage || 0), 0) / safeExamRecords.length
     : 0;
 
-  // Define the stats using the safe, pre-calculated values.
   const stats = [
     { title: 'Pending Dues', value: totalPendingAmount, icon: DollarSign, color: 'from-red-500 to-orange-500', textColor: 'text-red-600', isCurrency: true },
     { title: 'Average Score', value: averageScore, icon: TrendingUp, color: 'from-green-500 to-emerald-600', textColor: 'text-green-600' },
     { title: 'School Notices', value: safeNotices.length, icon: Bell, color: 'from-blue-500 to-indigo-600', textColor: 'text-blue-600' }
   ];
+
   const navItems = [
     { id: 'fees', name: 'Fee Details', icon: CreditCard },
     { id: 'academic', name: 'Academic Records', icon: Award },
@@ -56,7 +58,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         </div>
         <div className="relative z-10">
           <h2 className="text-3xl font-bold mb-3">Welcome to Marudhar Defence School Student ERP</h2>
-          <p className="text-blue-100 text-lg">Excellence in Education & Character - Manage your ward's Profile</p>
+          <p className="text-blue-100 text-lg">Excellence in Education & Character - Manage your Ward's Profile</p>
           <div className="mt-4 flex items-center space-x-6 text-blue-200">
             <div className="flex items-center space-x-2">
               <BookOpen className="w-5 h-5" />
@@ -82,7 +84,6 @@ const Dashboard: React.FC<DashboardProps> = ({
               <div>
                 <p className="text-sm font-medium text-gray-600 mb-1">{stat.title}</p>
                 <p className={`text-3xl font-bold ${stat.textColor}`}>
-                  {/* --- CLEANED UP JSX --- */}
                   {stat.isCurrency
                     ? `₹${stat.value.toLocaleString('en-IN')}`
                     : stat.title === 'Average Score'
@@ -106,7 +107,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           {navItems.map(item => (
             <button
               key={item.id}
-              onClick={() => onTabChange(item.id)} // This tells the parent to switch views
+              onClick={() => onTabChange(item.id)}
               className="flex flex-col items-center justify-center p-4 rounded-xl text-center transition-all duration-200 bg-gray-50 text-gray-700 hover:shadow-lg hover:bg-blue-500 hover:text-white"
             >
               <item.icon size={28} className="mb-2" />
