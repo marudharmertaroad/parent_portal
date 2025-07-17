@@ -60,27 +60,26 @@ const FeesSection: React.FC<FeesSectionProps> = ({ feeRecords = [], studentName}
   return (
     <div className="space-y-8">
       {/* Header */}
-      
-      <div className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-2xl p-8 shadow-lg">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center space-x-4">
-          <div className="p-4 bg-white/20 rounded-xl">
+          <div className="p-4 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-2xl">
             <CreditCard className="w-8 h-8 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold">Fee Status for {studentName}</h1>
-            <p className="text-cyan-100 mt-1">Your complete payment history and outstanding dues.</p>
+            <h1 className="text-3xl font-bold text-gray-800">Fee Details</h1>
+            <p className="text-gray-600 mt-1">Your complete payment history and outstanding dues.</p>
           </div>
         </div>
       </div>
       
-      {/* Summary Stat Cards with new colors */}
+      {/* Summary Stat Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard title="Total Fees Generated" amount={totalBillable} icon={FileText} color="bg-blue-500" />
-        <StatCard title="Total Amount Paid" amount={totalPaid} icon={CheckCircle} color="bg-green-500" />
-        <StatCard title="Total Balance Due" amount={totalDue} icon={DollarSign} color="bg-red-500" />
+        <StatCard title="Total Billable" amount={totalBillable} icon={FileText} color="bg-blue-500" />
+        <StatCard title="Total Paid" amount={totalPaid} icon={CheckCircle} color="bg-green-500" />
+        <StatCard title="Balance Due" amount={totalDue} icon={DollarSign} color="bg-red-500" />
       </div>
 
-      {/* Fee Records List with Detailed Breakdown */}
+      {/* Fee Records List */}
       <div className="bg-white rounded-xl shadow-md border">
         <div className="p-6 border-b">
           <h3 className="text-lg font-semibold text-gray-800">Transaction History</h3>
@@ -90,43 +89,36 @@ const FeesSection: React.FC<FeesSectionProps> = ({ feeRecords = [], studentName}
             const status = getStatusInfo(record);
             const isPaid = status.text === 'Paid';
             return (
-              <div key={record.recordId} className={`p-4 md:p-6 grid grid-cols-1 md:grid-cols-3 gap-4 items-center ${isPaid ? 'bg-green-50/50' : ''}`}>
+              <div key={record.recordId} className="p-4 md:p-6 grid md:grid-cols-4 gap-4 items-center hover:bg-gray-50 transition-colors">
                 
-                {/* Column 1: Fee Breakdown */}
-                <div className="md:col-span-1 space-y-2">
+                {/* Column 1: Description */}
+                <div className="md:col-span-1">
                   <p className="font-bold text-gray-800">Academic Year Invoice</p>
-                  <div className="text-sm text-gray-600 border-l-2 pl-3 space-y-1">
-                    <p>Tuition Fee: {formatCurrency(record.totalFees)}</p>
-                    {record.busFees > 0 && <p>Bus Fee: {formatCurrency(record.busFees)}</p>}
-                    {record.discountFees > 0 && <p className="text-green-600">Discount Applied: -{formatCurrency(record.discountFees)}</p>}
-                  </div>
+                  <p className="text-sm text-gray-500">For Class {record.class}</p>
                 </div>
 
-                {/* Column 2: Status and Dates */}
-                <div className="md:col-span-1 flex flex-col items-start md:items-center">
-                   <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${status.color} ${status.bgColor}`}>
+                {/* Column 2: Amount & Dates */}
+                <div className="md:col-span-1 text-left">
+                  <p className="text-sm font-semibold text-gray-800">{formatCurrency(record.pendingFees)}</p>
+                  <p className="text-xs text-gray-500">Due: {formatDate(record.dueDate)}</p>
+                </div>
+
+                {/* Column 3: Status */}
+                <div className="md:col-span-1 flex justify-start md:justify-center">
+                   <div className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold ${status.color} ${status.bgColor}`}>
                     <status.icon size={16} className="mr-2" />
                     {status.text}
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">Due Date: {formatDate(record.dueDate)}</p>
                 </div>
                 
-                {/* Column 3: Amount and Actions */}
-                <div className="md:col-span-1 flex items-center justify-between md:justify-end gap-4">
-                   <div className="text-right">
-                    <p className="text-sm text-gray-500">{isPaid ? 'Amount Paid' : 'Amount Due'}</p>
-                    <p className={`text-2xl font-bold ${isPaid ? 'text-green-600' : 'text-red-600'}`}>
-                      {formatCurrency(isPaid ? record.paidFees : record.pendingFees)}
-                    </p>
-                  </div>
-                  
+                {/* Column 4: Actions */}
+                <div className="md:col-span-1 flex justify-start md:justify-end">
                   {isPaid ? (
-                    <button onClick={() => handleViewReceipt(record.recordId)} className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg text-sm font-semibold hover:bg-gray-300">
-                      <Receipt size={16} />
-                      Receipt
+                    <button onClick={() => handleViewReceipt(record.recordId)} className="px-4 py-2 bg-gray-200 text-gray-800 text-sm font-semibold rounded-lg hover:bg-gray-300">
+                      View Receipt
                     </button>
                   ) : (
-                    <button onClick={() => handlePayNow(record.pendingFees)} className="px-6 py-3 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 shadow-sm">
+                    <button onClick={() => handlePayNow(record.pendingFees)} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 shadow-sm">
                       Pay Now
                     </button>
                   )}
