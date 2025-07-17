@@ -326,7 +326,7 @@ const StudentPortal: React.FC = () => {
       case 'academic':
         return <AcademicRecords student={student} examRecords={examRecords} onViewReport={() => setShowReportCard(true)} />;
       case 'homework':
-        return <HomeworkSection />;
+        return <HomeworkSection homeworkList={homework} student={student} />;
       case 'notices':
         return <NoticeBoard />;
       default:
