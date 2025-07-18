@@ -233,6 +233,13 @@ const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { 
 
 const StudentPortal: React.FC = () => {
   const { student } = useAuth();
+
+   useEffect(() => {
+    if (student) {
+      console.log("INSPECTING THE STUDENT OBJECT:", student);
+    }
+  }, [student]);
+  
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
