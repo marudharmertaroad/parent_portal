@@ -316,60 +316,67 @@ const StudentPortal: React.FC = () => {
   }, [fetchStudentData]);
 
   useEffect(() => {
-    if (!student) return; // Don't run if student data isn't loaded yet
-
-    const setupFcm = async () => {
-      console.log("Setting up Firebase Cloud Messaging...");
-      
-      // 1. Request permission and get the FCM token
-      const fcmToken = await requestForToken();
-
-      if (fcmToken) {
-        try {
-          // 2. The user's ID is needed to link the token in the database.
-          //    We get this from the student object, which comes from your auth context.
-          const userId = student.user_id; // IMPORTANT: Verify this field name is correct!
-          if (!userId) {
-              console.error("Could not find user_id on student object.");
-              return;
-          }
-
-          // 3. Check if this token already exists for this user to avoid duplicates.
-          const { data: existingToken } = await supabase
-            .from('fcm_tokens')
-            .select('id')
-            .eq('user_id', userId)
-            .eq('token', fcmToken)
-            .maybeSingle();
-
-          // 4. If the token is new, insert it into our database.
-          if (!existingToken) {
-            console.log('New FCM token found, saving to database...');
-            const { error: insertError } = await supabase
-              .from('fcm_tokens')
-              .insert({
-                user_id: userId,
-                token: fcmToken,
-                device_info: navigator.userAgent // Store browser/device info
-              });
-
-            if (insertError) throw insertError;
-
-            console.log('FCM token saved successfully!');
-          } else {
-            console.log('This device is already registered for push notifications.');
-          }
-        } catch (error) {
-          console.error('Error during FCM token handling:', error);
+    // We add a small delay to ensure the student object from context is fully settled.
+    const timer = setTimeout(() => {
+        if (!student) {
+            console.log("FCM DEBUG | useEffect ran, but student object is still null. Aborting.");
+            return;
         }
-      } else {
-        console.log("Permission for push notifications not granted.");
-      }
-    };
 
-    setupFcm();
+        console.log("FCM DEBUG | StudentPortal mounted. Student object is:", student);
 
-  }, [student]);
+        const setupFcm = async () => {
+            try {
+                const fcmToken = await requestForToken();
+
+                if (!fcmToken) {
+                    console.warn("FCM DEBUG | Permission not granted or token not received.");
+                    return;
+                }
+
+                console.log(`FCM DEBUG | Token received successfully: ${fcmToken}`);
+
+                const userId = student.user_id;
+
+                if (!userId) {
+                    console.error("FCM DEBUG | FATAL ERROR: The student object does NOT have a user_id property!", student);
+                    alert("A fatal error occurred: User ID is missing from the student session. Cannot save notification token.");
+                    return;
+                }
+                
+                console.log(`FCM DEBUG | Extracted user_id: ${userId}`);
+                
+                const payloadToInsert = {
+                    user_id: userId,
+                    token: fcmToken,
+                    device_info: navigator.userAgent
+                };
+
+                console.log("FCM DEBUG | Attempting to insert this object into fcm_tokens:", payloadToInsert);
+
+                const { error: insertError } = await supabase
+                    .from('fcm_tokens')
+                    .insert(payloadToInsert);
+
+                if (insertError) {
+                    console.error('FCM DEBUG | DATABASE INSERT ERROR:', insertError);
+                    alert(`Error saving notification token: ${insertError.message}. Check the browser console and RLS policy.`);
+                } else {
+                    console.log('%cFCM DEBUG | SUCCESS! Token saved to the database.', 'color: green; font-weight: bold;');
+                }
+
+            } catch (error) {
+                console.error('FCM DEBUG | CRITICAL ERROR in setupFcm try/catch block:', error);
+            }
+        };
+
+        setupFcm();
+
+    }, 500); // 500ms delay
+
+    return () => clearTimeout(timer); // Cleanup timer
+
+}, [student]);
 
   useEffect(() => {
     if (!student) return;
