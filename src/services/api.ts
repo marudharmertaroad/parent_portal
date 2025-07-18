@@ -5,37 +5,49 @@ import { LoginCredentials, Student, FeeRecord, ExamRecord, Notice} from '../type
 
 class ApiService {
   
-  async function login(credentials: LoginCredentials): Promise<Student> {
-    try {
-        const { data, error } = await supabase.functions.invoke('parent-login', {
-            body: { 
-                username: credentials.srNo, 
-                dob: credentials.dob // Using dob as the password
-            },
-        });
+  async login(credentials: LoginCredentials): Promise<Student> {
+    const { rollNumber, dateOfBirth } = credentials;
+    console.log(`[API] Attempting to find student with sr_no: '${rollNumber}' and dob: '${dateOfBirth}'`);
+    if (!rollNumber || !dateOfBirth) throw new Error("SR Number and Date of Birth are required.");
 
-        // --- DEBUG LOGGING ---
-        console.log('API RESPONSE | Received from Edge Function:', data);
-        // ---------------------
+    console.log('API RESPONSE | Received from Edge Function:', data);
 
-        if (error) {
-            const errorMessage = error.context?.error?.message || error.message || "An unknown login error occurred.";
-            throw new Error(errorMessage);
-        }
-        
-        if (!data || !data.user_id) {
-            // If the data is missing or doesn't have a user_id, stop the login.
-            throw new Error("Login failed: Server did not return complete user data.");
-        }
-        
-        return data as Student;
+    const { data, error } = await supabase
+      .from('students')
+      .select('*')
+      .eq('sr_no', rollNumber.trim())
+      .eq('dob', dateOfBirth)
+      .single();
 
-    } catch (err: any) {
-        console.error("API Service Login Error:", err);
-        throw new Error(err.message || "Failed to connect to the server.");
+    if (error) {
+      console.error("Login API Error:", error);
+      throw new Error("Invalid SR Number or Date of Birth.");
     }
-}
+    if (!data) {
+      console.error('[API] Query succeeded but returned no data.');
+      throw new Error("No student record found for the provided credentials.");
+    }
 
+    const mappedStudent: Student = {
+      id: data.id,
+      name: data.name,
+      class: data.class,
+      srNo: data.sr_no,
+      fatherName: data.father_name,
+      motherName: data.mother_name,
+      contact: data.contact,
+      address: data.address,
+      medium: data.medium,
+      gender: data.gender,
+      dob: data.dob,
+      bus_route: data.bus_route,
+      religion: data.religion,
+      nicStudentId: data.nic_student_id,
+      isRte: data.is_rte,
+    };
+    
+    return mappedStudent;
+  }
 
   async getFeeRecords(studentId: number): Promise<FeeRecord[]> {
     const { data, error } = await supabase.from('fee_records').select('*').eq('student_primary_id', studentId);
