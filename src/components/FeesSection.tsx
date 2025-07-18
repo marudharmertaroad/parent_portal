@@ -15,13 +15,13 @@ interface FeesSectionProps {
 
 // A more vibrant, reusable card for the summary stats
 const StatCard: React.FC<{ title: string; amount: number; icon: React.ElementType; color: string; }> = ({ title, amount, icon: Icon, color }) => (
-  <div className="bg-white rounded-xl p-6 shadow-md border flex items-center gap-4">
-    <div className={`w-12 h-12 ${color} rounded-lg flex items-center justify-center`}>
-      <Icon size={24} className="text-white" />
+  <div className="bg-white rounded-xl p-4 sm:p-6 shadow-md border flex items-center gap-4">
+    <div className={`w-10 h-10 sm:w-12 sm:h-12 ${color} rounded-lg flex items-center justify-center`}>
+      <Icon size={20} sm:size={24} className="text-white" />
     </div>
     <div>
-      <p className="text-sm font-medium text-gray-600">{title}</p>
-      <p className="text-2xl font-bold text-gray-900">
+      <p className="text-xs sm:text-sm font-medium text-gray-600">{title}</p>
+      <p className="text-xl sm:text-2xl font-bold text-gray-900">
         {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount)}
       </p>
     </div>
