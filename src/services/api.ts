@@ -16,30 +16,51 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 class ApiService {
   async login(credentials: LoginCredentials): Promise<Student> {
-    const { rollNumber, dateOfBirth } = credentials;
-    console.log(`[API] Invoking 'parent-login' with sr_no: '${rollNumber}'`);
-    
-    if (!rollNumber || !dateOfBirth) throw new Error("SR Number and DOB required.");
+  const { rollNumber, dateOfBirth } = credentials;
+  console.log(`[API] Attempting login with sr_no: '${rollNumber}'`);
 
-    try {
-      const { data, error } = await supabase.functions.invoke('parent-login', {
-        body: {
-          username: rollNumber,
-          dob: dateOfBirth
-        },
-      });
-
-      if (error) throw new Error(error.message);
-      if (data.error) throw new Error(data.error);
-      
-      console.log("[API] Login successful. Received student data:", data);
-      return data as Student;
-
-    } catch (err: any) {
-      console.error("[API] Login failed:", err);
-      throw new Error(err.message || "An unexpected error occurred during login.");
-    }
+  if (!rollNumber || !dateOfBirth) {
+    throw new Error("SR Number and Date of Birth are required.");
   }
+
+  // This is the original logic that queries the students table directly.
+  const { data, error } = await supabase
+    .from('students')
+    .select('*')
+    .eq('sr_no', rollNumber.trim())
+    .eq('dob', dateOfBirth)
+    .single();
+
+  if (error) {
+    console.error("Login API Error:", error);
+    throw new Error("Invalid SR Number or Date of Birth.");
+  }
+  if (!data) {
+    throw new Error("No student record found for the provided credentials.");
+  }
+  
+  // Assuming you have a mapping step, keep it as it was.
+  // This is a generic mapping based on your previous code.
+  const mappedStudent: Student = {
+    id: data.id,
+    name: data.name,
+    class: data.class,
+    srNo: data.sr_no,
+    fatherName: data.father_name,
+    motherName: data.mother_name,
+    contact: data.contact,
+    address: data.address,
+    medium: data.medium,
+    gender: data.gender,
+    dob: data.dob,
+    bus_route: data.bus_route,
+    religion: data.religion,
+    nicStudentId: data.nic_student_id,
+    isRte: data.is_rte,
+  };
+  
+  return mappedStudent;
+}
   // --- YOUR OTHER API FUNCTIONS REMAIN THE SAME ---
 
   async getFeeRecords(studentId: number): Promise<FeeRecord[]> {
