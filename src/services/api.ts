@@ -15,62 +15,35 @@ if (!supabaseUrl || !supabaseAnonKey) {
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 class ApiService {
-
   /**
-   * This is the new, correct login function.
-   * It calls our secure Edge Function instead of querying the database directly.
+   * This is the final login function. It calls our secure Edge Function.
    */
   async login(credentials: LoginCredentials): Promise<Student> {
-  const { rollNumber, dateOfBirth } = credentials;
-  console.log(`[API] Attempting to authenticate student with sr_no: '${rollNumber}'`);
+    const { rollNumber, dateOfBirth } = credentials;
+    console.log(`[API] Invoking 'parent-login' with sr_no: '${rollNumber}'`);
+    
+    if (!rollNumber || !dateOfBirth) throw new Error("SR Number and DOB required.");
 
-  if (!rollNumber || !dateOfBirth) {
-    throw new Error("SR Number and Date of Birth are required.");
+    try {
+      // This calls the Edge Function we just updated.
+      const { data, error } = await supabase.functions.invoke('parent-login', {
+        body: {
+          username: rollNumber,
+          dob: dateOfBirth
+        },
+      });
+
+      if (error) throw new Error(error.message); // Handles network errors
+      if (data.error) throw new Error(data.error); // Handles errors from function logic
+      
+      console.log("[API] Login successful. Received student data:", data);
+      return data as Student;
+
+    } catch (err: any) {
+      console.error("[API] Login failed:", err);
+      throw new Error(err.message || "An unexpected error occurred during login.");
+    }
   }
-
-  // Step 1: Construct the unique email and password for Supabase Auth
-  const loginEmail = `${rollNumber.trim()}@student.schoolerp`;
-  const loginPassword = dateOfBirth;
-
-  // Step 2: Call Supabase's built-in signIn method
-  const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-    email: loginEmail,
-    password: loginPassword,
-  });
-
-  if (authError) {
-    console.error("Authentication API Error:", authError.message);
-    throw new Error("Invalid SR Number or Date of Birth.");
-  }
-  if (!authData.user) {
-    throw new Error("Login failed, user data not returned.");
-  }
-  
-  const user = authData.user;
-  console.log(`[API] Auth successful for user ID: ${user.id}`);
-
-  // Step 3: Now that authentication is successful, fetch the full student profile.
-  const { data: studentProfile, error: profileError } = await supabase
-    .from('students')
-    .select('*')
-    .eq('sr_no', rollNumber.trim())
-    .single();
-
-  if (profileError || !studentProfile) {
-    console.error("[API] Auth successful, but could not fetch student profile.", profileError);
-    throw new Error("Could not find student record after successful login.");
-  }
-
-  // Step 4: Combine the student profile with the user ID and return it.
-  // This is the crucial step that adds the user_id to the student object.
-  const studentWithAuth: Student = {
-    ...studentProfile,
-    user_id: user.id // Add the user_id here!
-  };
-
-  return studentWithAuth;
-}
-
   // --- YOUR OTHER API FUNCTIONS REMAIN THE SAME ---
 
   async getFeeRecords(studentId: number): Promise<FeeRecord[]> {
