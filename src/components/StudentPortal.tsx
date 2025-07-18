@@ -379,7 +379,7 @@ const StudentPortal: React.FC = () => {
     
     switch (activeTab) {
       case 'dashboard':
-        return <Dashboard student={student} feeRecords={feeRecords} examRecords={examRecords} notices={notices} onTabChange={setActiveTab} />;
+        return <Dashboard student={student} feeRecords={feeRecords} examRecords={examRecords} notices={notices} onTabChange={handleTabChange} />;
       case 'fees':
         return <FeesSection feeRecords={feeRecords} studentName={student.name} />;
       case 'academic':
