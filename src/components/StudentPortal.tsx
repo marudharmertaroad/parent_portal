@@ -395,11 +395,6 @@ const StudentPortal: React.FC = () => {
   }, [student]);
 
   // Request notification permission on component mount
-  useEffect(() => {
-    if ("Notification" in window && Notification.permission !== "granted") {
-      Notification.requestPermission();
-    }
-  }, []);
 
   const handleBellClick = () => {
     setShowNotificationDrawer(true);
