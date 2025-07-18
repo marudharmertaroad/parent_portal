@@ -31,28 +31,38 @@ const Header: React.FC<HeaderProps> = ({ studentName, activeTab, onTabChange, on
 
   return (
     <header className="flex-shrink-0 bg-white shadow-md z-20 relative">
+      {/* The main container is now a flexbox that justifies space between its children */}
       <div className="flex items-center justify-between h-16 px-4 md:px-6">
-        {activeTab === 'dashboard' ? (
-            // On dashboard, show the styled Welcome message
-            <div className="hidden lg:flex items-center gap-3">
+        
+        {/* --- Left Side of Header --- */}
+        <div>
+          {activeTab === 'dashboard' ? (
+            // [MOBILE & DESKTOP] On the dashboard, show the school logo and name.
+            <div className="flex items-center gap-3">
               <img src="/logo.png" alt="logo" className="h-10 w-10 rounded-full" />
               <div>
-                <h1 className="text-md font-bold text-gray-800">Welcome, {studentName}!</h1>
+                {/* [MOBILE] On small screens, just show the school name. */}
+                <h1 className="text-md font-bold text-gray-800 lg:hidden">Marudhar Defence School</h1>
+                {/* [DESKTOP] On large screens (lg and up), show the personalized welcome. */}
+                <h1 className="text-md font-bold text-gray-800 hidden lg:block">Welcome, {studentName}!</h1>
                 <p className="text-xs text-gray-500">Student & Parent Portal</p>
               </div>
             </div>
           ) : (
-            // On any other tab, show a "Back to Dashboard" button
+            // [MOBILE & DESKTOP] On any other tab, show a "Back to Dashboard" button.
             <button 
               onClick={() => onTabChange('dashboard')} 
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 font-semibold hover:bg-gray-100"
             >
               <Home size={20} />
-              Dashboard
+              {/* [DESKTOP] Show the "Dashboard" text on medium screens and up. */}
+              <span className="hidden md:inline">Dashboard</span>
             </button>
           )}
+        </div>
 
-        <div className="flex items-center space-x-4">
+        {/* --- Right Side of Header --- */}
+        <div className="flex items-center space-x-2 md:space-x-4">
           <button onClick={onBellClick} className="relative p-2 rounded-full text-gray-500 hover:bg-gray-100" aria-label="Notifications">
             <Bell size={20} />
             {unreadCount > 0 && (
