@@ -232,8 +232,11 @@ const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { 
 
 const StudentPortal: React.FC = () => {
   const { student } = useAuth();
-  
   const [activeTab, setActiveTab] = useState('dashboard');
+   const handleTabChange = (tab: string) => {
+    console.log(`Tab change requested. New tab will be: '${tab}'`);
+    setActiveTab(tab);
+  };
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [showReportCard, setShowReportCard] = useState(false);
