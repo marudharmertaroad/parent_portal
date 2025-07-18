@@ -53,32 +53,32 @@ const Dashboard: React.FC<DashboardProps> = ({
     <div className="space-y-6 md:space-y-8">
       {/* Welcome Banner */}
       {/* [MOBILE COMPACT] Changed padding from p-8 to p-6 for smaller screens */}
-      <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-800 rounded-2xl p-6 md:p-8 text-white relative overflow-hidden shadow-2xl">
-        <div className="absolute -bottom-16 -right-16 opacity-10">
-          <img src="/logo.png" alt="School Logo Background" className="w-64 h-64" />
-        </div>
-        <div className="relative z-10">
-          {/* [MOBILE COMPACT] Changed text size from text-3xl to text-2xl on mobile */}
-          <h2 className="text-2xl md:text-3xl font-bold mb-2 md:mb-3">Welcome to Marudhar Defence School Student ERP</h2>
-          {/* [MOBILE COMPACT] Changed text size from text-lg to text-base on mobile */}
-          <p className="text-blue-100 text-base md:text-lg">Excellence in Education & Character - Manage your Ward's Profile</p>
-          {/* [MOBILE COMPACT] Make the stats below the text stack vertically on mobile */}
-          <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-6 text-blue-200">
-            <div className="flex items-center space-x-2">
-              <BookOpen className="w-5 h-5" />
-              <span>Est. 1991</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Users className="w-5 h-5" />
-              <span>1300+ Students</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <TrendingUp className="w-5 h-5" />
-              <span>Growing Strong</span>
-            </div>
-          </div>
-        </div>
+      <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-800 rounded-2xl p-4 sm:p-6 md:p-8 text-white relative overflow-hidden shadow-2xl">
+  <div className="absolute -bottom-20 -right-20 opacity-10 sm:-bottom-16 sm:-right-16">
+    <img src="/logo.png" alt="School Logo Background" className="w-48 h-48 sm:w-64 sm:h-64" />
+  </div>
+  <div className="relative z-10">
+    {/* [MOBILE COMPACT V2] Reduced text size even more on mobile */}
+    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2">Welcome to the Student ERP</h2>
+    {/* [MOBILE COMPACT V2] Hiding this secondary text on the smallest screens */}
+    <p className="text-blue-100 text-sm md:text-lg hidden sm:block">Excellence in Education & Character - Manage your Ward's Profile</p>
+    {/* [MOBILE COMPACT V2] Tighter layout for the stats row */}
+    <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-blue-200">
+      <div className="flex items-center space-x-2">
+        <BookOpen className="w-4 h-4" />
+        <span>Est. 1991</span>
       </div>
+      <div className="flex items-center space-x-2">
+        <Users className="w-4 h-4" />
+        <span>1300+ Students</span>
+      </div>
+      <div className="flex items-center space-x-2">
+        <TrendingUp className="w-4 h-4" />
+        <span>Growing Strong</span>
+      </div>
+    </div>
+  </div>
+</div>
 
       {/* Stats Grid */}
       {/* [MOBILE COMPACT] Changed from 1 column to 2 on mobile, then 3 on desktop */}
