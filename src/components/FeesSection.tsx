@@ -5,7 +5,7 @@ import { FeeRecord } from '../types';
 import { formatDate } from '../utils';
 import { 
   DollarSign, CheckCircle, Clock, AlertCircle, CreditCard, 
-  TrendingUp, TrendingDown, ArrowLeft, FileText
+  TrendingUp, TrendingDown, ArrowLeft, FileText, Receipt
 } from 'lucide-react';
 
 interface FeesSectionProps {
