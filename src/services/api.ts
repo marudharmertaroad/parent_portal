@@ -16,30 +16,44 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 class ApiService {
   async login(credentials: LoginCredentials): Promise<Student> {
-    const { rollNumber, dateOfBirth } = credentials;
-    console.log(`[API] Invoking 'parent-login' with sr_no: '${rollNumber}'`);
-    
-    if (!rollNumber || !dateOfBirth) throw new Error("SR Number and DOB required.");
-
-    try {
-      const { data, error } = await supabase.functions.invoke('parent-login', {
-        body: {
-          username: rollNumber,
-          dob: dateOfBirth
-        },
-      });
-
-      if (error) throw new Error(error.message);
-      if (data.error) throw new Error(data.error);
-      
-      console.log("[API] Login successful. Received student data:", data);
-      return data as Student;
-
-    } catch (err: any) {
-      console.error("[API] Login failed:", err);
-      throw new Error(err.message || "An unexpected error occurred during login.");
-    }
+  // Your LoginCredentials type might use different names (e.g., srNo).
+  // We use 'rollNumber' and 'dateOfBirth' here as per your previously shared code.
+  const { rollNumber, dateOfBirth } = credentials;
+  console.log(`[API] Invoking 'parent-login' Edge Function with sr_no: '${rollNumber}'`);
+  
+  if (!rollNumber || !dateOfBirth) {
+    throw new Error("SR Number and Date of Birth are required.");
   }
+
+  try {
+    // This is the call to the Supabase Edge Function we created in Step 2.
+    const { data, error } = await supabase.functions.invoke('parent-login', {
+      body: {
+        username: rollNumber, // The Edge Function expects 'username'
+        dob: dateOfBirth      // The Edge Function expects 'dob'
+      },
+    });
+
+    // Handle network errors or if the function itself crashes before returning a value.
+    if (error) {
+      throw new Error(error.message);
+    }
+    
+    // Handle logical errors returned by our function's code (e.g., "Invalid SR Number").
+    if (data.error) {
+      throw new Error(data.error);
+    }
+
+    // The 'data' from a successful call is the full student object, including the user_id.
+    console.log("[API] Login successful. Received complete student data:", data);
+    return data as Student;
+
+  } catch (err: any) {
+    console.error("[API] Login failed:", err);
+    // Re-throw a user-friendly message to be displayed by the UI.
+    throw new Error(err.message || "An unexpected error occurred during login.");
+  }
+}
   // --- YOUR OTHER API FUNCTIONS REMAIN THE SAME ---
 
   async getFeeRecords(studentId: number): Promise<FeeRecord[]> {
