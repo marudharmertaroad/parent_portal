@@ -309,6 +309,62 @@ const StudentPortal: React.FC = () => {
   }, [fetchStudentData]);
 
   useEffect(() => {
+    if (!student) return; // Don't run if student data isn't loaded yet
+
+    const setupFcm = async () => {
+      console.log("Setting up Firebase Cloud Messaging...");
+      
+      // 1. Request permission and get the FCM token
+      const fcmToken = await requestForToken();
+
+      if (fcmToken) {
+        try {
+          // 2. The user's ID is needed to link the token in the database.
+          //    We get this from the student object, which comes from your auth context.
+          const userId = student.user_id; // IMPORTANT: Verify this field name is correct!
+          if (!userId) {
+              console.error("Could not find user_id on student object.");
+              return;
+          }
+
+          // 3. Check if this token already exists for this user to avoid duplicates.
+          const { data: existingToken } = await supabase
+            .from('fcm_tokens')
+            .select('id')
+            .eq('user_id', userId)
+            .eq('token', fcmToken)
+            .maybeSingle();
+
+          // 4. If the token is new, insert it into our database.
+          if (!existingToken) {
+            console.log('New FCM token found, saving to database...');
+            const { error: insertError } = await supabase
+              .from('fcm_tokens')
+              .insert({
+                user_id: userId,
+                token: fcmToken,
+                device_info: navigator.userAgent // Store browser/device info
+              });
+
+            if (insertError) throw insertError;
+
+            console.log('FCM token saved successfully!');
+          } else {
+            console.log('This device is already registered for push notifications.');
+          }
+        } catch (error) {
+          console.error('Error during FCM token handling:', error);
+        }
+      } else {
+        console.log("Permission for push notifications not granted.");
+      }
+    };
+
+    setupFcm();
+
+  }, [student]);
+
+  useEffect(() => {
     if (!student) return;
 
     const channel = supabase
