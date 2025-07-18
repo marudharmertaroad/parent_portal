@@ -3,18 +3,15 @@
 import { initializeApp } from "firebase/app";
 import { getMessaging, getToken } from "firebase/messaging";
 
-// --- PASTE THE CONFIG OBJECT FROM STEP 1 HERE ---
 const firebaseConfig = {
-  apiKey: "PASTE_YOUR_API_KEY_HERE",
-  authDomain: "PASTE_YOUR_AUTH_DOMAIN_HERE",
-  projectId: "PASTE_YOUR_PROJECT_ID_HERE",
-  storageBucket: "PASTE_YOUR_STORAGE_BUCKET_HERE",
-  messagingSenderId: "PASTE_YOUR_MESSAGING_SENDER_ID_HERE",
-  appId: "PASTE_YOUR_APP_ID_HERE"
-}; // <--- THE FIX: Ensure this closing brace and semicolon are present.
-// -----------------------------------------------
+  apiKey: "AIzaSyAB6luds9Z-Luc_T4Of4qNQrRe9Oh7Pt8Q",
+  authDomain: "marudhar-school-erp.firebaseapp.com",
+  projectId: "marudhar-school-erp",
+  storageBucket: "marudhar-school-erp.firebasestorage.app",
+  messagingSenderId: "400371137837",
+  appId: "1:400371137837:web:c8a7bbed749f2d1029a7a4"
+};
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const messaging = getMessaging(app);
 
