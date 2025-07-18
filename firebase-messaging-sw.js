@@ -1,11 +1,10 @@
-// public/firebase-messaging-sw.js
+// In public/firebase-messaging-sw.js
 
-// Import and configure the Firebase SDK
-// It is very important to use the 'compat' version for the service worker
-importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js');
+// These import statements are required.
+importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js');
 
-// --- PASTE YOUR FIREBASE CONFIG OBJECT AGAIN HERE ---
+// --- PASTE YOUR FIREBASE CONFIG OBJECT HERE ---
 const firebaseConfig = {
   apiKey: "AIzaSyAB6luds9Z-Luc_T4Of4qNQrRe9Oh7Pt8Q",
   authDomain: "marudhar-school-erp.firebaseapp.com",
@@ -16,11 +15,12 @@ const firebaseConfig = {
 };
 // ---------------------------------------------------
 
+// Initialize the Firebase app in the service worker
 firebase.initializeApp(firebaseConfig);
 
+// Retrieve an instance of Firebase Messaging so that it can handle background messages.
 const messaging = firebase.messaging();
 
-// Optional: Handle background messages
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Received background message ', payload);
   
