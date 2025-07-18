@@ -225,6 +225,37 @@ const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { 
                       );
                     })}
                   </tbody>
+                  <tfoot className="font-bold bg-blue-50 text-center">
+                    <tr>
+                      <td className="border p-1 text-left">Total Marks</td>
+                      {uniqueExamTypes.map(examType => {
+                        const exam = safeExamRecords.find(e => e.examType === examType);
+                        return (
+                          <React.Fragment key={examType}>
+                            <td className="border p-1" colSpan={3}>{exam ? `${exam.obtainedMarks} / ${exam.totalMarks}` : '-'}</td>
+                          </React.Fragment>
+                        );
+                      })}
+                      {/* Grand Total */}
+                      <td className="border p-1 bg-green-100" colSpan={3}>{`${totalObtained} / ${totalMax}`}</td>
+                    </tr>
+                    <tr>
+                      <td className="border p-1 text-left">Percentage & Grade</td>
+                      {uniqueExamTypes.map(examType => {
+                        const exam = safeExamRecords.find(e => e.examType === examType);
+                        const grade = exam ? calculateGrade(exam.percentage) : 'N/A';
+                        return (
+                          <React.Fragment key={examType}>
+                            <td className="border p-1" colSpan={3}>
+                              {exam ? `${exam.percentage.toFixed(1)}% (${grade})` : '-'}
+                            </td>
+                          </React.Fragment>
+                        );
+                      })}
+                       {/* Grand Total Percentage */}
+                      <td className="border p-1 bg-green-100" colSpan={3}>{`${overallPercentage.toFixed(1)}% (${overallGrade})`}</td>
+                    </tr>
+                  </tfoot>
                 </table>
               </main>
             </div>
