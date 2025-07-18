@@ -398,7 +398,7 @@ const StudentPortal: React.FC = () => {
       <Header
         studentName={student.name}
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+onTabChange={handleTabChange}
         onProfileClick={() => setShowProfileModal(true)}
         unreadCount={unreadCount}
         onBellClick={handleBellClick}
