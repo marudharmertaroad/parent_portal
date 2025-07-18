@@ -6,7 +6,6 @@ import { Student, FeeRecord, ExamRecord, Notice, SubjectMark } from '../types';
 import { supabase } from '../utils/supabaseClient';
 import { X, Printer, Settings } from 'lucide-react';
 import { formatDate, getGradeColor, calculateGrade } from '../utils';
-import { requestForToken } from '../firebase-init';
 
 // Import all necessary components
 import Header from './Header';
@@ -233,66 +232,6 @@ const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { 
 
 const StudentPortal: React.FC = () => {
   const { student } = useAuth();
-
-   useEffect(() => {
-  // This logic runs only when the 'student' object is available AND has a user_id.
-  if (student && student.user_id) {
-    
-    console.log('%cStudentPortal: Found student with user_id. Proceeding with FCM setup.', 'color: blue; font-weight: bold;');
-
-    const setupFcm = async () => {
-      try {
-        // 1. Request permission from the user and get the token.
-        const fcmToken = await requestForToken();
-
-        if (!fcmToken) {
-          console.warn("FCM: Permission not granted or token could not be generated.");
-          return;
-        }
-
-        // 2. Check if this exact token is already in our database for this user.
-        const { data: existingToken, error: checkError } = await supabase
-          .from('fcm_tokens')
-          .select('id')
-          .eq('user_id', student.user_id)
-          .eq('token', fcmToken)
-          .maybeSingle();
-
-        if (checkError) {
-          console.error("FCM: Error checking for existing token.", checkError);
-          return;
-        }
-
-        if (existingToken) {
-          console.log('FCM: This device is already registered.');
-        } else {
-          // 3. If the token is new, insert it into the database.
-          console.log("FCM: New device token. Saving to database...");
-          const { error: insertError } = await supabase
-            .from('fcm_tokens')
-            .insert({
-              user_id: student.user_id,
-              token: fcmToken,
-              device_info: navigator.userAgent // Optional: store browser info
-            });
-
-          if (insertError) {
-            console.error('FCM: DATABASE INSERT ERROR!', insertError);
-            // This error often means a problem with Row Level Security (RLS) policies.
-            alert(`Error saving notification token: ${insertError.message}`);
-          } else {
-            console.log('%cFCM: SUCCESS! Token saved to the database.', 'color: green; font-weight: bold;');
-          }
-        }
-      } catch (error) {
-        console.error("FCM: A critical error occurred in the setupFcm function.", error);
-      }
-    };
-
-    setupFcm();
-  }
-// The dependency array ensures this code runs whenever the student object becomes available.
-}, [student]);
   
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showProfileModal, setShowProfileModal] = useState(false);
