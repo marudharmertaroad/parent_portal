@@ -150,26 +150,29 @@ const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { 
           </div>
           <div id="report-card-wrapper">
             <div className="border-2 border-black p-4 bg-white rounded-lg flex flex-col h-full relative" id="report-card">
-              <header className="flex items-center justify-between mb-2">
-                <div className="flex items-center space-x-4">
-                  <img src="/logo.png" alt="School Logo" className="h-20 w-20 object-contain" />
+              <header className="flex flex-col sm:flex-row items-center justify-between mb-2 gap-2">
+                <div className="flex items-center space-x-2 sm:space-x-4">
+                  <img src="/logo.png" alt="School Logo" className="h-16 w-16 sm:h-20 sm:w-20 object-contain" />
                   <div>
-                    <h1 className="text-3xl font-bold text-blue-800">{settings.schoolName}</h1>
-                    <p className="text-sm text-gray-500">{settings.schoolAddress}</p>
+                    <h1 className="text-xl sm:text-3xl font-bold text-blue-800">{settings.schoolName}</h1>
+                    <p className="text-xs sm:text-sm text-gray-500">{settings.schoolAddress}</p>
                   </div>
                 </div>
-                <div className="text-center">
-                  <h2 className="text-2xl font-bold text-blue-800">{reportTitle}</h2>
-                  <p className="text-lg text-blue-600">Session: {settings.session}</p>
+                <div className="text-center mt-2 sm:mt-0">
+                  <h2 className="text-lg sm:text-2xl font-bold text-blue-800">{reportTitle}</h2>
+                  <p className="text-base sm:text-lg text-blue-600">Session: {settings.session}</p>
                 </div>
-                <div className="w-24 h-28 border-2 border-gray-400 rounded-lg p-1 bg-white flex items-center justify-center">
+                {/* Hiding the photo box on the smallest screens to save space */}
+                <div className="w-20 h-24 sm:w-24 sm:h-28 border-2 border-gray-400 rounded-lg p-1 bg-white hidden sm:flex items-center justify-center">
                   {student.photoUrl ? <img src={student.photoUrl} alt="Student" className="w-full h-full object-cover"/> : <span className="text-xs text-gray-400">Photo</span>}
                 </div>
               </header>
-              <section className="grid grid-cols-2 gap-x-4">
-                <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
-                  <h3 className="font-bold text-md mb-2 text-blue-800">Student Information</h3>
-                  <div className="text-xs grid grid-cols-2 gap-x-4 gap-y-1">
+
+              {/* [MOBILE COMPACT] Sections now stack on mobile */}
+              <section className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-x-4 text-xs">
+                <div className="bg-blue-50 rounded-lg p-2 sm:p-3 border border-blue-200">
+                  <h3 className="font-bold text-sm mb-1 text-blue-800">Student Information</h3>
+                  <div className="grid grid-cols-2 gap-x-2 gap-y-1">
                     <p><strong>Name:</strong> {student.name}</p>
                     <p><strong>SR No:</strong> {student.srNo}</p>
                     <p><strong>Father's Name:</strong> {student.fatherName}</p>
@@ -177,18 +180,20 @@ const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { 
                     <p className="col-span-2"><strong>Class:</strong> {student.class}</p>
                   </div>
                 </div>
-                <div className="bg-green-50 rounded-lg p-3 border border-green-200">
-                  <h3 className="font-bold text-md mb-2 text-green-800">Performance Summary</h3>
-                  <div className="text-xs grid grid-cols-2 gap-x-4 gap-y-1">
+                <div className="bg-green-50 rounded-lg p-2 sm:p-3 border border-green-200">
+                  <h3 className="font-bold text-sm mb-1 text-green-800">Performance Summary</h3>
+                  <div className="grid grid-cols-2 gap-x-2 gap-y-1">
                     <p><strong>Total Marks:</strong> {totalMax}</p>
                     <p><strong>Marks Obt:</strong> {totalObtained}</p>
                     <p><strong>Percentage:</strong> {overallPercentage.toFixed(1)}%</p>
-                    <p><strong>Grade:</strong> <span className={`px-2 py-0.5 rounded-full font-bold ${getGradeColor(overallGrade)}`}>{overallGrade}</span></p>
-                    <p className="col-span-2"><strong>Result:</strong><span className={`px-2 py-0.5 rounded-full font-bold ${overallResult === 'PASS' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{overallResult}</span></p>
+                    <p><strong>Grade:</strong> <span className={`px-2 py-0.5 rounded font-bold ${getGradeColor(overallGrade)}`}>{overallGrade}</span></p>
+                    <p className="col-span-2"><strong>Result:</strong><span className={`px-2 py-0.5 rounded font-bold ${overallResult === 'PASS' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{overallResult}</span></p>
                   </div>
                 </div>
               </section>
-              <main className="flex-grow mt-4">
+
+              {/* [MOBILE COMPACT] This wrapper makes the table horizontally scrollable on small screens */}
+              <main className="flex-grow mt-4 overflow-x-auto">
                 <table className="w-full border-collapse border border-gray-400 text-xs">
                   <thead className="font-bold">
                     <tr className="bg-blue-100"><th rowSpan={2} className="border p-1">Subject</th>{uniqueExamTypes.map(et => (<th key={et} colSpan={3} className="border p-1">{et}</th>))}<th colSpan={3} className="border p-1 bg-green-200">Total</th></tr>
