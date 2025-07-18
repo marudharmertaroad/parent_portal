@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Notice } from '../types';
 import { formatDate } from '../utils';
-import { Megaphone, Calendar, Search, AlertTriangle, Check, Users, ScrollText, User, ChevronDown } from 'lucide-react';
+import { Megaphone, Calendar, Search, AlertTriangle, CheckCircle, Users, ScrollText, User, ChevronDown } from 'lucide-react';
 
 interface NoticeBoardProps {
   notices: Notice[];
