@@ -34,7 +34,7 @@ export const requestForToken = async () => {
       console.log('No registration token available. Request permission to generate one.');
       return null;
     }
-  } catch (err) => {
+ } catch (err) { 
     console.error('An error occurred while retrieving token:', err);
     return null;
   }
