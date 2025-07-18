@@ -159,93 +159,62 @@ const AcademicRecords: React.FC<AcademicRecordsProps> = ({ student, examRecords 
   }, [examRecords]);
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
+    <div className="space-y-6 md:space-y-8">
+      {/* Header and Action Buttons - now responsive */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center space-x-4">
-          <div className="p-4 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-2xl">
-            <Award className="w-8 h-8 text-white" />
-          </div>
+        <div className="flex items-center space-x-3 sm:space-x-4">
+          <div className="p-3 sm:p-4 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-xl sm:rounded-2xl"><Award className="w-6 h-6 sm:w-8 sm:h-8 text-white" /></div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">Academic Records</h1>
-            <p className="text-gray-600 mt-1">Your performance overview and report cards.</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Academic Records</h1>
+            <p className="text-sm sm:text-base text-gray-600 mt-1">Performance overview and reports.</p>
           </div>
         </div>
-        <button
-          onClick={() => setShowAdmitCard(true)}
-          className="w-full sm:w-auto flex items-center justify-center px-5 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-medium shadow-lg transition-transform hover:scale-105"
-        >
-          <FileText size={18} className="mr-2" />
-          View / Print Admit Card
-        </button>
+        <button onClick={() => setShowAdmitCard(true)} className="w-full sm:w-auto flex items-center justify-center px-4 py-2 sm:px-5 sm:py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-medium shadow-lg transition-transform hover:scale-105"><FileText size={18} className="mr-2" /> View Admit Card</button>
       </div>
-      <div className="bg-white p-6 rounded-2xl shadow-md border flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-md border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-center md:text-left">
         <div>
-          <h3 className="text-xl font-bold text-gray-800">Consolidated Performance</h3>
-          <p className="text-gray-500 mt-1">View a summary of all exam results for the entire academic year.</p>
+          <h3 className="text-lg sm:text-xl font-bold text-gray-800">Consolidated Performance</h3>
+          <p className="text-sm text-gray-500 mt-1">View a summary of all exam results for the entire year.</p>
         </div>
-        <button
-          onClick={onViewReport} // <-- Use the prop here
-          className="w-full md:w-auto flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 font-medium shadow-lg transition-transform hover:scale-105"
-        >
-          <ReportIcon size={18} className="mr-2" />
-          View Consolidated Report
-        </button>
+        <button onClick={onViewReport} className="w-full md:w-auto shrink-0 flex items-center justify-center px-5 py-2 sm:px-6 sm:py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 font-medium shadow-lg transition-transform hover:scale-105"><FileText size={18} className="mr-2" /> View Report</button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard title="Overall Percentage" value={`${stats.overallPercentage.toFixed(1)}%`} icon={TrendingUp} color="bg-green-500" />
-        <StatCard title="Exams Appeared" value={stats.examsTaken} icon={Book} color="bg-blue-500" />
-        <StatCard title="Top Subject" value={stats.bestSubject} icon={StarIcon} color="bg-yellow-500" />
+      {/* Stats Cards - now responsive */}
+      <div className="flex flex-wrap gap-4">
+        <div className="flex-grow min-w-[160px]"><StatCard title="Overall Percentage" value={`${stats.overallPercentage.toFixed(1)}%`} icon={TrendingUp} color="bg-green-500" /></div>
+        <div className="flex-grow min-w-[160px]"><StatCard title="Exams Appeared" value={stats.examsTaken} icon={Book} color="bg-blue-500" /></div>
+        <div className="flex-grow min-w-[160px]"><StatCard title="Top Subject" value={stats.bestSubject} icon={StarIcon} color="bg-yellow-500" /></div>
       </div>
 
       {/* Exam Results List */}
       <div className="bg-white rounded-xl shadow-md border">
-        <div className="p-6 border-b">
-          <h3 className="text-lg font-semibold text-gray-800">Exam Report Cards</h3>
-        </div>
+        <div className="p-4 sm:p-6 border-b"><h3 className="text-base sm:text-lg font-semibold text-gray-800">Exam Report Cards</h3></div>
         <div className="divide-y divide-gray-200">
           {examRecords.length > 0 ? examRecords.map((exam) => (
-            <div key={exam.id} className="p-4 md:p-6 grid md:grid-cols-4 gap-4 items-center hover:bg-gray-50 transition-colors">
-              
-              <div className="md:col-span-1">
-                <p className="font-bold text-lg text-gray-800">{exam.examType}</p>
-                <p className="text-sm text-gray-500">{formatDate(exam.examDate)}</p>
-              </div>
-
-              <div className="md:col-span-1 flex items-center gap-4">
-                <div className="text-right">
-                  <p className="text-xs text-gray-500">Score</p>
-                  <p className="font-semibold text-gray-800">{exam.obtainedMarks}/{exam.totalMarks}</p>
+            // [MOBILE COMPACT] Each exam is now a self-contained card on mobile
+            <div key={exam.id} className="p-4 hover:bg-gray-50/50" onClick={() => setSelectedExam(exam)}>
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                    <p className="font-bold text-base sm:text-lg text-gray-800">{exam.examType}</p>
+                    <p className="text-xs sm:text-sm text-gray-500">{formatDate(exam.examDate)}</p>
+                    {/* Mobile-only details */}
+                    <div className="sm:hidden mt-2 flex items-center gap-4 text-sm">
+                        <div className="text-left"><p className="text-xs text-gray-500">Score</p><p className="font-semibold text-gray-800">{exam.obtainedMarks}/{exam.totalMarks}</p></div>
+                        <div className="text-left"><p className="text-xs text-gray-500">%</p><p className="font-semibold text-gray-800">{exam.percentage.toFixed(1)}%</p></div>
+                    </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-xs text-gray-500">Percentage</p>
-                  <p className="font-semibold text-gray-800">{exam.percentage.toFixed(1)}%</p>
+                {/* Desktop-only details */}
+                <div className="hidden sm:flex items-center gap-4">
+                  <div className="text-right"><p className="text-xs text-gray-500">Score</p><p className="font-semibold text-gray-800">{exam.obtainedMarks}/{exam.totalMarks}</p></div>
+                  <div className="text-right"><p className="text-xs text-gray-500">Percentage</p><p className="font-semibold text-gray-800">{exam.percentage.toFixed(1)}%</p></div>
+                  <span className={`px-4 py-2 text-md font-bold rounded-full ${getGradeColor(exam.grade)}`}>Grade: {exam.grade}</span>
                 </div>
-              </div>
-
-              <div className="md:col-span-1 flex justify-start md:justify-center">
-                <span className={`px-4 py-2 text-md font-bold rounded-full ${getGradeColor(exam.grade)}`}>
-                  Grade: {exam.grade}
-                </span>
-              </div>
-              
-              <div className="md:col-span-1 flex justify-end">
-                <button
-                  onClick={() => setSelectedExam(exam)}
-                  className="px-4 py-2 bg-blue-100 text-blue-800 text-sm font-semibold rounded-lg hover:bg-blue-200"
-                >
-                  View Details
-                </button>
+                <div className="ml-4">
+                    <ChevronRight size={20} className="text-gray-400" />
+                </div>
               </div>
             </div>
-          )) : (
-            <div className="text-center p-12 text-gray-500">
-              <p className="font-semibold">No Exam Records Found</p>
-              <p className="text-sm mt-1">Your results will appear here once published.</p>
-            </div>
-          )}
+          )) : ( <div className="text-center p-12 text-gray-500"><p className="font-semibold">No Exam Records Found</p><p className="text-sm mt-1">Your results will appear here once published.</p></div> )}
         </div>
       </div>
 
@@ -255,4 +224,5 @@ const AcademicRecords: React.FC<AcademicRecordsProps> = ({ student, examRecords 
     </div>
   );
 };
+
 export default AcademicRecords;
