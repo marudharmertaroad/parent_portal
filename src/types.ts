@@ -13,13 +13,14 @@ export interface Student {
   address?: string;
   dob: string;
   bus_route?: string;
-  user_id?: string | null; 
   isRte: boolean;
   
   // --- ADDED MISSING FIELDS TO MATCH YOUR DATABASE ---
   gender?: string;
   religion?: string;
   nicStudentId?: string;
+    user_id?: string; 
+
 }
 
 // For the Parent Login Form
