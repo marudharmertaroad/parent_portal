@@ -14,10 +14,10 @@ const firebaseConfig = {
   appId: "1:400371137837:web:c8a7bbed749f2d1029a7a4"
 };
 
-// ----------------------------------------------------
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const messaging = getMessaging(app);-----------------------
 
-firebase.initializeApp(firebaseConfig);
-const messaging = firebase.messaging();
 
 // This part handles notifications that arrive when the app is in the background.
 messaging.onBackgroundMessage((payload) => {
