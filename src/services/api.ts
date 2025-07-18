@@ -16,33 +16,42 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 class ApiService {
   /**
-   * This is the final login function. It calls our secure Edge Function.
+   * This function now directly and securely authenticates with Supabase Auth.
    */
   async login(credentials: LoginCredentials): Promise<Student> {
     const { rollNumber, dateOfBirth } = credentials;
-    console.log(`[API] Invoking 'parent-login' with sr_no: '${rollNumber}'`);
-    
     if (!rollNumber || !dateOfBirth) throw new Error("SR Number and DOB required.");
 
-    try {
-      // This calls the Edge Function we just updated.
-      const { data, error } = await supabase.functions.invoke('parent-login', {
-        body: {
-          username: rollNumber,
-          dob: dateOfBirth
-        },
-      });
+    const loginEmail = `${rollNumber.trim()}@student.schoolerp`;
+    const loginPassword = dateOfBirth;
 
-      if (error) throw new Error(error.message); // Handles network errors
-      if (data.error) throw new Error(data.error); // Handles errors from function logic
-      
-      console.log("[API] Login successful. Received student data:", data);
-      return data as Student;
+    // Step 1: Sign in using Supabase's built-in method.
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      email: loginEmail,
+      password: loginPassword,
+    });
 
-    } catch (err: any) {
-      console.error("[API] Login failed:", err);
-      throw new Error(err.message || "An unexpected error occurred during login.");
+    if (authError) throw new Error("Invalid SR Number or Date of Birth.");
+    if (!authData.user) throw new Error("Login failed, user data not returned.");
+    
+    const user = authData.user;
+
+    // Step 2: Fetch the full student profile.
+    const { data: studentProfile, error: profileError } = await supabase
+      .from('students')
+      .select('*')
+      .eq('sr_no', rollNumber.trim())
+      .single();
+
+    if (profileError) throw new Error("Could not find student record after login.");
+
+    // Step 3: Link the user_id to the student record in the database if not already linked.
+    if (studentProfile.user_id !== user.id) {
+      await supabase.from('students').update({ user_id: user.id }).eq('sr_no', rollNumber.trim());
     }
+
+    // Step 4: Return the student profile with the auth user_id merged in.
+    return { ...studentProfile, user_id: user.id };
   }
   // --- YOUR OTHER API FUNCTIONS REMAIN THE SAME ---
 
