@@ -6,7 +6,6 @@ import { supabase } from '../utils/supabaseClient';
 import { FileText as ReportIcon } from 'lucide-react';
 
 const AdmitCardModal: React.FC<{ isOpen: boolean; onClose: () => void; student: Student }> = ({ isOpen, onClose, student }) => {
-  // This modal will have its own logic to fetch the datesheet
   const [datesheet, setDatesheet] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -14,7 +13,7 @@ const AdmitCardModal: React.FC<{ isOpen: boolean; onClose: () => void; student: 
     if (isOpen) {
       const fetchDatesheet = async () => {
         setLoading(true);
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from('datesheets')
           .select('exam_title, schedule')
           .eq('class_name', student.class)
@@ -22,7 +21,6 @@ const AdmitCardModal: React.FC<{ isOpen: boolean; onClose: () => void; student: 
           .order('created_at', { ascending: false })
           .limit(1)
           .single();
-        
         if (data) setDatesheet(data);
         setLoading(false);
       };
@@ -31,109 +29,85 @@ const AdmitCardModal: React.FC<{ isOpen: boolean; onClose: () => void; student: 
   }, [isOpen, student.class, student.medium]);
 
   const handlePrint = () => window.print();
-
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-      <style>{`@media print { .no-print { display: none; } #printable-admit-card { margin: 0; padding: 0; border: none; box-shadow: none; } }`}</style>
+      <style>{`@media print { .no-print { display: none; } #printable-admit-card { margin: 0; padding: 0; border: none; box-shadow: none; font-size: 10pt; } }`}</style>
       <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] flex flex-col">
-        <div id="printable-admit-card" className="p-8 overflow-y-auto">
-          {loading ? (
-            <p>Loading Exam Schedule...</p>
-          ) : datesheet ? (
+        <div id="printable-admit-card" className="p-4 sm:p-8 overflow-y-auto">
+          {loading ? <p>Loading Exam Schedule...</p> : datesheet ? (
             <>
               <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold">MARUDHAR DEFENCE SCHOOL</h2>
-                <h3 className="text-lg font-semibold text-gray-700">{datesheet.exam_title}</h3>
-                <h4 className="text-md text-gray-600">ADMIT CARD</h4>
+                <h2 className="text-xl sm:text-2xl font-bold">MARUDHAR DEFENCE SCHOOL</h2>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-700">{datesheet.exam_title}</h3>
+                <h4 className="text-sm sm:text-md text-gray-600">ADMIT CARD</h4>
               </div>
-              <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
+              <div className="flex flex-col sm:flex-row justify-between gap-2 mb-6 text-xs sm:text-sm">
                 <div><p><strong>Student:</strong> {student.name}</p><p><strong>Class:</strong> {student.class} ({student.medium})</p></div>
-                <div className="text-right"><p><strong>SR No:</strong> {student.srNo}</p><p><strong>Father's Name:</strong> {student.fatherName}</p></div>
+                <div className="sm:text-right"><p><strong>SR No:</strong> {student.srNo}</p><p><strong>Father's Name:</strong> {student.fatherName}</p></div>
               </div>
-              <table className="w-full border-collapse">
-                <thead className="bg-gray-100"><tr><th className="border p-2">Date</th><th className="border p-2">Day</th><th className="border p-2">Subject</th><th className="border p-2">Time</th></tr></thead>
-                <tbody>
-                  {datesheet.schedule.map((row: any) => (
-                    <tr key={row.subject}><td className="border p-2">{formatDate(row.date)}</td><td className="border p-2">{row.day}</td><td className="border p-2 font-medium">{row.subject}</td><td className="border p-2">{row.time}</td></tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse text-xs sm:text-sm">
+                  <thead className="bg-gray-100"><tr><th className="border p-2">Date</th><th className="border p-2">Day</th><th className="border p-2">Subject</th><th className="border p-2">Time</th></tr></thead>
+                  <tbody>{datesheet.schedule.map((row: any) => (<tr key={row.subject}><td className="border p-2">{formatDate(row.date)}</td><td className="border p-2">{row.day}</td><td className="border p-2 font-medium">{row.subject}</td><td className="border p-2">{row.time}</td></tr>))}</tbody>
+                </table>
+              </div>
             </>
-          ) : (
-            <p className="text-center text-red-500">No admit card or exam schedule has been published for your class yet.</p>
-          )}
+          ) : ( <p className="text-center text-red-500">No admit card or exam schedule has been published for your class yet.</p> )}
         </div>
         <div className="p-4 border-t flex justify-end space-x-3 no-print">
           <button onClick={onClose} className="px-4 py-2 border rounded-lg hover:bg-gray-100">Close</button>
-          <button onClick={handlePrint} disabled={!datesheet} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
-            <Printer size={16} className="inline mr-2" />Print Admit Card
-          </button>
+          <button onClick={handlePrint} disabled={!datesheet} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"><Printer size={16} /> Print</button>
         </div>
       </div>
     </div>
   );
 };
 
-// --- A new modal to show subject-wise details for a single exam ---
+// [MOBILE COMPACT] ExamDetailsModal is now responsive
 const ExamDetailsModal: React.FC<{ exam: ExamRecord | null, onClose: () => void }> = ({ exam, onClose }) => {
   if (!exam) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl">
-        <div className="p-6 border-b flex justify-between items-center">
-          <h3 className="text-xl font-bold text-gray-800">{exam.examType} - Detailed Marks</h3>
-          <button onClick={onClose} className="p-2 rounded-full text-gray-400 hover:bg-gray-100">
-            <X size={24} />
-          </button>
+        <div className="p-4 sm:p-6 border-b flex justify-between items-center">
+          <h3 className="text-lg sm:text-xl font-bold text-gray-800">{exam.examType} - Detailed Marks</h3>
+          <button onClick={onClose} className="p-2 rounded-full text-gray-400 hover:bg-gray-100"><X size={24} /></button>
         </div>
-        <div className="p-6 overflow-y-auto">
-          <table className="w-full text-left">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="p-3 font-semibold text-sm">Subject</th>
-                <th className="p-3 font-semibold text-sm text-center">Max Marks</th>
-                <th className="p-3 font-semibold text-sm text-center">Obtained Marks</th>
-                <th className="p-3 font-semibold text-sm text-center">Grade</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {exam.subjects.map(subject => (
-                <tr key={subject.subject}>
-                  <td className="p-3 font-medium">{subject.subject}</td>
-                  <td className="p-3 text-center">{subject.maxMarks}</td>
-                  <td className="p-3 text-center font-bold">{subject.obtainedMarks}</td>
-                  <td className="p-3 text-center">
-                    <span className={`px-2 py-1 text-xs font-bold rounded-full ${getGradeColor(subject.grade)}`}>
-                      {subject.grade}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="p-4 bg-gray-50 border-t flex justify-end">
-           <button onClick={onClose} className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 font-medium">
-            Close
-          </button>
+        <div className="p-4 sm:p-6 overflow-y-auto">
+            {/* [MOBILE COMPACT] On mobile, we use a list. On desktop (sm and up), we use a table. */}
+            {/* Mobile List View */}
+            <div className="sm:hidden divide-y">
+                {exam.subjects.map(subject => (
+                    <div key={subject.subject} className="py-3">
+                        <p className="font-bold text-gray-800">{subject.subject}</p>
+                        <div className="flex justify-between items-center mt-1 text-sm">
+                            <p className="text-gray-500">Score: <span className="font-semibold text-gray-700">{subject.obtainedMarks} / {subject.maxMarks}</span></p>
+                            <span className={`px-2 py-0.5 text-xs font-bold rounded-full ${getGradeColor(subject.grade)}`}>{subject.grade}</span>
+                        </div>
+                    </div>
+                ))}
+            </div>
+            {/* Desktop Table View */}
+            <table className="w-full text-left hidden sm:table">
+                <thead className="bg-gray-100"><tr><th className="p-3 font-semibold text-sm">Subject</th><th className="p-3 font-semibold text-sm text-center">Max Marks</th><th className="p-3 font-semibold text-sm text-center">Obtained Marks</th><th className="p-3 font-semibold text-sm text-center">Grade</th></tr></thead>
+                <tbody className="divide-y">{exam.subjects.map(subject => (<tr key={subject.subject}><td className="p-3 font-medium">{subject.subject}</td><td className="p-3 text-center">{subject.maxMarks}</td><td className="p-3 text-center font-bold">{subject.obtainedMarks}</td><td className="p-3 text-center"><span className={`px-2 py-1 text-xs font-bold rounded-full ${getGradeColor(subject.grade)}`}>{subject.grade}</span></td></tr>))}</tbody>
+            </table>
         </div>
       </div>
     </div>
   );
 };
 
-
+// [MOBILE COMPACT] StatCard is now responsive
 const StatCard: React.FC<{ title: string; value: string | number; icon: React.ElementType; color: string }> = ({ title, value, icon: Icon, color }) => (
-    <div className="bg-white rounded-xl p-6 shadow-md border flex items-center gap-4">
-        <div className={`w-12 h-12 ${color} rounded-lg flex items-center justify-center`}>
-            <Icon size={24} className="text-white" />
-        </div>
+    <div className="bg-white rounded-xl p-4 sm:p-6 shadow-md border flex items-center gap-4">
+        <div className={`w-10 h-10 sm:w-12 sm:h-12 ${color} rounded-lg flex items-center justify-center`}><Icon size={20} sm:size={24} className="text-white" /></div>
         <div>
-            <p className="text-sm font-medium text-gray-600">{title}</p>
-            <p className="text-2xl font-bold text-gray-900">{value}</p>
+            <p className="text-xs sm:text-sm font-medium text-gray-600">{title}</p>
+            <p className="text-xl sm:text-2xl font-bold text-gray-900">{value}</p>
         </div>
     </div>
 );
