@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { ExamRecord, Student } from '../types';
 import { formatDate, getGradeColor } from '../utils';
-import { Award, TrendingUp, Book, Printer, FileText, X, Check, Star as StarIcon } from 'lucide-react';
+import { Award, TrendingUp, Book, Printer, FileText, X, Check, Star as StarIcon, ChevronRight } from 'lucide-react';
 import { supabase } from '../utils/supabaseClient';
 import { FileText as ReportIcon } from 'lucide-react';
 
