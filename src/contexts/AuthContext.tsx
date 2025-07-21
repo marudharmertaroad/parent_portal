@@ -83,7 +83,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       
   const logout = useCallback(async () => {
     // This is now safe for the same reason
-    await OneSignal.removeExternalUserId();
+      await OneSignal.setExternalUserId(null);
     
     setStudent(null);
     localStorage.removeItem('parentPortalStudent');
