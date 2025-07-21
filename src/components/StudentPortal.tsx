@@ -27,6 +27,8 @@ const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { 
   
     if (!selectedStudentHistory) return null;
     const handlePrint = () => window.print();
+
+  const viewingExamType = 'Total';
     const classRank = studentRanks.get(selectedStudentHistory.studentId);
 
     // --- 1. DYNAMIC DATA PROCESSING LOGIC ---
