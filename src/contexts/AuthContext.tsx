@@ -4,7 +4,12 @@ import React, { createContext, useContext, useState, useEffect, ReactNode, useCa
 import { supabase } from '../utils/supabaseClient';
 import { Student, LoginCredentials } from '../types';
 
-// We NO LONGER import 'react-onesignal'.
+// We are interacting with the global window.OneSignal object
+declare global {
+  interface Window {
+    OneSignal: any;
+  }
+}
 
 interface AuthContextType {
   student: Student | null;
@@ -27,7 +32,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [student, setStudent] = useState<Student | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // useEffect for localStorage remains the same.
+  // This useEffect correctly loads the student from localStorage
   useEffect(() => {
     try {
       const savedStudentData = localStorage.getItem('parentPortalStudent');
@@ -44,7 +49,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = useCallback(async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     try {
-      // Supabase login logic is correct.
+      // The Supabase logic to fetch the student is correct.
       let { data } = await supabase.from('students').select('*').eq('sr_no', credentials.rollNumber).eq('medium', 'English').maybeSingle();
       if (!data) {
         const { data: hindiData } = await supabase.from('students').select('*').eq('sr_no', credentials.rollNumber).eq('medium', 'Hindi').maybeSingle();
@@ -64,15 +69,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setStudent(loggedInStudent);
       localStorage.setItem('parentPortalStudent', JSON.stringify(loggedInStudent));
 
-      // --- THE FINAL, GUARANTEED FIX ---
-      // We use the official, global window.OneSignal.push() method.
-      window.OneSignal.push(function() {
-        window.OneSignal.setExternalUserId(loggedInStudent.srNo);
-        window.OneSignal.sendTags({
+      // --- THE FINAL, CORRECTED ONESIGNAL LOGIC ---
+      // We use the official .push() method to queue the commands safely.
+      window.OneSignal.push(async function() {
+        // Use the modern `login` method to set the external user ID.
+        await window.OneSignal.login(loggedInStudent.srNo);
+        console.log(`OneSignal user logged in with external ID: ${loggedInStudent.srNo}`);
+
+        // Sending tags is still correct.
+        await window.OneSignal.sendTags({
           sr_no: loggedInStudent.srNo,
           class: loggedInStudent.class,
           medium: loggedInStudent.medium,
         });
+        console.log(`OneSignal tags sent for sr_no: ${loggedInStudent.srNo}`);
+
+        // Prompt after identifying the user.
         window.OneSignal.Slidedown.promptPush();
       });
       
@@ -86,11 +98,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
       
   const logout = useCallback(() => {
-    // --- THIS IS THE FINAL, CORRECT LOGOUT METHOD ---
-    window.OneSignal.push(function() {
-      // To remove the user ID, you call setExternalUserId with an empty string or null.
-      window.OneSignal.setExternalUserId(""); 
-      console.log("OneSignal external user ID has been cleared.");
+    // --- THE FINAL, CORRECTED LOGOUT METHOD ---
+    window.OneSignal.push(async function() {
+      // Use the modern `logout` method.
+      await window.OneSignal.logout();
+      console.log("OneSignal user logged out.");
     });
     
     setStudent(null);
