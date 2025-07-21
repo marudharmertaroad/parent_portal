@@ -65,6 +65,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const logout = useCallback(() => {
     setStudent(null);
     localStorage.removeItem('parentPortalStudzent');
+
+    OneSignal.removeExternalUserId();
+    console.log("OneSignal user logged out.");
   }, []);
   
   const value = { student, isLoading, login, logout };
