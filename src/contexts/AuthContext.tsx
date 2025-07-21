@@ -109,7 +109,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     OneSignal.removeExternalUserId();
     console.log("OneSignal user logged out.");
-  } []);
+  } ,[]);
   
   const value = { student, isLoading, login, logout };
 
