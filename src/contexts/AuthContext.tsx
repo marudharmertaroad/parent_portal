@@ -37,6 +37,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [student, setStudent] = useState<Student | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  useEffect(() => {
+    // This event listener is crucial. It waits for the device to be ready.
+    document.addEventListener('deviceready', () => {
+      console.log("Device is ready, initializing OneSignal for native.");
+      
+      const OneSignal = window.plugins.OneSignal;
+      
+      // Set App ID for the native plugin
+      OneSignal.setAppId(ONESIGNAL_APP_ID);
+
+      // Prompt for push notification permission on the native device
+      OneSignal.promptForPushNotificationsWithUserResponse((accepted: boolean) => {
+        console.log("User accepted notifications: ", accepted);
+      });
+    }, false);
   // Checks for a saved session in localStorage when the app loads.
   useEffect(() => {
     try {
