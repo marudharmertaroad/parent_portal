@@ -169,6 +169,8 @@ const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { 
         )}
       </div>
     </div>
+            );
+};
               </header>
 
               {/* [MOBILE COMPACT] Sections now stack on mobile */}
