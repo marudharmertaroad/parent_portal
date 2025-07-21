@@ -48,8 +48,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         .from('students')
         .select('*') // This is crucial - it gets ALL columns, including photo_url.
         .eq('sr_no', credentials.rollNumber)
-        .single(); // We expect exactly one student for this SR Number.
-
+        .eq('medium', 'English')
+        
+.maybeSingle();
       if (error || !data) {
         console.error("Login query failed or student not found:", error);
         return { success: false, error: 'SR Number not found.' };
