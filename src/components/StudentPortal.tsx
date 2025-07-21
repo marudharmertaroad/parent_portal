@@ -18,70 +18,31 @@ import NoticeBoard from './NoticeBoard';
 import NotificationDrawer from './NotificationDrawer';
 
 // --- Report Card Modal (Corrected and Self-Contained) ---
-const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { student: Student | null, examRecords: ExamRecord[], onClose: () => void, settings: any }) => {
+const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { student: Student, examRecords: ExamRecord[], onClose: () => void, settings: any }) => {
+  if (!student) return null;
 
-  const selectedStudentHistory = {
-    ...student,
-    exams: examRecords
-  };
+  const handlePrint = () => window.print();
+
+  // --- SAFE & CORRECTED CALCULATIONS ---
+  const safeExamRecords = Array.isArray(examRecords) ? examRecords : [];
+  const reportTitle = "PROGRESS REPORT - CONSOLIDATED";
   
-    if (!selectedStudentHistory) return null;
-    const handlePrint = () => window.print();
+  const allSubjectsForStudent = safeExamRecords.flatMap(exam => exam.subjects || []);
+  const mainSubjectNames = Array.from(new Set(allSubjectsForStudent.filter(s => !s.isComplementary).map(s => s.subject))).sort();
+  
+  const totalObtained = safeExamRecords.reduce((sum, exam) => sum + (exam.obtainedMarks || 0), 0);
+  const totalMax = safeExamRecords.reduce((sum, exam) => sum + (exam.totalMarks || 0), 0);
+  
+  const overallPercentage = totalMax > 0 ? (totalObtained / totalMax) * 100 : 0;
+  const overallGrade = calculateGrade(overallPercentage);
+  const overallResult = overallPercentage >= settings.passingMarks ? 'PASS' : 'FAIL';
 
-  const viewingExamType = 'Total';
+  const examOrder = ['Unit Test 1', 'Unit Test 2', 'Unit Test 3', 'Quarterly', 'Half Yearly', 'Yearly Exam', 'Pre-Board'];
+  const uniqueExamTypes = Array.from(new Set(safeExamRecords.map(e => e.examType))).sort((a, b) => examOrder.indexOf(a) - examOrder.indexOf(b));
 
-    // --- 1. DYNAMIC DATA PROCESSING LOGIC ---
-    const examsToDisplay = viewingExamType === 'Total'
-        ? selectedStudentHistory.exams
-        : selectedStudentHistory.exams.filter(e => e.examType === viewingExamType);
-
-    const reportTitle = viewingExamType === 'Total'
-        ? "PROGRESS REPORT - CONSOLIDATED"
-        : `PROGRESS REPORT - ${viewingExamType.toUpperCase()}`;
-        
-    const performance = {
-        obtained: examsToDisplay.reduce((sum, exam) => sum + exam.obtainedMarks, 0),
-        total: examsToDisplay.reduce((sum, exam) => sum + exam.totalMarks, 0),
-    };
-
-    const examOrder = ['Unit Test 1', 'Unit Test 2', 'Unit Test 3', 'Quarterly', 'Half Yearly', 'Yearly Exam', 'Pre-Board'];
-    performance.percentage = performance.total > 0 ? (performance.obtained / performance.total) * 100 : 0;
-    performance.grade = calculateGrade(performance.percentage);
-    performance.result = performance.percentage >= reportSettings.passingMarks ? 'PASS' : 'FAIL';
-
-    const allSubjectsForStudent = selectedStudentHistory.exams.flatMap(exam => exam.subjects);
-    const mainSubjectNames = Array.from(new Set(allSubjectsForStudent.filter(s => !s.isComplementary).map(s => s.subject))).sort();
-    
-    let complementarySubjectsData: { subject: string; grade: string }[] = [];
-    if (viewingExamType === 'Total') {
-        const complementarySubjects = allSubjectsForStudent.filter(s => s.isComplementary);
-        const groupedComplementary = complementarySubjects.reduce((acc, subject) => {
-            if (!acc[subject.subject]) {
-                acc[subject.subject] = { totalObtained: 0, totalMax: 0, count: 0 };
-            }
-            acc[subject.subject].totalObtained += subject.obtainedMarks;
-            acc[subject.subject].totalMax += subject.maxMarks;
-            acc[subject.subject].count++;
-            return acc;
-        }, {} as Record<string, { totalObtained: number; totalMax: number; count: number }>);
-
-        complementarySubjectsData = Object.entries(groupedComplementary).map(([subject, data]) => {
-            const averagePercentage = data.totalMax > 0 ? (data.totalObtained / data.totalMax) * 100 : 0;
-            return {
-                subject: subject,
-                grade: calculateGrade(averagePercentage) 
-            };
-        }).sort((a,b) => a.subject.localeCompare(b.subject));
-    }
-    
-    const uniqueExamTypes = Array.from(new Set(examsToDisplay.map(e => e.examType)))
-      .sort((a, b) => examOrder.indexOf(a) - examOrder.indexOf(b));
-
-  // --- 2. YOUR PREFERRED JSX LAYOUT (with dynamic data injected) ---
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 print:p-0 print:bg-white">
-      {/* MODIFICATION: Simplified and corrected print stylesheet */}
-      <style>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4 print:p-0 print:bg-white">
+       <style>
     {`
       /* --- Watermark & Print Preparation --- */
       #report-card {
@@ -94,7 +55,7 @@ const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { 
       }
       #report-card::after {
         content: '';
-        background: url('/logo copy.png') center/contain no-repeat;
+        background: url('/logo.png') center/contain no-repeat;
         position: absolute;
         inset: 0;
         opacity: 0.08;
@@ -178,114 +139,126 @@ const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { 
       }
     `}
   </style>
-
       <div className="bg-white rounded-2xl w-full max-w-7xl max-h-[95vh] overflow-auto shadow-2xl">
         <div className="p-6">
-            <div className="flex justify-between items-center mb-4 no-print">
-                <h3 className="text-xl font-bold text-gray-800">Student Report Card</h3>
-                <div className="flex space-x-3">
-                    
-                    <button onClick={handlePrint} className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"><Printer className="w-4 h-4 mr-2" />Print</button>
-                    <button onClick={() => setShowReportCardModal(false)} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Close</button>
-                </div>
+          <div className="flex justify-between items-center mb-4 no-print">
+            <h3 className="text-xl font-bold text-gray-800">Student Report Card</h3>
+            <div className="flex space-x-3">
+              <button onClick={handlePrint} className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"><Printer className="w-4 h-4 mr-2" />Print</button>
+              <button onClick={onClose} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Close</button>
             </div>
-          
-          <div id="report-card-wrapper"> 
-          {/* MODIFICATION: The main container is now the primary flex container */}
-          <div className="border-2 border-black p-4 bg-white rounded-lg flex flex-col h-full relative" id="report-card">
-            
-            <header className="flex items-center justify-between mb-2">
-              <div className="flex items-center space-x-4">
-                 <img src="/logo copy.png" alt="School Logo" className="h-20 w-20 object-contain" />
-                 <div>
-                    <h1 className="text-3xl font-bold text-blue-800">{reportSettings.schoolName}</h1>
-                    <p className="text-sm text-gray-500">{reportSettings.schoolAddress}</p>
-                 </div>
-              </div>
-              <div className="text-center">
-                <h2 className="text-2xl font-bold text-blue-800">{reportTitle}</h2>
-                <p className="text-lg text-blue-600">Session: {reportSettings.session}</p>
-              </div>
-              <div className="w-24 h-28 border-2 border-gray-400 rounded-lg p-1 bg-white flex items-center justify-center">
-                    {selectedStudentHistory.photoUrl ? (
-                      <img 
-                        src={selectedStudentHistory.photoUrl} 
-                        alt="Student" 
-                        className="w-full h-full object-cover rounded-md" 
-                      />
-                    ) : (
-                      <div className="w-full h-full border border-dashed flex items-center justify-center">
-                        <span className="text-xs text-gray-400 text-center">Student Photo</span>
-                      </div>
-                    )}
-                  </div>
-            </header>
-
-            <section className="grid grid-cols-2 gap-x-4">
-    <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
-        <h3 className="font-bold text-md mb-2 text-blue-800">Student Information</h3>
-        {/* MODIFICATION: A more logical and symmetrical grid layout */}
-        <div className="text-xs grid grid-cols-3 gap-x-2 gap-y-1">
-            <p className="col-span-2"><strong>Name:</strong> {selectedStudentHistory.studentName}</p>
-            <p><strong>Roll No:</strong> {selectedStudentHistory.rollNumber}</p>
-            
-            <p className="col-span-2"><strong>Father's Name:</strong> {selectedStudentHistory.fatherName}</p>
-            <p><strong>D.O.B:</strong> {selectedStudentHistory.dateOfBirth ? formatDate(selectedStudentHistory.dateOfBirth) : 'N/A'}</p>
-            
-            <p className="col-span-3"><strong>Class:</strong> {selectedStudentHistory.class}{selectedStudentHistory.section ? `-${selectedStudentHistory.section}` : ''}</p>
-        </div>
-    </div>
-    <div className="bg-green-50 rounded-lg p-3 border border-green-200">
-        <h3 className="font-bold text-md mb-2 text-green-800">Performance Summary</h3>
-        <div className="text-xs grid grid-cols-3 gap-1.5">
-            <p><strong>Total Marks:</strong> {performance.total}</p>
-            <p><strong>Percentage:</strong> {performance.percentage.toFixed(2)}%</p>
-            <p><strong>Grade:</strong> <span className={`px-2 py-0.5 rounded-full font-bold ${getGradeColor(performance.grade)}`}>{performance.grade}</span></p>
-            
-            <p><strong>Marks Obt:</strong> {performance.obtained}</p>
-            <p><strong>Rank:</strong> <span className="font-bold text-blue-700">{classRank ? `#${classRank}` : 'N/A'}</span></p>
-            <p><strong>Result:</strong><span className={`px-2 py-0.5 rounded-full font-bold ${performance.result === 'PASS' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{performance.result}</span></p>
-        </div>
-    </div>
-</section>
-            
-            {/* MODIFICATION: The 'main' content section now has flex-grow */}
-            <main className="flex-grow space-y-3">
-              <div>
-                  <h3 className="font-bold text-lg mb-1 text-blue-800">Scholastic Areas</h3>
-                  <div className="overflow-x-auto">
-                      <table className="w-full border-collapse border border-gray-400 text-xs">
-                          <thead className="font-bold">
-                              <tr className="bg-blue-100"><th rowSpan={2} className="border border-gray-400 p-1 align-bottom text-center">Subject</th>{uniqueExamTypes.map(examType => (<th key={examType} colSpan={3} className="border border-gray-400 p-1 text-center bg-blue-200">{examType}</th>))}<th colSpan={3} className="border border-gray-400 p-1 align-bottom text-center bg-green-200">Total</th></tr>
-                              <tr className="bg-blue-50 text-xs">{uniqueExamTypes.map(examType => (<React.Fragment key={`${examType}-headers`}><th className="border border-gray-400 p-1 text-center">Max</th><th className="border border-gray-400 p-1 text-center">Obt.</th><th className="border border-gray-400 p-1 text-center">Grd.</th></React.Fragment>))}<th className="border border-gray-400 p-1 text-center bg-green-100">Marks</th><th className="border border-gray-400 p-1 text-center bg-green-100">Grade</th><th className="border border-gray-400 p-1 text-center bg-green-100">%</th></tr>
-                          </thead>
-                          <tbody>
-                              {mainSubjectNames.map(subjectName => { let totalObtained = 0; let totalMax = 0; return ( <tr key={subjectName} className="text-center"><td className="border border-gray-400 p-1 font-medium text-left">{subjectName}</td>{uniqueExamTypes.map(examType => { const subject = examsToDisplay.find(e => e.examType === examType)?.subjects.find(s => s.subject === subjectName); if(subject) { totalObtained += subject.obtainedMarks; totalMax += subject.maxMarks; } return (<React.Fragment key={`${examType}-${subjectName}`}><td className="border border-gray-400 p-1">{subject?.maxMarks ?? '-'}</td><td className="border border-gray-400 p-1">{subject?.obtainedMarks ?? '-'}</td><td className="border border-gray-400 p-1">{subject?.grade ?? '-'}</td></React.Fragment>); })}<td className="border border-gray-400 p-1 font-bold bg-green-50">{totalObtained}/{totalMax}</td><td className="border border-gray-400 p-1 font-bold bg-green-50">{calculateGrade((totalObtained / totalMax) * 100)}</td><td className="border border-gray-400 p-1 font-bold bg-green-50">{totalMax > 0 ? ((totalObtained / totalMax) * 100).toFixed(1) : '0'}%</td></tr> ); })}
-                          </tbody>
-                          <tfoot className="font-bold text-center">
-                              <tr className="bg-blue-100"><td className="border border-gray-400 p-1">GRAND TOTAL</td>{uniqueExamTypes.map(examType => { const exam = examsToDisplay.find(e => e.examType === examType); return (<td key={examType} colSpan={3} className="border border-gray-400 p-1">{exam ? `${exam.obtainedMarks} / ${exam.totalMarks}` : '-'}</td>); })}<td colSpan={3} className="border border-gray-400 p-1 bg-green-200">{`${performance.obtained} / ${performance.total}`}</td></tr>
-                              <tr className="bg-blue-100"><td className="border border-gray-400 p-1">Percentage</td>{uniqueExamTypes.map(examType => { const exam = examsToDisplay.find(e => e.examType === examType); const percentage = exam && exam.totalMarks > 0 ? ((exam.obtainedMarks / exam.totalMarks) * 100).toFixed(1) + '%' : '-'; return (<td key={examType} colSpan={3} className="border border-gray-400 p-1">{percentage}</td>); })}<td colSpan={3} className="border border-gray-400 p-1 bg-green-200">{performance.percentage.toFixed(2)}%</td></tr>
-                          </tfoot>
-                      </table>
-                  </div>
-              </div>
-
-              {viewingExamType === 'Total' && complementarySubjectsData.length > 0 && (
-                  <div>
-                      <h3 className="font-bold text-lg mb-1 text-purple-800">Co-Scholastic Areas</h3>
-                      <table className="w-full border-collapse border border-gray-400 text-xs">
-                          <thead className="font-bold bg-purple-100">
-                            <tr>{complementarySubjectsData.map(item => (<th key={item.subject} className="border border-gray-400 p-1 text-center">{item.subject}</th>))}</tr>
-                          </thead>
-                          <tbody>
-                            <tr className="text-center">{complementarySubjectsData.map(item => (<td key={item.subject} className="border border-gray-400 p-1 font-bold">{item.grade}</td>))}</tr>
-                          </tbody>
-                      </table>
-                  </div>
-              )}
-            </main>
-              
           </div>
+          <div id="report-card-wrapper">
+            <div className="border-2 border-black p-4 bg-white rounded-lg flex flex-col h-full relative" id="report-card">
+              <header className="flex flex-col sm:flex-row items-center justify-between mb-2 gap-2">
+                <div className="flex items-center space-x-2 sm:space-x-4">
+                  <img src="/logo.png" alt="School Logo" className="h-16 w-16 sm:h-20 sm:w-20 object-contain" />
+                  <div>
+                    <h1 className="text-xl sm:text-3xl font-bold text-blue-800">{settings.schoolName}</h1>
+                    <p className="text-xs sm:text-sm text-gray-500">{settings.schoolAddress}</p>
+                  </div>
+                </div>
+                <div className="text-center mt-2 sm:mt-0">
+                  <h2 className="text-lg sm:text-2xl font-bold text-blue-800">{reportTitle}</h2>
+                  <p className="text-base sm:text-lg text-blue-600">Session: {settings.session}</p>
+                </div>
+                {/* Hiding the photo box on the smallest screens to save space */}
+                <div className="w-20 h-24 sm:w-24 sm:h-28 border-2 border-gray-400 rounded-lg p-1 bg-white hidden sm:flex items-center justify-center">
+                  {student.photoUrl ? <img src={student.photoUrl} alt="Student" className="w-full h-full object-cover"/> : <span className="text-xs text-gray-400">Photo</span>}
+                </div>
+              </header>
+
+              {/* [MOBILE COMPACT] Sections now stack on mobile */}
+              <section className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-x-4 text-xs">
+                <div className="bg-blue-50 rounded-lg p-2 sm:p-3 border border-blue-200">
+                  <h3 className="font-bold text-sm mb-1 text-blue-800">Student Information</h3>
+                  <div className="grid grid-cols-2 gap-x-2 gap-y-1">
+                    <p><strong>Name:</strong> {student.name}</p>
+                    <p><strong>SR No:</strong> {student.srNo}</p>
+                    <p><strong>Father's Name:</strong> {student.fatherName}</p>
+                    <p><strong>D.O.B:</strong> {formatDate(student.dob)}</p>
+                    <p className="col-span-2"><strong>Class:</strong> {student.class}</p>
+                  </div>
+                </div>
+                <div className="bg-green-50 rounded-lg p-2 sm:p-3 border border-green-200">
+                  <h3 className="font-bold text-sm mb-1 text-green-800">Performance Summary</h3>
+                  <div className="grid grid-cols-2 gap-x-2 gap-y-1">
+                    <p><strong>Total Marks:</strong> {totalMax}</p>
+                    <p><strong>Marks Obt:</strong> {totalObtained}</p>
+                    <p><strong>Percentage:</strong> {overallPercentage.toFixed(1)}%</p>
+                    <p><strong>Grade:</strong> <span className={`px-2 py-0.5 rounded font-bold ${getGradeColor(overallGrade)}`}>{overallGrade}</span></p>
+                    <p className="col-span-2"><strong>Result:</strong><span className={`px-2 py-0.5 rounded font-bold ${overallResult === 'PASS' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{overallResult}</span></p>
+                  </div>
+                </div>
+              </section>
+
+              {/* [MOBILE COMPACT] This wrapper makes the table horizontally scrollable on small screens */}
+              <main className="flex-grow mt-4 overflow-x-auto">
+                <table className="w-full border-collapse border border-gray-400 text-xs">
+                  <thead className="font-bold">
+                    <tr className="bg-blue-100"><th rowSpan={2} className="border p-1">Subject</th>{uniqueExamTypes.map(et => (<th key={et} colSpan={3} className="border p-1">{et}</th>))}<th colSpan={3} className="border p-1 bg-green-200">Total</th></tr>
+                    <tr className="bg-blue-50">{uniqueExamTypes.flatMap(() => ['Max', 'Obt.', 'Grd.']).map((h, i) => <th key={i} className="border p-1">{h}</th>)}<th className="border p-1 bg-green-100">Marks</th><th className="border p-1 bg-green-100">Grade</th><th className="border p-1 bg-green-100">%</th></tr>
+                  </thead>
+                  <tbody>
+                    {mainSubjectNames.map(subjectName => {
+                      let totalSubObtained = 0;
+                      let totalSubMax = 0;
+                      safeExamRecords.forEach(exam => {
+                        const subject = exam.subjects?.find(s => s.subject === subjectName);
+                        if (subject) {
+                          totalSubObtained += (subject.obtainedMarks || 0);
+                          totalSubMax += (subject.maxMarks || 0);
+                        }
+                      });
+                      const subjectPercentage = totalSubMax > 0 ? (totalSubObtained / totalSubMax) * 100 : 0;
+                      return (
+                        <tr key={subjectName} className="text-center">
+                          <td className="border p-1 font-medium text-left">{subjectName}</td>
+                          {uniqueExamTypes.map(examType => {
+                            const subject = safeExamRecords.find(e => e.examType === examType)?.subjects?.find(s => s.subject === subjectName);
+                            return <React.Fragment key={examType}><td className="border p-1">{subject?.maxMarks ?? '-'}</td><td className="border p-1">{subject?.obtainedMarks ?? '-'}</td><td className="border p-1">{subject?.grade ?? '-'}</td></React.Fragment>;
+                          })}
+                          <td className="border p-1 font-bold bg-green-50">{totalSubObtained}/{totalSubMax}</td>
+                          <td className="border p-1 font-bold bg-green-50">{calculateGrade(subjectPercentage)}</td>
+                          <td className="border p-1 font-bold bg-green-50">{subjectPercentage.toFixed(1)}%</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                  <tfoot className="font-bold bg-blue-50 text-center">
+                    <tr>
+                      <td className="border p-1 text-left">Total Marks</td>
+                      {uniqueExamTypes.map(examType => {
+                        const exam = safeExamRecords.find(e => e.examType === examType);
+                        return (
+                          <React.Fragment key={examType}>
+                            <td className="border p-1" colSpan={3}>{exam ? `${exam.obtainedMarks} / ${exam.totalMarks}` : '-'}</td>
+                          </React.Fragment>
+                        );
+                      })}
+                      {/* Grand Total */}
+                      <td className="border p-1 bg-green-100" colSpan={3}>{`${totalObtained} / ${totalMax}`}</td>
+                    </tr>
+                    <tr>
+                      <td className="border p-1 text-left">Percentage & Grade</td>
+                      {uniqueExamTypes.map(examType => {
+                        const exam = safeExamRecords.find(e => e.examType === examType);
+                        const grade = exam ? calculateGrade(exam.percentage) : 'N/A';
+                        return (
+                          <React.Fragment key={examType}>
+                            <td className="border p-1" colSpan={3}>
+                              {exam ? `${exam.percentage.toFixed(1)}% (${grade})` : '-'}
+                            </td>
+                          </React.Fragment>
+                        );
+                      })}
+                       {/* Grand Total Percentage */}
+                      <td className="border p-1 bg-green-100" colSpan={3}>{`${overallPercentage.toFixed(1)}% (${overallGrade})`}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </main>
+            </div>
           </div>
         </div>
       </div>
