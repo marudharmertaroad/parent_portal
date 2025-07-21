@@ -28,23 +28,29 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [student, setStudent] = useState<Student | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [isOneSignalInitialized, setIsOneSignalInitialized] = useState(false);
+  const oneSignalInitRef = useRef(false);
 
-  // --- THIS IS THE NEW, CORRECT INITIALIZATION ---
-  // Effect to initialize OneSignal ONCE when the provider mounts.
+  // Effect to initialize OneSignal ONLY ONCE.
   useEffect(() => {
+    // If the ref is true, it means we've already run this. Do nothing.
+    if (oneSignalInitRef.current) {
+      return;
+    }
+    // Mark it as true immediately so it doesn't run again.
+    oneSignalInitRef.current = true;
+
     const initOneSignal = async () => {
-      if (isOneSignalInitialized) return;
       try {
         await OneSignal.init({ appId: ONESIGNAL_APP_ID, allowLocalhostAsSecureOrigin: true });
-        setIsOneSignalInitialized(true);
         console.log("OneSignal initialized successfully.");
+        // We no longer need the isOneSignalInitialized state.
+        // The prompt will be triggered after a successful login.
       } catch (e) {
         console.error("Error initializing OneSignal:", e);
       }
     };
     initOneSignal();
-  }, [isOneSignalInitialized]);
+  }, []);
 
   // Checks for a saved session in localStorage when the app first loads
   useEffect(() => {
