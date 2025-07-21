@@ -4,7 +4,6 @@ import React from 'react';
 import { X } from 'lucide-react';
 import { Student } from '../types';
 import ProfileSection from './ProfileSection';
-import PhotoUpload from './PhotoUpload';
 
 interface ProfileModalProps {
   isOpen: boolean;
