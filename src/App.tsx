@@ -28,13 +28,7 @@ const AppContent: React.FC = () => {
 
 // The main App component
 function App() {
-  useEffect(() => {
-    const initOneSignal = async () => {
-      await OneSignal.init({ appId: ONESIGNAL_APP_ID, allowLocalhostAsSecureOrigin: true });
-      OneSignal.Slidedown.promptPush(); // This will show a nice slide-down prompt for notifications
-    };
-    initOneSignal();
-  }, []);
+ 
   return (
     // Wrap the entire application with the AuthProvider so all components can access the context
     <AuthProvider>
