@@ -43,29 +43,46 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = useCallback(async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     try {
-      // Step 1: Fetch the complete student record from the 'students' table.
-      const { data, error } = await supabase
+      // --- THIS IS THE NEW, CORRECTED LOGIC ---
+
+      // Step 1: Try to find the student in the 'English' medium first.
+      let { data, error } = await supabase
         .from('students')
-        .select('*') // This is crucial - it gets ALL columns, including photo_url.
+        .select('*')
         .eq('sr_no', credentials.rollNumber)
-        .eq('medium', 'English')
+        .eq('medium', 'English') // Add the medium filter
+        .maybeSingle(); // Use maybeSingle() to prevent errors if not found
+
+      // Step 2: If not found in English, try to find them in the 'Hindi' medium.
+      if (!data) {
+        const { data: hindiData, error: hindiError } = await supabase
+          .from('students')
+          .select('*')
+          .eq('sr_no', credentials.rollNumber)
+          .eq('medium', 'Hindi') // Try the other medium
+          .maybeSingle();
         
-.maybeSingle();
-      if (error || !data) {
-        console.error("Login query failed or student not found:", error);
-        return { success: false, error: 'SR Number not found.' };
+        // If there was an error in the second query, throw it
+        if (hindiError) throw hindiError;
+        
+        // If still not found after checking both, it's an invalid SR Number.
+        if (!hindiData) {
+            return { success: false, error: 'SR Number not found in either medium.' };
+        }
+        // If found in Hindi, use that data
+        data = hindiData;
       }
 
-      // Step 2: Verify the date of birth.
+      // Step 3: Now that we have a unique student record, verify the date of birth.
       if (data.dob !== credentials.dateOfBirth) {
         return { success: false, error: 'Date of Birth does not match.' };
       }
 
-      // Step 3: Map the raw database data (snake_case) to our clean 'Student' interface (camelCase).
+      // Step 4: Map the data and save the session (this part is the same as before).
       const loggedInStudent: Student = {
+        srNo: data.sr_no,
         name: data.name,
         class: data.class,
-        srNo: data.sr_no,
         fatherName: data.father_name,
         motherName: data.mother_name,
         contact: data.contact,
@@ -77,10 +94,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         category: data.category,
         nicStudentId: data.nic_student_id,
         isRte: data.is_rte,
-        photoUrl: data.photo_url, // <-- This now correctly includes the photo URL
+        photoUrl: data.photo_url,
       };
       
-      // Step 4: Save the complete student object to the React state and browser's localStorage.
       setStudent(loggedInStudent);
       localStorage.setItem('parentPortalStudent', JSON.stringify(loggedInStudent));
 
