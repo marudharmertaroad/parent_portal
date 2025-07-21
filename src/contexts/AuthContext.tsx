@@ -101,6 +101,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setStudent(loggedInStudent);
       localStorage.setItem('parentPortalStudent', JSON.stringify(loggedInStudent));
 
+       await OneSignal.setExternalUserId(loggedInStudent.srNo);
+      console.log(`OneSignal user identified as: ${loggedInStudent.srNo}`);
+
       return { success: true };
 
     } catch (error: any) {
@@ -114,6 +117,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const logout = useCallback(() => {
     setStudent(null);
     localStorage.removeItem('parentPortalStudent');
+
+    OneSignal.removeExternalUserId();
+    console.log("OneSignal user logged out.");
   }, []);
   
   const value = { student, isLoading, login, logout };
