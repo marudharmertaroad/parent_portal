@@ -26,17 +26,25 @@ const AppContent: React.FC = () => {
   return student ? <StudentPortal /> : <LoginForm />;
 };
 
-// The main App component
 function App() {
+  const osInitialized = useRef(false);
+
   useEffect(() => {
+    if (osInitialized.current) return;
+    osInitialized.current = true;
+    
     const initOneSignal = async () => {
-      await OneSignal.init({ appId: ONESIGNAL_APP_ID, allowLocalhostAsSecureOrigin: true });
-      OneSignal.Slidedown.promptPush(); // This will show a nice slide-down prompt for notifications
+      await OneSignal.init({
+        appId: ONESIGNAL_APP_ID,
+        allowLocalhostAsSecureOrigin: true
+      });
+      console.log("OneSignal Initialized in App.tsx.");
     };
+    
     initOneSignal();
   }, []);
+
   return (
-    // Wrap the entire application with the AuthProvider so all components can access the context
     <AuthProvider>
       <AppContent />
     </AuthProvider>
