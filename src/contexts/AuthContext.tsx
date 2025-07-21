@@ -6,6 +6,16 @@ import { apiService } from '../services/api';
 import OneSignal from 'react-onesignal';
 import { isPlatform } from '@ionic/react';
 
+declare global {
+  interface Window {
+    plugins: {
+      OneSignal: any;
+    };
+  }
+}
+
+const ONESIGNAL_APP_ID = "c8dca610-5f15-47e4-84f1-8943672e86dd";
+
 interface AuthContextType {
   student: Student | null;
   isLoading: boolean;
