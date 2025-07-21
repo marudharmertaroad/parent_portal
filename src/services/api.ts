@@ -57,7 +57,7 @@ class ApiService {
     religion: data.religion,
     nicStudentId: data.nic_student_id,
     isRte: data.is_rte,
-    photoUrl?: data.photo_url,
+    photoUrl: data.photo_url,
   };
   
   return mappedStudent;
