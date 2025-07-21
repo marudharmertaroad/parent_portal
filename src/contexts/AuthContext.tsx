@@ -100,6 +100,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
       
   const logout = useCallback(() => {
+    if (isPlatform('capacitor')) {
 
     window.plugins.OneSignal.removeExternalUserId();
     }
