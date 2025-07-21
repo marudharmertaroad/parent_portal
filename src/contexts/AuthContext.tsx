@@ -26,7 +26,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [student, setStudent] = useState<Student | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load student from localStorage on initial app load
+  // useEffect for loading from localStorage remains the same
   useEffect(() => {
     try {
       const savedStudentData = localStorage.getItem('parentPortalStudent');
@@ -43,7 +43,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = useCallback(async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     try {
-      // Login logic to fetch student data... (This part is correct)
+      // Login logic to fetch student data is correct...
       let { data, error } = await supabase.from('students').select('*').eq('sr_no', credentials.rollNumber).eq('medium', 'English').maybeSingle();
       if (!data && !error) {
         const { data: hindiData } = await supabase.from('students').select('*').eq('sr_no', credentials.rollNumber).eq('medium', 'Hindi').maybeSingle();
@@ -53,6 +53,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (data.dob !== credentials.dateOfBirth) return { success: false, error: 'Date of Birth does not match.' };
 
       const loggedInStudent: Student = {
+        // Correct mapping of all student properties
         name: data.name, class: data.class, srNo: data.sr_no, fatherName: data.father_name,
         motherName: data.mother_name, contact: data.contact, address: data.address,
         medium: data.medium, gender: data.gender, dob: data.dob, bus_route: data.bus_route,
@@ -63,27 +64,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setStudent(loggedInStudent);
       localStorage.setItem('parentPortalStudent', JSON.stringify(loggedInStudent));
 
-      // --- THIS IS THE FINAL, CORRECTED ONESIGNAL LOGIC ---
-      console.log("Login successful. Setting OneSignal properties...");
+      // --- THE FINAL, CORRECTED ONESIGNAL LOGIC ---
+      // The push method ensures these commands are queued and run only when OneSignal is ready.
+      // This is the most robust way to avoid race conditions.
+      await OneSignal.push(async () => {
+        await OneSignal.setExternalUserId(loggedInStudent.srNo);
+        console.log(`OneSignal External User ID set to: ${loggedInStudent.srNo}`);
+        
+        await OneSignal.sendTags({
+          sr_no: loggedInStudent.srNo,
+          class: loggedInStudent.class,
+          medium: loggedInStudent.medium,
+        });
+        console.log(`OneSignal tags sent for sr_no: ${loggedInStudent.srNo}`);
 
-      // 1. Set the External User ID
-      await OneSignal.setExternalUserId(loggedInStudent.srNo);
-      console.log(`OneSignal External User ID set to: ${loggedInStudent.srNo}`);
-
-      // 2. Send all tags in a single, reliable call
-      await OneSignal.sendTags({
-        sr_no: loggedInStudent.srNo,
-        class: loggedInStudent.class,
-        medium: loggedInStudent.medium,
+        OneSignal.Slidedown.promptPush();
       });
-      console.log(`OneSignal tags sent:`, { sr_no: loggedInStudent.srNo, class: loggedInStudent.class, medium: loggedInStudent.medium });
-
-      // 3. Prompt for notifications AFTER identifying the user.
-      OneSignal.Slidedown.promptPush();
       
       return { success: true };
     } catch (error: any) {
-      console.error("Login or OneSignal error:", error);
+      console.error("Login error:", error);
       return { success: false, error: "An unexpected error occurred." };
     } finally {
       setIsLoading(false);
@@ -91,10 +91,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
       
   const logout = useCallback(async () => {
-    await OneSignal.removeExternalUserId();
+    // --- THIS IS THE CORRECT LOGOUT METHOD ---
+    // It uses the same .push() method to queue the command safely.
+    await OneSignal.push(async () => {
+      await OneSignal.removeExternalUserId();
+      console.log("OneSignal external user ID removed.");
+    });
+    
     setStudent(null);
     localStorage.removeItem('parentPortalStudent');
-    console.log("User logged out and OneSignal ID removed.");
   }, []);
   
   const value = { student, isLoading, login, logout };
