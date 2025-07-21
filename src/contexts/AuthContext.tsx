@@ -143,14 +143,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, [isOneSignalInitialized]);
       
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    if (!isOneSignalInitialized) {
+      console.warn("OneSignal not initialized, cannot remove user ID.");
+    } else {
+      await OneSignal.removeExternalUserId(); // This is the correct function for the React SDK
+      console.log("OneSignal external user ID removed.");
+    }
     setStudent(null);
     localStorage.removeItem('parentPortalStudent');
-
-    OneSignal.setExternalUserId(null); 
-    
-    console.log("OneSignal external user ID removed.");
-  }, []);
+  }, [isOneSignalInitialized]);
+  
   
   const value = { student, isLoading, login, logout };
 
