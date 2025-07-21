@@ -69,7 +69,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = useCallback(async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     try {
-      // Step 1: Try to find the student in the 'English' medium.
+await oneSignalReady;
+      console.log("OneSignal is ready, proceeding with login.");
+      
       let { data, error } = await supabase
         .from('students')
         .select('*')
