@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { supabase } from '../utils/supabaseClient'; // Make sure this path is correct
 import { Student, LoginCredentials } from '../types';
+import OneSignal from 'react-onesignal';
 
 interface AuthContextType {
   student: Student | null;
