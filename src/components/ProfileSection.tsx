@@ -54,20 +54,35 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ student }) => {
 
   return (
     <div className="space-y-8">
-      {/* --- UPDATED HEADER PROFILE CARD WITH PHOTO --- */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-8 rounded-2xl shadow-lg text-white">
-        <div className="flex flex-col md:flex-row items-center gap-6">
-          {/* The Photo Avatar */}
-          <div className="relative flex-shrink-0">
-            <div className="w-24 h-24 md:w-32 md:h-32 bg-white/20 border-4 border-white/50 rounded-full flex items-center justify-center overflow-hidden">
+      {/* --- THIS IS THE UPDATED HEADER PROFILE CARD --- */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 md:p-8 rounded-2xl shadow-lg text-white">
+        <div className="flex items-center justify-between">
+          {/* Left side: Name and Details */}
+          <div>
+            <h2 className="text-3xl md:text-4xl font-bold">{student.name}</h2>
+            <p className="text-lg md:text-xl text-blue-200 mt-1">
+              Class: {student.class} | SR No: {student.srNo}
+            </p>
+          </div>
+          
+          {/* Right side: Photo Avatar */}
+          <div className="flex-shrink-0">
+            <div className="w-20 h-20 md:w-28 md:h-28 bg-white/20 border-4 border-white/50 rounded-full flex items-center justify-center overflow-hidden">
               {student.photoUrl ? (
-                <img src={student.photoUrl} alt={student.name} className="w-full h-full object-cover" />
+                <img 
+                  src={student.photoUrl} 
+                  alt={student.name} 
+                  className="w-full h-full object-cover" 
+                />
               ) : (
-                <span className="font-bold text-6xl">{student.name.charAt(0).toUpperCase()}</span>
+                <span className="font-bold text-4xl md:text-5xl">
+                  {student.name.charAt(0).toUpperCase()}
+                </span>
               )}
             </div>
           </div>
-          <div>
+        </div>
+      </div>
             {/* [MOBILE COMPACT] Smaller text on mobile */}
             <h2 className="text-3xl sm:text-4xl font-bold">{student.name}</h2>
             <p className="text-lg sm:text-xl text-blue-200 mt-1">
