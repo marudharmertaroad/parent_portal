@@ -104,17 +104,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, []);
       
-  const logout = useCallback(async () => {
+   const logout = useCallback(async () => {
     // Platform-aware logout
     if (isPlatform('capacitor')) {
+      // The native plugin uses removeExternalUserId
       await window.plugins.OneSignal.removeExternalUserId();
+      console.log("Native OneSignal user ID removed.");
     } else {
-      await OneSignal.removeExternalUserId();
+      // --- THIS IS THE FIX for the WEB SDK ---
+      // To remove the user ID, you call setExternalUserId with null
+      await OneSignal.setExternalUserId(null);
+      console.log("Web OneSignal external user ID removed.");
+      // --- END OF FIX ---
     }
     
     setStudent(null);
-    localStorage.removeItem('parentPortalStudent'); // Corrected typo from "Studzent"
-    console.log("OneSignal user logged out.");
+    localStorage.removeItem('parentPortalStudent');
   } ,[]);
   
   const value = { student, isLoading, login, logout };
