@@ -135,14 +135,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           // --- END OF UPDATE ---
 
           return { success: true };
-
     } catch (error: any) {
       console.error("Login error:", error);
-      return { success: false, error: "An unexpected error occurred. Please try again." };
+      return { success: false, error: "An unexpected error occurred." };
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [isOneSignalInitialized]);
       
   const logout = useCallback(() => {
     setStudent(null);
