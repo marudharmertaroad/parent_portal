@@ -14,11 +14,6 @@ interface ProfileModalProps {
 const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, student }) => {
   if (!isOpen) return null;
 
-  // This function will simply reload the page to get the latest student data (including photo)
-  const handlePhotoUploadSuccess = () => {
-    window.location.reload();
-  };
-
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl max-w-5xl w-full m-4 max-h-[90vh] flex flex-col shadow-2xl">
