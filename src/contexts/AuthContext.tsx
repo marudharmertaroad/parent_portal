@@ -123,8 +123,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setStudent(null);
     localStorage.removeItem('parentPortalStudent');
 
-    OneSignal.removeExternalUserId();
-    console.log("OneSignal user logged out.");
+    OneSignal.setExternalUserId(null); 
+    
+    console.log("OneSignal external user ID removed.");
   }, []);
   
   const value = { student, isLoading, login, logout };
