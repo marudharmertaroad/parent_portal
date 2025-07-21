@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Student, FeeRecord, ExamRecord, Notice, SubjectMark, Homework, Notification } from '../types'; // Added Homework & Notification types
+import { Student, FeeRecord, ExamRecord, Notice, SubjectMark, Homework } from '../types'; // Added Homework & Notification types
 import { supabase } from '../utils/supabaseClient';
 import { X, Printer } from 'lucide-react';
 import { formatDate, getGradeColor, calculateGrade } from '../utils';
