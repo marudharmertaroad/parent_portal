@@ -1,20 +1,9 @@
 // src/contexts/AuthContext.tsx
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { Student, LoginCredentials } from '../types';
-import { apiService } from '../services/api';
 import OneSignal from 'react-onesignal';
-import { isPlatform } from '@ionic/react';
-
-declare global {
-  interface Window {
-    plugins: {
-      OneSignal: any;
-    };
-  }
-}
-
-const ONESIGNAL_APP_ID = "c8dca610-5f15-47e4-84f1-8943672e86dd";
+import { supabase } from '../utils/supabaseClient';
+import { Student, LoginCredentials } from '../types';
 
 interface AuthContextType {
   student: Student | null;
@@ -37,33 +26,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [student, setStudent] = useState<Student | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Load student from localStorage on initial app load
   useEffect(() => {
-    // This function will run once when the component first mounts.
-    
-    // 1. Native App Initialization (for APK)
-    // This listener waits for the Capacitor bridge to be ready.
-    document.addEventListener('deviceready', () => {
-      console.log("Device is ready, initializing OneSignal for native.");
-      
-      const oneSignalNative = window.plugins.OneSignal;
-      
-      oneSignalNative.setAppId(ONESIGNAL_APP_ID);
-      oneSignalNative.promptForPushNotificationsWithUserResponse((accepted: boolean) => {
-        console.log("User accepted native notifications: ", accepted);
-      });
-    }, false);
-
-    // 2. Web App Initialization (for Browser)
-    // We also initialize the web SDK so you can test in the browser.
-    const initializeWebOneSignal = async () => {
-        if (!isPlatform('capacitor')) {
-            await OneSignal.init({ appId: ONESIGNAL_APP_ID, allowLocalhostAsSecureOrigin: true });
-            console.log("OneSignal initialized for web.");
-        }
-    };
-    initializeWebOneSignal();
-    
-    // 3. Check for a saved session in localStorage.
     try {
       const savedStudentData = localStorage.getItem('parentPortalStudent');
       if (savedStudentData) {
@@ -71,7 +35,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
     } catch (error) {
       console.error("Failed to parse student data from localStorage", error);
-      localStorage.removeItem('parentPortalStudent');
     } finally {
       setIsLoading(false);
     }
@@ -80,47 +43,59 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = useCallback(async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     try {
-      const loggedInStudent = await apiService.login(credentials);
+      // Login logic to fetch student data... (This part is correct)
+      let { data, error } = await supabase.from('students').select('*').eq('sr_no', credentials.rollNumber).eq('medium', 'English').maybeSingle();
+      if (!data && !error) {
+        const { data: hindiData } = await supabase.from('students').select('*').eq('sr_no', credentials.rollNumber).eq('medium', 'Hindi').maybeSingle();
+        data = hindiData;
+      }
+      if (!data) return { success: false, error: 'SR Number not found.' };
+      if (data.dob !== credentials.dateOfBirth) return { success: false, error: 'Date of Birth does not match.' };
+
+      const loggedInStudent: Student = {
+        name: data.name, class: data.class, srNo: data.sr_no, fatherName: data.father_name,
+        motherName: data.mother_name, contact: data.contact, address: data.address,
+        medium: data.medium, gender: data.gender, dob: data.dob, bus_route: data.bus_route,
+        category: data.category, nicStudentId: data.nic_student_id, isRte: data.is_rte,
+        photoUrl: data.photo_url,
+      };
       
       setStudent(loggedInStudent);
       localStorage.setItem('parentPortalStudent', JSON.stringify(loggedInStudent));
 
-      // Platform-aware user identification
-      if (isPlatform('capacitor')) {
-        console.log(`Native App: Identifying user with sr_no: ${loggedInStudent.srNo}`);
-        window.plugins.OneSignal.setExternalUserId(loggedInStudent.srNo);
-      } else {
-        console.log(`Web: Identifying user with sr_no: ${loggedInStudent.srNo}`);
-        await OneSignal.setExternalUserId(loggedInStudent.srNo);
-        await OneSignal.sendTag("sr_no", loggedInStudent.srNo);
-        OneSignal.Slidedown.promptPush(); // Only prompt on the web
-      }
+      // --- THIS IS THE FINAL, CORRECTED ONESIGNAL LOGIC ---
+      console.log("Login successful. Setting OneSignal properties...");
 
+      // 1. Set the External User ID
+      await OneSignal.setExternalUserId(loggedInStudent.srNo);
+      console.log(`OneSignal External User ID set to: ${loggedInStudent.srNo}`);
+
+      // 2. Send all tags in a single, reliable call
+      await OneSignal.sendTags({
+        sr_no: loggedInStudent.srNo,
+        class: loggedInStudent.class,
+        medium: loggedInStudent.medium,
+      });
+      console.log(`OneSignal tags sent:`, { sr_no: loggedInStudent.srNo, class: loggedInStudent.class, medium: loggedInStudent.medium });
+
+      // 3. Prompt for notifications AFTER identifying the user.
+      OneSignal.Slidedown.promptPush();
+      
       return { success: true };
     } catch (error: any) {
-      return { success: false, error: error.message };
+      console.error("Login or OneSignal error:", error);
+      return { success: false, error: "An unexpected error occurred." };
     } finally {
       setIsLoading(false);
     }
   }, []);
       
-   const logout = useCallback(async () => {
-    // Platform-aware logout
-    if (isPlatform('capacitor')) {
-      // The native plugin uses removeExternalUserId
-      await window.plugins.OneSignal.removeExternalUserId();
-      console.log("Native OneSignal user ID removed.");
-    } else {
-      // --- THIS IS THE FIX for the WEB SDK ---
-      // To remove the user ID, you call setExternalUserId with null
-      await OneSignal.setExternalUserId(null);
-      console.log("Web OneSignal external user ID removed.");
-      // --- END OF FIX ---
-    }
-    
+  const logout = useCallback(async () => {
+    await OneSignal.removeExternalUserId();
     setStudent(null);
     localStorage.removeItem('parentPortalStudent');
-  } ,[]);
+    console.log("User logged out and OneSignal ID removed.");
+  }, []);
   
   const value = { student, isLoading, login, logout };
 
