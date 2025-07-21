@@ -18,7 +18,7 @@ import NoticeBoard from './NoticeBoard';
 import NotificationDrawer from './NotificationDrawer';
 
 // --- Report Card Modal (Corrected and Self-Contained) ---
-const EnhancedReportCardModal = () => {
+const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { student: Student | null, examRecords: ExamRecord[], onClose: () => void, settings: any }) => {
     if (!selectedStudentHistory) return null;
     const handlePrint = () => window.print();
     const classRank = studentRanks.get(selectedStudentHistory.studentId);
