@@ -81,8 +81,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ student }) => {
               )}
             </div>
           </div>
-        </div>
-      </div>
+        
             {/* [MOBILE COMPACT] Smaller text on mobile */}
             <h2 className="text-3xl sm:text-4xl font-bold">{student.name}</h2>
             <p className="text-lg sm:text-xl text-blue-200 mt-1">
