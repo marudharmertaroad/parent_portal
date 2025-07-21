@@ -1,6 +1,6 @@
 // src/contexts/AuthContext.tsx
 
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from 'react';
 import { supabase } from '../utils/supabaseClient'; // Make sure this path is correct
 import { Student, LoginCredentials } from '../types';
 import OneSignal from 'react-onesignal';
