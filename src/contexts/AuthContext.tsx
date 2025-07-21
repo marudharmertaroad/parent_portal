@@ -1,8 +1,8 @@
 // src/contexts/AuthContext.tsx
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { supabase } from '../utils/supabaseClient'; // Make sure you import your supabase client
-import { Student, LoginCredentials } from '../types';
+import { supabase } from '../utils/supabaseClient'; // Make sure this path is correct
+import { Student, LoginCredentials } from '../types'; // Make sure this path is correct
 
 interface AuthContextType {
   student: Student | null;
@@ -25,7 +25,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [student, setStudent] = useState<Student | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Checks for a saved session in localStorage when the app loads.
+  // Checks for a saved session in localStorage when the app first loads.
   useEffect(() => {
     try {
       const savedStudentData = localStorage.getItem('parentPortalStudent');
@@ -40,33 +40,32 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, []);
 
-  // --- THIS IS THE CORRECTED AND SIMPLIFIED LOGIN FUNCTION ---
   const login = useCallback(async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     try {
-      // Step 1: Fetch the student record using SR Number
+      // Step 1: Fetch the complete student record from the database.
       const { data, error } = await supabase
         .from('students')
-        .select('*') // Select all columns, including photo_url
+        .select('*') // This is crucial - it gets ALL columns, including photo_url.
         .eq('sr_no', credentials.rollNumber)
-        .single(); // Expect only one result
+        .single(); // We expect exactly one student for this SR Number.
 
-      // Handle query errors or if the student was not found
       if (error || !data) {
-        console.error("Login query failed:", error);
+        console.error("Login query failed or student not found:", error);
         return { success: false, error: 'SR Number not found.' };
       }
 
-      // Step 2: Verify the date of birth
+      // Step 2: Verify the date of birth.
       if (data.dob !== credentials.dateOfBirth) {
         return { success: false, error: 'Date of Birth does not match.' };
       }
 
-      // Step 3: Map the database record to our TypeScript Student interface
+      // Step 3: Map the raw database data to our clean 'Student' TypeScript interface.
+      // This is the most important part.
       const loggedInStudent: Student = {
-        srNo: data.sr_no,
         name: data.name,
         class: data.class,
+        srNo: data.sr_no,
         fatherName: data.father_name,
         motherName: data.mother_name,
         contact: data.contact,
@@ -78,10 +77,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         category: data.category,
         nicStudentId: data.nic_student_id,
         isRte: data.is_rte,
-        photoUrl: data.photo_url, // This now correctly includes the photo URL
+        photoUrl: data.photo_url, // <-- THE MISSING PIECE, NOW CORRECTLY MAPPED
       };
       
-      // Step 4: Set the state and save the session
+      // Step 4: Save the complete student object to state and localStorage.
       setStudent(loggedInStudent);
       localStorage.setItem('parentPortalStudent', JSON.stringify(loggedInStudent));
 
@@ -98,8 +97,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const logout = useCallback(() => {
     setStudent(null);
     localStorage.removeItem('parentPortalStudent');
-    // It's good practice to redirect to the login page after logout
-    // window.location.href = '/login'; 
   }, []);
   
   const value = { student, isLoading, login, logout };
