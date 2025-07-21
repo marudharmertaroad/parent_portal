@@ -86,9 +86,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
       
   const logout = useCallback(() => {
-    // --- THE FINAL, GUARANTEED FIX ---
+    // --- THIS IS THE FINAL, CORRECT LOGOUT METHOD ---
     window.OneSignal.push(function() {
-      window.OneSignal.removeExternalUserId();
+      // To remove the user ID, you call setExternalUserId with an empty string or null.
+      window.OneSignal.setExternalUserId(""); 
+      console.log("OneSignal external user ID has been cleared.");
     });
     
     setStudent(null);
