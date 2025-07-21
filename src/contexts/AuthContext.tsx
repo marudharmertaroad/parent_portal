@@ -1,9 +1,8 @@
 // src/contexts/AuthContext.tsx
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import OneSignal from 'react-onesignal';
-import { supabase } from '../utils/supabaseClient';
 import { Student, LoginCredentials } from '../types';
+import { apiService } from '../services/api';
 
 interface AuthContextType {
   student: Student | null;
@@ -26,7 +25,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [student, setStudent] = useState<Student | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // This effect ONLY handles loading the student from localStorage
+  // Checks for a saved session in localStorage when the app loads.
   useEffect(() => {
     try {
       const savedStudentData = localStorage.getItem('parentPortalStudent');
@@ -35,6 +34,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
     } catch (error) {
       console.error("Failed to parse student data from localStorage", error);
+      localStorage.removeItem('parentPortalStudent');
     } finally {
       setIsLoading(false);
     }
@@ -43,51 +43,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = useCallback(async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     try {
-      let { data, error } = await supabase.from('students').select('*').eq('sr_no', credentials.rollNumber).eq('medium', 'English').maybeSingle();
-      if (!data && !error) {
-        const { data: hindiData } = await supabase.from('students').select('*').eq('sr_no', credentials.rollNumber).eq('medium', 'Hindi').maybeSingle();
-        data = hindiData;
-      }
+      // Calls the original apiService.login function
+      const loggedInStudent = await apiService.login(credentials);
       
-      if (!data) {
-        return { success: false, error: 'SR Number not found.' };
-      }
-      if (data.dob !== credentials.dateOfBirth) {
-        return { success: false, error: 'Date of Birth does not match.' };
-      }
-
-      const loggedInStudent: Student = {
-        name: data.name, class: data.class, srNo: data.sr_no, fatherName: data.father_name,
-        motherName: data.mother_name, contact: data.contact, address: data.address,
-        medium: data.medium, gender: data.gender, dob: data.dob, bus_route: data.bus_route,
-        category: data.category, nicStudentId: data.nic_student_id, isRte: data.is_rte,
-        photoUrl: data.photo_url,
-      };
-      
+      // Sets the state and saves the session
       setStudent(loggedInStudent);
       localStorage.setItem('parentPortalStudent', JSON.stringify(loggedInStudent));
 
-      // These OneSignal calls are now safe because App.tsx initialized the library
-      await OneSignal.setExternalUserId(loggedInStudent.srNo);
-      await OneSignal.sendTag("sr_no", loggedInStudent.srNo);
-      OneSignal.Slidedown.promptPush();
-      
       return { success: true };
     } catch (error: any) {
-      console.error("Login error:", error);
-      return { success: false, error: "An unexpected error occurred." };
+      return { success: false, error: error.message };
     } finally {
       setIsLoading(false);
     }
   }, []);
       
-  const logout = useCallback(async () => {
-    // This is now safe for the same reason
-      await OneSignal.setExternalUserId(null);
-    
+  const logout = useCallback(() => {
     setStudent(null);
     localStorage.removeItem('parentPortalStudent');
-    console.log("User logged out and OneSignal ID removed.");
   }, []);
   
   const value = { student, isLoading, login, logout };
