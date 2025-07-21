@@ -294,7 +294,12 @@ const StudentPortal: React.FC = () => {
     passingMarks: 35,
     session: '2024-25',
   });
-
+useEffect(() => {
+    if (student) {
+      console.log("Student object in StudentPortal:", student);
+      console.log("Photo URL from context:", student.photoUrl);
+    }
+  }, [student]);
   const fetchStudentData = useCallback(async () => {
     if (!student) return;
     setIsLoadingData(true);
