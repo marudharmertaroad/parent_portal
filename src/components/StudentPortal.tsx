@@ -164,7 +164,15 @@ const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { 
                 </div>
                 {/* Hiding the photo box on the smallest screens to save space */}
                 <div className="w-20 h-24 sm:w-24 sm:h-28 border-2 border-gray-400 rounded-lg p-1 bg-white hidden sm:flex items-center justify-center">
-                  {student.photoUrl ? <img src={student.photoUrl} alt="Student" className="w-full h-full object-cover"/> : <span className="text-xs text-gray-400">Photo</span>}
+                  {student.photoUrl ? (
+                    <img 
+                      src={student.photoUrl} 
+                      alt="Student" 
+                      className="w-full h-full object-cover rounded-md" 
+                    />
+                  ) : (
+                    <span className="text-xs text-gray-400">Photo</span>
+                  )}
                 </div>
               </header>
 
