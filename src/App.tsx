@@ -1,13 +1,14 @@
-import React, { useEffect } from 'react';
+// src/App.tsx
+
+import React, { useEffect, useRef } from 'react';
+import OneSignal from 'react-onesignal';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import LoginForm from './components/LoginForm';
 import StudentPortal from './components/StudentPortal';
-import OneSignal from 'react-onesignal';
 
-// Your OneSignal App ID should be here
 const ONESIGNAL_APP_ID = "c8dca610-5f15-47e4-84f1-8943672e86dd";
 
-// AppContent remains the same, it correctly decides which view to show
+// This is the component that decides whether to show the login page or the main app
 const AppContent: React.FC = () => {
   const { student, isLoading } = useAuth();
 
@@ -22,21 +23,26 @@ const AppContent: React.FC = () => {
   return student ? <StudentPortal /> : <LoginForm />;
 };
 
-// --- THIS IS THE CORRECTED MAIN APP COMPONENT ---
+// This is the main App component
 function App() {
-  // This useEffect will run ONCE when the entire application first loads.
-  useEffect(() => {
-    const initializeOneSignal = async () => {
-      // It's safe to run init here because App is the root component.
-      await OneSignal.init({ 
-        appId: ONESIGNAL_APP_ID, 
-        allowLocalhostAsSecureOrigin: true 
-      });
-      console.log("OneSignal has been initialized in App.tsx.");
-    };
+  const initialized = useRef(false); // Use a ref to ensure this runs only once
 
-    initializeOneSignal();
-  }, []); // The empty dependency array ensures this runs only once.
+  useEffect(() => {
+    // Prevent initialization from running twice in React's Strict Mode (development)
+    if (!initialized.current) {
+      initialized.current = true;
+      
+      const initOneSignal = async () => {
+        await OneSignal.init({
+          appId: ONESIGNAL_APP_ID,
+          allowLocalhostAsSecureOrigin: true
+        });
+        console.log("OneSignal Initialized.");
+      };
+      
+      initOneSignal();
+    }
+  }, []); // Empty dependency array ensures this runs only on mount
 
   return (
     <AuthProvider>
