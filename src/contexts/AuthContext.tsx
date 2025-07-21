@@ -44,6 +44,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setIsLoading(true);
     try {
       // Calls the original apiService.login function
+      const { data, error } = await supabase
+        .from('students')
+        // Select all columns to ensure photo_url is included
+        .select('*') 
+        .eq('sr_no', credentials.rollNumber)
+        .single(); 
       const loggedInStudent = await apiService.login(credentials);
       
       // Sets the state and saves the session
