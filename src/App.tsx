@@ -1,18 +1,15 @@
 // src/App.tsx
 
-import React, { useEffect, useRef } from 'react';
-import OneSignal from 'react-onesignal';
+import React from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import LoginForm from './components/LoginForm';
 import StudentPortal from './components/StudentPortal';
 
-// Your OneSignal App ID
-const ONESIGNAL_APP_ID = "c8dca610-5f15-47e4-84f1-8943672e86dd";
-
-// The AppContent component decides which screen to show
 const AppContent: React.FC = () => {
+  // Get the session state from our context
   const { student, isLoading } = useAuth();
 
+  // 1. Show a loading spinner while the context is checking localStorage for a saved session
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -21,32 +18,15 @@ const AppContent: React.FC = () => {
     );
   }
 
+  // 2. If loading is done and a student is logged in, show the main portal.
+  //    Otherwise, show the login form.
   return student ? <StudentPortal /> : <LoginForm />;
 };
 
-// The main App component, responsible for initialization
+// The main App component
 function App() {
-  const osInitialized = useRef(false);
-
-  // This useEffect runs only ONCE when the app starts
-  useEffect(() => {
-    if (osInitialized.current) {
-      return; // Prevent re-initialization in React Strict Mode
-    }
-    osInitialized.current = true;
-    
-    const initOneSignal = async () => {
-      await OneSignal.init({
-        appId: ONESIGNAL_APP_ID,
-        allowLocalhostAsSecureOrigin: true
-      });
-      console.log("OneSignal Initialized.");
-    };
-    
-    initOneSignal();
-  }, []);
-
   return (
+    // Wrap the entire application with the AuthProvider so all components can access the context
     <AuthProvider>
       <AppContent />
     </AuthProvider>
