@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode, useCa
 import { Student, LoginCredentials } from '../types';
 import { apiService } from '../services/api';
 import OneSignal from 'react-onesignal';
+import { Device } from '@capacitor/device';
 
 interface AuthContextType {
   student: Student | null;
