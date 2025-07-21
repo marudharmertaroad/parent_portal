@@ -71,24 +71,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = useCallback(async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     try {
-      // Calls the original apiService.login function
       const loggedInStudent = await apiService.login(credentials);
       
-      // Sets the state and saves the session
       setStudent(loggedInStudent);
       localStorage.setItem('parentPortalStudent', JSON.stringify(loggedInStudent));
 
-      await OneSignal.setExternalUserId(loggedInStudent.srNo);
-      console.log(`OneSignal user identified as: ${loggedInStudent.srNo}`);
-
+      // Platform-aware user identification
       if (isPlatform('capacitor')) {
-        // NATIVE APP LOGIC
-        console.log(`Native App: Identifying user to OneSignal with sr_no: ${loggedInStudent.srNo}`);
+        console.log(`Native App: Identifying user with sr_no: ${loggedInStudent.srNo}`);
         window.plugins.OneSignal.setExternalUserId(loggedInStudent.srNo);
       } else {
-        // WEB BROWSER LOGIC (This will be ignored inside the app)
-        // You can keep this for when you run the app in a regular browser for testing
-        console.log("Web: OneSignal logic will be handled by the global script.");
+        console.log(`Web: Identifying user with sr_no: ${loggedInStudent.srNo}`);
+        await OneSignal.setExternalUserId(loggedInStudent.srNo);
+        await OneSignal.sendTag("sr_no", loggedInStudent.srNo);
+        OneSignal.Slidedown.promptPush(); // Only prompt on the web
       }
 
       return { success: true };
