@@ -99,15 +99,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, []);
       
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    // Platform-aware logout
     if (isPlatform('capacitor')) {
-
-    window.plugins.OneSignal.removeExternalUserId();
+      await window.plugins.OneSignal.removeExternalUserId();
+    } else {
+      await OneSignal.removeExternalUserId();
     }
+    
     setStudent(null);
-    localStorage.removeItem('parentPortalStudzent');
-
-    OneSignal.removeExternalUserId();
+    localStorage.removeItem('parentPortalStudent'); // Corrected typo from "Studzent"
     console.log("OneSignal user logged out.");
   } ,[]);
   
@@ -117,5 +118,5 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
-  )
+  );
 };
