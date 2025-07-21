@@ -5,6 +5,8 @@ import { supabase } from '../utils/supabaseClient'; // Make sure this path is co
 import { Student, LoginCredentials } from '../types';
 import OneSignal from 'react-onesignal';
 
+const ONESIGNAL_APP_ID = "c8dca610-5f15-47e4-84f1-8943672e86dd";
+
 interface AuthContextType {
   student: Student | null;
   isLoading: boolean;
