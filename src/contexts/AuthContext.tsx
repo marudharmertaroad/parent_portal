@@ -1,11 +1,12 @@
 // src/contexts/AuthContext.tsx
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from 'react';
-import { supabase } from '../utils/supabaseClient'; // Make sure this path is correct
-import { Student, LoginCredentials } from '../types';
 import OneSignal from 'react-onesignal';
+import { supabase } from '../utils/supabaseClient';
+import { Student, LoginCredentials } from '../types';
 
-const ONESIGNAL_APP_ID = "c8dca610-5f15-47e4-84f1-8943672e86dd";
+// Your OneSignal App ID from your OneSignal dashboard
+const ONESIGNAL_APP_ID = "c8dca610-5f15-47e4-84f1-8943672e86dd"; // Make sure this is correct
 
 interface AuthContextType {
   student: Student | null;
@@ -28,15 +29,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [student, setStudent] = useState<Student | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   
-  // Use a ref to ensure OneSignal initializes only once.
+  // A ref to ensure OneSignal initialization only runs once, preventing errors.
   const oneSignalInitRef = useRef(false);
 
-  // Effect to initialize OneSignal once on component mount.
+  // Effect to initialize OneSignal once when the app loads.
   useEffect(() => {
     if (oneSignalInitRef.current) {
-      return;
+      return; // If already initialized, do nothing.
     }
-    oneSignalInitRef.current = true; // Mark as initialized immediately
+    oneSignalInitRef.current = true; // Mark as initialized immediately.
 
     const initOneSignal = async () => {
       try {
@@ -47,9 +48,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
     };
     initOneSignal();
-  }, []); // Empty dependency array ensures it runs only once.
+  }, []); // Empty dependency array ensures this runs only once.
 
-  // Effect to load student from localStorage (remains the same)
+
+  // Effect to check for a saved session in localStorage on initial app load.
   useEffect(() => {
     try {
       const savedStudentData = localStorage.getItem('parentPortalStudent');
@@ -58,41 +60,73 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
     } catch (error) {
       console.error("Failed to parse student data from localStorage", error);
+      localStorage.removeItem('parentPortalStudent');
     } finally {
       setIsLoading(false);
     }
   }, []);
 
   const login = useCallback(async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
-    // --- FIX: REMOVED the check for `isOneSignalInitialized` ---
     setIsLoading(true);
-    
     try {
-      // Your corrected login logic (fetching from both mediums) is correct.
-      let { data, error } = await supabase.from('students').select('*').eq('sr_no', credentials.rollNumber).eq('medium', 'English').maybeSingle();
-      if (!data) {
-        const { data: hindiData, error: hindiError } = await supabase.from('students').select('*').eq('sr_no', credentials.rollNumber).eq('medium', 'Hindi').maybeSingle();
+      // Step 1: Try to find the student in the 'English' medium.
+      let { data, error } = await supabase
+        .from('students')
+        .select('*')
+        .eq('sr_no', credentials.rollNumber)
+        .eq('medium', 'English')
+        .maybeSingle();
+
+      // Step 2: If not found, try the 'Hindi' medium.
+      if (!data && !error) {
+        const { data: hindiData, error: hindiError } = await supabase
+          .from('students')
+          .select('*')
+          .eq('sr_no', credentials.rollNumber)
+          .eq('medium', 'Hindi')
+          .maybeSingle();
+        
         if (hindiError) throw hindiError;
-        if (!hindiData) return { success: false, error: 'SR Number not found in either medium.' };
         data = hindiData;
       }
+      
+      if (error) throw error;
+      if (!data) return { success: false, error: 'SR Number not found in either medium.' };
+
+      // Step 3: Verify the date of birth.
       if (data.dob !== credentials.dateOfBirth) {
         return { success: false, error: 'Date of Birth does not match.' };
       }
 
+      // Step 4: Map the complete database record to our Student interface.
       const loggedInStudent: Student = {
-        // ... (mapping all student properties is correct)
-        photoUrl: data.photo_url,
+        name: data.name,
+        class: data.class,
+        srNo: data.sr_no,
+        fatherName: data.father_name,
+        motherName: data.mother_name,
+        contact: data.contact,
+        address: data.address,
+        medium: data.medium,
+        gender: data.gender,
+        dob: data.dob,
+        bus_route: data.bus_route,
+        category: data.category,
+        nicStudentId: data.nic_student_id,
+        isRte: data.is_rte,
+        photoUrl: data.photo_url, // <-- Photo URL is correctly included
       };
       
+      // Step 5: Update state, localStorage, and OneSignal.
       setStudent(loggedInStudent);
       localStorage.setItem('parentPortalStudent', JSON.stringify(loggedInStudent));
 
-      // Identify the user and prompt for notifications
       await OneSignal.setExternalUserId(loggedInStudent.srNo);
       await OneSignal.sendTag("sr_no", loggedInStudent.srNo);
       OneSignal.Slidedown.promptPush();
       
+      console.log(`OneSignal user identified and tagged with sr_no: ${loggedInStudent.srNo}`);
+
       return { success: true };
     } catch (error: any) {
       console.error("Login error:", error);
@@ -100,11 +134,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } finally {
       setIsLoading(false);
     }
-    // --- FIX: REMOVED `isOneSignalInitialized` from dependency array ---
   }, []);
       
   const logout = useCallback(async () => {
-    // --- FIX: REMOVED the check for `isOneSignalInitialized` ---
     try {
       await OneSignal.removeExternalUserId();
       console.log("OneSignal external user ID removed.");
@@ -113,9 +145,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
     setStudent(null);
     localStorage.removeItem('parentPortalStudent');
-    // --- FIX: REMOVED `isOneSignalInitialized` from dependency array ---
   }, []);
-  
   
   const value = { student, isLoading, login, logout };
 
