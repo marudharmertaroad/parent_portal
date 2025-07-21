@@ -60,7 +60,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       
   const logout = useCallback(() => {
     setStudent(null);
-    localStorage.removeItem('parentPortalStudent');
+    localStorage.removeItem('parentPortalStudzent');
   }, []);
   
   const value = { student, isLoading, login, logout };
