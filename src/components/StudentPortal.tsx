@@ -162,15 +162,13 @@ const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { 
                   <h2 className="text-lg sm:text-2xl font-bold text-blue-800">{reportTitle}</h2>
                   <p className="text-base sm:text-lg text-blue-600">Session: {settings.session}</p>
                 </div>
-                {student.photoUrl ? (
-          <img src={student.photoUrl} alt="Student" className="w-full h-full object-cover" />
-        ) : (
-          <span className="text-xs text-gray-400">Photo</span>
-        )}
-      </div>
-    </div>
-            );
-};
+                <div className="w-20 h-24 sm:w-24 sm:h-28 border-2 border-gray-400 rounded-lg p-1 bg-white hidden sm:flex items-center justify-center">
+                  {student.photoUrl ? (
+                    <img src={student.photoUrl} alt="Student" className="w-full h-full object-cover rounded-md" />
+                  ) : (
+                    <span className="text-xs text-gray-400">Photo</span>
+                  )}
+                </div>
               </header>
 
               {/* [MOBILE COMPACT] Sections now stack on mobile */}
