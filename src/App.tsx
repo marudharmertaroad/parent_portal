@@ -4,6 +4,9 @@ import React from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import LoginForm from './components/LoginForm';
 import StudentPortal from './components/StudentPortal';
+import OneSignal from 'react-onesignal';
+
+const ONESIGNAL_APP_ID = "c8dca610-5f15-47e4-84f1-8943672e86dd";
 
 const AppContent: React.FC = () => {
   // Get the session state from our context
