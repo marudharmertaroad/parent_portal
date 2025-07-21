@@ -28,6 +28,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [student, setStudent] = useState<Student | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [isOneSignalInitialized, setIsOneSignalInitialized] = useState(false);
+
+  // --- THIS IS THE NEW, CORRECT INITIALIZATION ---
+  // Effect to initialize OneSignal ONCE when the provider mounts.
+  useEffect(() => {
+    const initOneSignal = async () => {
+      if (isOneSignalInitialized) return;
+      try {
+        await OneSignal.init({ appId: ONESIGNAL_APP_ID, allowLocalhostAsSecureOrigin: true });
+        setIsOneSignalInitialized(true);
+        console.log("OneSignal initialized successfully.");
+      } catch (e) {
+        console.error("Error initializing OneSignal:", e);
+      }
+    };
+    initOneSignal();
+  }, [isOneSignalInitialized]);
+
   // Checks for a saved session in localStorage when the app first loads
   useEffect(() => {
     try {
@@ -44,7 +62,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   const login = useCallback(async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
+    if (!isOneSignalInitialized) {
+      return { success: false, error: "Notification service is not ready. Please try again in a moment." };
+    }
+    
     setIsLoading(true);
+    
     try {
       // --- THIS IS THE NEW, CORRECTED LOGIC ---
 
