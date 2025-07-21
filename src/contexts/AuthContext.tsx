@@ -100,6 +100,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
       
   const logout = useCallback(() => {
+
+    window.plugins.OneSignal.removeExternalUserId();
+    }
     setStudent(null);
     localStorage.removeItem('parentPortalStudzent');
 
