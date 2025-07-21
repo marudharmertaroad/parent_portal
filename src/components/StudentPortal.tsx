@@ -29,7 +29,6 @@ const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { 
     const handlePrint = () => window.print();
 
   const viewingExamType = 'Total';
-    const classRank = studentRanks.get(selectedStudentHistory.studentId);
 
     // --- 1. DYNAMIC DATA PROCESSING LOGIC ---
     const examsToDisplay = viewingExamType === 'Total'
@@ -185,7 +184,7 @@ const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { 
             <div className="flex justify-between items-center mb-4 no-print">
                 <h3 className="text-xl font-bold text-gray-800">Student Report Card</h3>
                 <div className="flex space-x-3">
-                    <button onClick={() => setShowReportCustomizer(true)} className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"><Settings className="w-4 h-4 mr-2" />Customize</button>
+                    
                     <button onClick={handlePrint} className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"><Printer className="w-4 h-4 mr-2" />Print</button>
                     <button onClick={() => setShowReportCardModal(false)} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Close</button>
                 </div>
