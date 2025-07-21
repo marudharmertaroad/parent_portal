@@ -51,6 +51,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setStudent(loggedInStudent);
       localStorage.setItem('parentPortalStudent', JSON.stringify(loggedInStudent));
 
+      await OneSignal.setExternalUserId(loggedInStudent.srNo);
+      console.log(`OneSignal user identified as: ${loggedInStudent.srNo}`);
+
       return { success: true };
     } catch (error: any) {
       return { success: false, error: error.message };
