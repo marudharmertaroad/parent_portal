@@ -1,7 +1,3 @@
-// src/App.tsx
-
-// src/App.tsx
-
 import React from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import LoginForm from './components/LoginForm';
