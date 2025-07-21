@@ -126,12 +126,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setStudent(loggedInStudent);
       localStorage.setItem('parentPortalStudent', JSON.stringify(loggedInStudent));
 
-       await OneSignal.setExternalUserId(loggedInStudent.srNo);
+        await OneSignal.setExternalUserId(loggedInStudent.srNo);
+      await OneSignal.sendTag("sr_no", loggedInStudent.srNo);
+      console.log(`OneSignal user identified and tagged with sr_no: ${loggedInStudent.srNo}`);
 
-          // ALSO, add a "tag" with their SRN
-          await OneSignal.sendTag("sr_no", loggedInStudent.srNo);
-          
-          console.log(`OneSignal user identified and tagged with sr_no: ${loggedInStudent.srNo}`);
+      // After identifying, prompt for push notifications.
+      OneSignal.Slidedown.promptPush();
           // --- END OF UPDATE ---
 
           return { success: true };
