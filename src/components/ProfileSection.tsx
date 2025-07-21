@@ -54,23 +54,31 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ student }) => {
 
   return (
     <div className="space-y-6 md:space-y-8">
-      {/* Header Profile Card - Now responsive */}
-      {/* [MOBILE COMPACT] Reduced padding on mobile */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 md:p-8 rounded-2xl shadow-lg text-white">
-        {/* [MOBILE COMPACT] Stack vertically on mobile, row on desktop */}
-        <div className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-4 sm:gap-6">
-          <div className="relative">
-            {/* [MOBILE COMPACT] Smaller avatar on mobile */}
-            <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 bg-white/20 border-4 border-white/50 rounded-full flex items-center justify-center font-bold text-5xl sm:text-6xl">
-              {student.name.charAt(0).toUpperCase()}
-            </div>
-          </div>
+        <div className="flex items-center justify-between">
+          {/* Left side: Name and Details */}
           <div>
-            {/* [MOBILE COMPACT] Smaller text on mobile */}
-            <h2 className="text-3xl sm:text-4xl font-bold">{student.name}</h2>
-            <p className="text-lg sm:text-xl text-blue-200 mt-1">
+            <h2 className="text-3xl md:text-4xl font-bold">{student.name}</h2>
+            <p className="text-lg md:text-xl text-blue-200 mt-1">
               Class: {student.class} | SR No: {student.srNo}
             </p>
+          </div>
+          
+          {/* Right side: Photo Avatar */}
+          <div className="flex-shrink-0">
+            <div className="w-20 h-20 md:w-28 md:h-28 bg-white/20 border-4 border-white/50 rounded-full flex items-center justify-center overflow-hidden">
+              {student.photoUrl ? (
+                <img 
+                  src={student.photoUrl} 
+                  alt={student.name} 
+                  className="w-full h-full object-cover" 
+                />
+              ) : (
+                <span className="font-bold text-4xl md:text-5xl">
+                  {student.name.charAt(0).toUpperCase()}
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>
