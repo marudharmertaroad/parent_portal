@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Student, FeeRecord, ExamRecord, Notice, SubjectMark, Homework } from '../types'; // Added Homework & Notification types
+import { Student, FeeRecord, ExamRecord, Notice, SubjectMark } from '../types';
 import { supabase } from '../utils/supabaseClient';
-import { X, Printer } from 'lucide-react';
+import { X, Printer, Settings } from 'lucide-react';
 import { formatDate, getGradeColor, calculateGrade } from '../utils';
 
 // Import all necessary components
@@ -23,6 +23,7 @@ const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { 
 
   const handlePrint = () => window.print();
 
+  // --- SAFE & CORRECTED CALCULATIONS ---
   const safeExamRecords = Array.isArray(examRecords) ? examRecords : [];
   const reportTitle = "PROGRESS REPORT - CONSOLIDATED";
   
@@ -41,7 +42,103 @@ const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { 
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4 print:p-0 print:bg-white">
-       <style>{`@page{size:landscape;margin:1cm}@media print{*{box-sizing:border-box!important}html,body{width:100%;height:100%;margin:0!important;padding:0!important;overflow:hidden!important}#report-card::after{content:'';background:url('/logo.png') center/contain no-repeat;position:absolute;inset:0;opacity:0.08;z-index:0}#report-card>*{position:relative;z-index:1}body *{visibility:hidden}#report-card-wrapper,#report-card-wrapper *{visibility:visible}#report-card-wrapper{position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden!important}.no-print{display:none!important}#report-card{width:100%;height:100%;border:2px solid black!important;box-shadow:none!important;border-radius:0;font-size:10pt;overflow:hidden!important;display:flex;flex-direction:column}#report-card table{font-size:9pt}#report-card main{flex-grow:1;flex-shrink:1;overflow:hidden}}`}</style>
+       <style>
+    {`
+      /* --- Watermark & Print Preparation --- */
+      #report-card {
+        position: relative; 
+      }
+      * {
+        -webkit-print-color-adjust: exact !important; /* For older Safari/Chrome */
+        print-color-adjust: exact !important;        /* The standard */
+        box-sizing: border-box !important;
+      }
+      #report-card::after {
+        content: '';
+        background: url('/logo.png') center/contain no-repeat;
+        position: absolute;
+        inset: 0;
+        opacity: 0.08;
+        z-index: 0;
+      }
+      
+      #report-card > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      /* --- Print-specific Styles --- */
+      @page {
+        size: landscape;
+        margin: 1cm;
+      }
+      
+      @media print {
+        /* A universal fix for many layout issues */
+        * {
+          box-sizing: border-box !important;
+        }
+
+        /* Reset body and hide overflow */
+        html, body {
+          width: 100%;
+          height: 100%;
+          margin: 0 !important;
+          padding: 0 !important;
+          overflow: hidden !important; /* CRUCIAL: Prevents scrollbars/overflow from creating a second page */
+        }
+        
+        /* Hide EVERYTHING on the page by default */
+        body * {
+          visibility: hidden;
+        }
+        
+        /* Make ONLY the report card wrapper and its contents visible */
+        #report-card-wrapper, #report-card-wrapper * {
+          visibility: visible;
+        }
+        
+        /* Position the wrapper to fill the entire print page */
+        #report-card-wrapper {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          overflow: hidden !important; /* Double-down on preventing overflow */
+        }
+      
+        /* Hide elements not meant for printing */
+        .no-print { 
+          display: none !important; 
+        }
+        
+        /* Style the report card itself for the page */
+        #report-card {
+          width: 100%;
+          height: 100%;
+          border: 2px solid black !important;
+          box-shadow: none !important;
+          border-radius: 0;
+          font-size: 10pt;
+          overflow: hidden !important; /* TRIPLE-down: no content can spill out */
+          display: flex;
+          flex-direction: column;
+        }
+        
+        #report-card table { 
+          font-size: 9pt; 
+        }
+
+        /* Ensure main content does not try to grow past the page height */
+        #report-card main {
+          flex-grow: 1;
+          flex-shrink: 1; /* Allow shrinking if needed */
+          overflow: hidden; /* Hide any internal overflow in the main section */
+        }
+      }
+    `}
+  </style>
       <div className="bg-white rounded-2xl w-full max-w-7xl max-h-[95vh] overflow-auto shadow-2xl">
         <div className="p-6">
           <div className="flex justify-between items-center mb-4 no-print">
@@ -65,10 +162,13 @@ const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { 
                   <h2 className="text-lg sm:text-2xl font-bold text-blue-800">{reportTitle}</h2>
                   <p className="text-base sm:text-lg text-blue-600">Session: {settings.session}</p>
                 </div>
+                {/* Hiding the photo box on the smallest screens to save space */}
                 <div className="w-20 h-24 sm:w-24 sm:h-28 border-2 border-gray-400 rounded-lg p-1 bg-white hidden sm:flex items-center justify-center">
                   {student.photoUrl ? <img src={student.photoUrl} alt="Student" className="w-full h-full object-cover"/> : <span className="text-xs text-gray-400">Photo</span>}
                 </div>
               </header>
+
+              {/* [MOBILE COMPACT] Sections now stack on mobile */}
               <section className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-x-4 text-xs">
                 <div className="bg-blue-50 rounded-lg p-2 sm:p-3 border border-blue-200">
                   <h3 className="font-bold text-sm mb-1 text-blue-800">Student Information</h3>
@@ -91,6 +191,8 @@ const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { 
                   </div>
                 </div>
               </section>
+
+              {/* [MOBILE COMPACT] This wrapper makes the table horizontally scrollable on small screens */}
               <main className="flex-grow mt-4 overflow-x-auto">
                 <table className="w-full border-collapse border border-gray-400 text-xs">
                   <thead className="font-bold">
@@ -123,14 +225,39 @@ const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { 
                       );
                     })}
                   </tbody>
+                  <tfoot className="font-bold bg-blue-50 text-center">
+                    <tr>
+                      <td className="border p-1 text-left">Total Marks</td>
+                      {uniqueExamTypes.map(examType => {
+                        const exam = safeExamRecords.find(e => e.examType === examType);
+                        return (
+                          <React.Fragment key={examType}>
+                            <td className="border p-1" colSpan={3}>{exam ? `${exam.obtainedMarks} / ${exam.totalMarks}` : '-'}</td>
+                          </React.Fragment>
+                        );
+                      })}
+                      {/* Grand Total */}
+                      <td className="border p-1 bg-green-100" colSpan={3}>{`${totalObtained} / ${totalMax}`}</td>
+                    </tr>
+                    <tr>
+                      <td className="border p-1 text-left">Percentage & Grade</td>
+                      {uniqueExamTypes.map(examType => {
+                        const exam = safeExamRecords.find(e => e.examType === examType);
+                        const grade = exam ? calculateGrade(exam.percentage) : 'N/A';
+                        return (
+                          <React.Fragment key={examType}>
+                            <td className="border p-1" colSpan={3}>
+                              {exam ? `${exam.percentage.toFixed(1)}% (${grade})` : '-'}
+                            </td>
+                          </React.Fragment>
+                        );
+                      })}
+                       {/* Grand Total Percentage */}
+                      <td className="border p-1 bg-green-100" colSpan={3}>{`${overallPercentage.toFixed(1)}% (${overallGrade})`}</td>
+                    </tr>
+                  </tfoot>
                 </table>
               </main>
-              <footer className="pt-4 no-print">
-                <div className="grid grid-cols-2 gap-x-8">
-                    <div className="border-2 border-gray-300 rounded-lg p-2 h-24 flex flex-col justify-end"><p className="text-center font-bold text-sm border-t-2 border-gray-400 pt-1">Class Teacher's Signature</p></div>
-                    <div className="border-2 border-gray-300 rounded-lg p-2 h-24 flex flex-col justify-end"><p className="text-center font-bold text-sm border-t-2 border-gray-400 pt-1">Principal's Signature & Seal</p></div>
-                </div>
-              </footer>
             </div>
           </div>
         </div>
@@ -142,6 +269,10 @@ const EnhancedReportCardModal = ({ student, examRecords, onClose, settings }: { 
 const StudentPortal: React.FC = () => {
   const { student } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
+   const handleTabChange = (tab: string) => {
+    console.log(`Tab change requested. New tab will be: '${tab}'`);
+    setActiveTab(tab);
+  };
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [showReportCard, setShowReportCard] = useState(false);
@@ -165,33 +296,58 @@ const StudentPortal: React.FC = () => {
     if (!student) return;
     setIsLoadingData(true);
 
-    const [feeRes, examRes, noticeRes, homeworkRes, notificationRes] = await Promise.all([
-      supabase.from('fee_records').select('*, student:students!inner(name, father_name, medium)').eq('student_id', student.srNo).eq('students.medium', student.medium),
-      supabase.from('exam_records').select(`*, students!inner(medium), subjects:subject_marks(*)`).eq('student_id', student.srNo).eq('students.medium', student.medium).order('exam_date', { ascending: false }),
-      supabase.from('notices').select('*').or(`target_class.is.null,target_class.eq.all,target_class.eq.${student.class}`).eq('is_active', true),
-      supabase.from('homework_assignments').select('*').eq('class', student.class).eq('medium', student.medium).eq('is_active', true),
-      supabase.from('notifications').select('*').or(`target_audience.eq.all,target_class.eq.${student.class},target_student_sr_no.eq.${student.srNo}`).order('created_at', { ascending: false }).limit(50)
-    ]);
+    const [feeResponse, examResponse, homeworkResponse, noticeResponse, notificationRes] = await Promise.all([
+    // Promise 1: feeResponse -> gets fee_records
+    supabase.from('fee_records').select('*, student:students!inner(name, father_name, medium)').eq('student_id', student.srNo).eq('students.medium', student.medium),
     
-    // Process all data with safety checks
-    setFeeRecords(feeRes.data?.map((r: any) => ({...r, studentName: r.student?.name, fatherName: r.student?.father_name})) || []);
-    setNotices(noticeRes.data || []);
-    setHomework(homeworkRes.data || []);
-    setNotifications(notificationRes.data || []);
+    // Promise 2: examResponse -> gets exam_records
+    supabase.from('exam_records').select(`*, students!inner(medium), subjects:subject_marks(*)`).eq('student_id', student.srNo).eq('students.medium', student.medium).order('exam_date', { ascending: false }),
+    
+    // Promise 3: homeworkResponse -> CORRECTLY gets homework_assignments now
+    supabase.from('homework_assignments').select('*').eq('class', student.class).eq('medium', student.medium).eq('is_active', true),
+    
+    // Promise 4: noticeResponse -> CORRECTLY gets notices now
+    supabase.from('notices').select('*').or(`target_class.is.null,target_class.eq.all,target_class.eq.${student.class}`).eq('is_active', true),
+    
+    // Promise 5: notificationRes -> gets notifications
+    supabase.from('notifications').select('*').or(`target_audience.eq.all,target_class.eq.${student.class},target_student_sr_no.eq.${student.srNo}`).order('created_at', { ascending: false }).limit(50)
+  ]);
 
-    if (examRes.error) console.error("Exam fetch error:", examRes.error);
+    const { data: feeData, error: feeError } = feeResponse;
+    if (feeError) console.error("Error fetching fees:", feeError);
     else {
-        const mappedExamRecords = (examRes.data || []).map((exam: any): ExamRecord => ({
-            id: exam.id, studentId: exam.student_id, examType: exam.exam_type, examDate: exam.exam_date,
-            totalMarks: exam.total_marks || 0, obtainedMarks: exam.obtained_marks || 0, percentage: exam.percentage || 0,
-            grade: exam.grade || 'N/A',
-            subjects: (exam.subjects || []).map((sub: any): SubjectMark => ({
-                subject: sub.subject, maxMarks: sub.max_marks || 0, obtainedMarks: sub.obtained_marks || 0,
-                grade: sub.grade || 'N/A', isComplementary: sub.is_complementary || false,
-            })),
-        }));
-        setExamRecords(mappedExamRecords);
+      const mappedFeeRecords = (feeData || []).map((r: any) => ({
+        recordId: r.id, studentId: r.student_id, studentName: r.student?.name, fatherName: r.student?.father_name, class: r.class, totalFees: r.total_fees || 0, paidFees: r.paid_fees || 0,
+        pendingFees: r.pending_fees || 0, discountFees: r.discount_fees || 0, busFees: r.bus_fees || 0, dueDate: r.due_date, lastPaymentDate: r.last_payment_date,
+      }));
+      setFeeRecords(mappedFeeRecords);
     }
+
+    const { data: examData, error: examError } = examResponse;
+    if (examError) console.error("Error fetching exams:", examError);
+    else {
+      const mappedExamRecords = (examData || []).map((exam: any) => ({
+        id: exam.id, studentId: exam.student_id, examType: exam.exam_type, examDate: exam.exam_date,
+        totalMarks: exam.total_marks || 0, obtainedMarks: exam.obtained_marks || 0, percentage: exam.percentage || 0,
+        grade: exam.grade || 'N/A',
+        subjects: (exam.subjects || []).map((sub: any): SubjectMark => ({
+          subject: sub.subject, maxMarks: sub.max_marks || 0, obtainedMarks: sub.obtained_marks || 0,
+          grade: sub.grade || 'N/A', isComplementary: sub.is_complementary || false,
+        })),
+      }));
+      setExamRecords(mappedExamRecords);
+    }
+  const { data: hwData, error: hwError } = homeworkResponse;
+    if (hwError) console.error("Error fetching homework:", hwError);
+    else setHomework(hwData || []);
+    
+    const { data: noticeData, error: noticeError } = noticeResponse;
+    if (noticeError) console.error("Error fetching notices:", noticeError);
+    else setNotices(noticeData || []);
+
+    if (notificationRes.error) console.error("Error fetching notifications:", notificationRes.error);
+    else setNotifications(notificationRes.data || []);
+    
     
     setIsLoadingData(false);
   }, [student]);
@@ -200,50 +356,70 @@ const StudentPortal: React.FC = () => {
     fetchStudentData();
   }, [fetchStudentData]);
 
+  
+
   useEffect(() => {
     if (!student) return;
-    const channel = supabase.channel('public:notifications').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, 
-      (payload) => {
+
+    const channel = supabase
+      .channel('public:notifications')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, (payload) => {
         const newNotification = payload.new as Notification;
-        const isTargeted = newNotification.target_audience === 'all' || (newNotification.target_audience === 'class' && newNotification.target_class === student.class) || (newNotification.target_audience === 'student' && newNotification.target_student_sr_no === student.srNo);
-        if (isTargeted) {
+
+        const isForEveryone = newNotification.target_audience === 'all';
+        const isForMyClass = newNotification.target_audience === 'class' && newNotification.target_class === student.class;
+        const isForMe = newNotification.target_audience === 'student' && newNotification.target_student_sr_no === student.srNo;
+
+        if (isForEveryone || isForMyClass || isForMe) {
+          console.log('New push notification received!', newNotification);
           setNotifications(prev => [newNotification, ...prev]);
           setUnreadCount(prev => prev + 1);
-          if (window.Notification?.permission === "granted") {
+          
+          // Trigger a browser notification if permission is granted
+          if (Notification.permission === "granted") {
             new window.Notification('New School Notice!', { body: newNotification.title });
           }
         }
-      }).subscribe();
-    return () => { supabase.removeChannel(channel); };
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [student]);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined' && "Notification" in window && Notification.permission !== "granted") {
-      Notification.requestPermission();
-    }
-  }, []);
+  // Request notification permission on component mount
 
   const handleBellClick = () => {
     setShowNotificationDrawer(true);
     setUnreadCount(0);
   };
   
+
   const refreshStudentData = () => {
     alert("Photo updated successfully! The portal will now refresh.");
     window.location.reload();
   };
 
   if (!student) {
-    return <div className="flex items-center justify-center h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>;
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-lg font-semibold text-gray-700">Loading Portal...</p>
+        </div>
+      </div>
+    );
   }
-
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
-  };
 
   const renderContent = () => {
     if (isLoadingData) {
-      return <div className="text-center p-10"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-500 mx-auto"></div><p className="mt-4 text-gray-600">Loading records...</p></div>;
+      return (
+        <div className="text-center p-10">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading student records...</p>
+        </div>
+      );
     }
     
     switch (activeTab) {
@@ -258,7 +434,7 @@ const StudentPortal: React.FC = () => {
       case 'notices':
         return <NoticeBoard notices={notices} studentClass={student.class} />;
       default:
-        return <Dashboard student={student} feeRecords={feeRecords} examRecords={examRecords} notices={notices} onTabChange={handleTabChange} />;
+        return <Dashboard student={student} feeRecords={feeRecords} examRecords={examRecords} notices={notices} onTabChange={setActiveTab} />;
     }
   };
 
@@ -267,17 +443,31 @@ const StudentPortal: React.FC = () => {
       <Header
         studentName={student.name}
         activeTab={activeTab}
-        onTabChange={handleTabChange}
+onTabChange={handleTabChange}
         onProfileClick={() => setShowProfileModal(true)}
         unreadCount={unreadCount}
         onBellClick={handleBellClick}
       />
       <main className="p-6 md:p-8">
-        <div className="max-w-7xl mx-auto">{renderContent()}</div>
+        <div className="max-w-7xl mx-auto">
+          {renderContent()}
+        </div>
       </main>
       
-      <ProfileModal isOpen={showProfileModal} onClose={() => setShowProfileModal(false)} student={student} onDataRefresh={refreshStudentData}/>
-      {showReportCard && <EnhancedReportCardModal student={student} examRecords={examRecords} onClose={() => setShowReportCard(false)} settings={reportSettings} />}
+      <ProfileModal
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+        student={student}
+        onDataRefresh={refreshStudentData}
+      />
+      {showReportCard && (
+        <EnhancedReportCardModal
+          student={student}
+          examRecords={examRecords}
+          onClose={() => setShowReportCard(false)}
+          settings={reportSettings}
+        />
+      )}
       <NotificationDrawer isOpen={showNotificationDrawer} onClose={() => setShowNotificationDrawer(false)} notifications={notifications} />
     </div>
   );
