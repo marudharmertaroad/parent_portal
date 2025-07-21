@@ -52,6 +52,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         console.log("User accepted notifications: ", accepted);
       });
     }, false);
+    
   // Checks for a saved session in localStorage when the app loads.
   useEffect(() => {
     try {
@@ -79,6 +80,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       await OneSignal.setExternalUserId(loggedInStudent.srNo);
       console.log(`OneSignal user identified as: ${loggedInStudent.srNo}`);
+
+      if (isPlatform('capacitor')) {
+        // NATIVE APP LOGIC
+        console.log(`Native App: Identifying user to OneSignal with sr_no: ${loggedInStudent.srNo}`);
+        window.plugins.OneSignal.setExternalUserId(loggedInStudent.srNo);
+      } else {
+        // WEB BROWSER LOGIC (This will be ignored inside the app)
+        // You can keep this for when you run the app in a regular browser for testing
+        console.log("Web: OneSignal logic will be handled by the global script.");
+      }
 
       return { success: true };
     } catch (error: any) {
