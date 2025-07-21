@@ -14,6 +14,7 @@ export interface Student {
   dob: string;
   bus_route?: string;
   isRte: boolean;
+  photoUrl?: string;
   
   // --- ADDED MISSING FIELDS TO MATCH YOUR DATABASE ---
   gender?: string;
