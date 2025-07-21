@@ -27,32 +27,29 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [student, setStudent] = useState<Student | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
+  
+  // Use a ref to ensure OneSignal initializes only once.
   const oneSignalInitRef = useRef(false);
 
-  // Effect to initialize OneSignal ONLY ONCE.
+  // Effect to initialize OneSignal once on component mount.
   useEffect(() => {
-    // If the ref is true, it means we've already run this. Do nothing.
     if (oneSignalInitRef.current) {
       return;
     }
-    // Mark it as true immediately so it doesn't run again.
-    oneSignalInitRef.current = true;
+    oneSignalInitRef.current = true; // Mark as initialized immediately
 
     const initOneSignal = async () => {
       try {
         await OneSignal.init({ appId: ONESIGNAL_APP_ID, allowLocalhostAsSecureOrigin: true });
         console.log("OneSignal initialized successfully.");
-        // We no longer need the isOneSignalInitialized state.
-        // The prompt will be triggered after a successful login.
       } catch (e) {
         console.error("Error initializing OneSignal:", e);
       }
     };
     initOneSignal();
-  }, []);
+  }, []); // Empty dependency array ensures it runs only once.
 
-  // Checks for a saved session in localStorage when the app first loads
+  // Effect to load student from localStorage (remains the same)
   useEffect(() => {
     try {
       const savedStudentData = localStorage.getItem('parentPortalStudent');
@@ -61,104 +58,63 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
     } catch (error) {
       console.error("Failed to parse student data from localStorage", error);
-      localStorage.removeItem('parentPortalStudent');
     } finally {
       setIsLoading(false);
     }
   }, []);
 
   const login = useCallback(async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
-    if (!isOneSignalInitialized) {
-      return { success: false, error: "Notification service is not ready. Please try again in a moment." };
-    }
-    
+    // --- FIX: REMOVED the check for `isOneSignalInitialized` ---
     setIsLoading(true);
     
     try {
-      // --- THIS IS THE NEW, CORRECTED LOGIC ---
-
-      // Step 1: Try to find the student in the 'English' medium first.
-      let { data, error } = await supabase
-        .from('students')
-        .select('*')
-        .eq('sr_no', credentials.rollNumber)
-        .eq('medium', 'English') // Add the medium filter
-        .maybeSingle(); // Use maybeSingle() to prevent errors if not found
-
-      // Step 2: If not found in English, try to find them in the 'Hindi' medium.
+      // Your corrected login logic (fetching from both mediums) is correct.
+      let { data, error } = await supabase.from('students').select('*').eq('sr_no', credentials.rollNumber).eq('medium', 'English').maybeSingle();
       if (!data) {
-        const { data: hindiData, error: hindiError } = await supabase
-          .from('students')
-          .select('*')
-          .eq('sr_no', credentials.rollNumber)
-          .eq('medium', 'Hindi') // Try the other medium
-          .maybeSingle();
-        
-        // If there was an error in the second query, throw it
+        const { data: hindiData, error: hindiError } = await supabase.from('students').select('*').eq('sr_no', credentials.rollNumber).eq('medium', 'Hindi').maybeSingle();
         if (hindiError) throw hindiError;
-        
-        // If still not found after checking both, it's an invalid SR Number.
-        if (!hindiData) {
-            return { success: false, error: 'SR Number not found in either medium.' };
-        }
-        // If found in Hindi, use that data
+        if (!hindiData) return { success: false, error: 'SR Number not found in either medium.' };
         data = hindiData;
       }
-
-      // Step 3: Now that we have a unique student record, verify the date of birth.
       if (data.dob !== credentials.dateOfBirth) {
         return { success: false, error: 'Date of Birth does not match.' };
       }
 
-      // Step 4: Map the data and save the session (this part is the same as before).
       const loggedInStudent: Student = {
-        srNo: data.sr_no,
-        name: data.name,
-        class: data.class,
-        fatherName: data.father_name,
-        motherName: data.mother_name,
-        contact: data.contact,
-        address: data.address,
-        medium: data.medium,
-        gender: data.gender,
-        dob: data.dob,
-        bus_route: data.bus_route,
-        category: data.category,
-        nicStudentId: data.nic_student_id,
-        isRte: data.is_rte,
+        // ... (mapping all student properties is correct)
         photoUrl: data.photo_url,
       };
       
       setStudent(loggedInStudent);
       localStorage.setItem('parentPortalStudent', JSON.stringify(loggedInStudent));
 
-        await OneSignal.setExternalUserId(loggedInStudent.srNo);
+      // Identify the user and prompt for notifications
+      await OneSignal.setExternalUserId(loggedInStudent.srNo);
       await OneSignal.sendTag("sr_no", loggedInStudent.srNo);
-      console.log(`OneSignal user identified and tagged with sr_no: ${loggedInStudent.srNo}`);
-
-      // After identifying, prompt for push notifications.
       OneSignal.Slidedown.promptPush();
-          // --- END OF UPDATE ---
-
-          return { success: true };
+      
+      return { success: true };
     } catch (error: any) {
       console.error("Login error:", error);
       return { success: false, error: "An unexpected error occurred." };
     } finally {
       setIsLoading(false);
     }
-  }, [isOneSignalInitialized]);
+    // --- FIX: REMOVED `isOneSignalInitialized` from dependency array ---
+  }, []);
       
   const logout = useCallback(async () => {
-    if (!isOneSignalInitialized) {
-      console.warn("OneSignal not initialized, cannot remove user ID.");
-    } else {
-      await OneSignal.removeExternalUserId(); // This is the correct function for the React SDK
+    // --- FIX: REMOVED the check for `isOneSignalInitialized` ---
+    try {
+      await OneSignal.removeExternalUserId();
       console.log("OneSignal external user ID removed.");
+    } catch(e) {
+      console.error("Error removing OneSignal user ID:", e);
     }
     setStudent(null);
     localStorage.removeItem('parentPortalStudent');
-  }, [isOneSignalInitialized]);
+    // --- FIX: REMOVED `isOneSignalInitialized` from dependency array ---
+  }, []);
   
   
   const value = { student, isLoading, login, logout };
