@@ -8,6 +8,16 @@
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#0000ff" />
     <title>Student Portal - Marudhar Defence Educational Group</title>
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+      window.OneSignal = window.OneSignal || [];
+      window.OneSignal.push(function() {
+        OneSignal.init({
+          appId: "c8dca610-5f15-47e4-84f1-8943672e86dd", // Your App ID
+          allowLocalhostAsSecureOrigin: true,
+        });
+      });
+    </script>
     <meta name="description" content="Complete parent-student portal for Marudhar Defence Educational Group with fees management, academic records, homework tracking, and more." />
   </head>
   <body>
