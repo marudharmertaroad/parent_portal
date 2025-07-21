@@ -6,9 +6,10 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import LoginForm from './components/LoginForm';
 import StudentPortal from './components/StudentPortal';
 
+// Your OneSignal App ID
 const ONESIGNAL_APP_ID = "c8dca610-5f15-47e4-84f1-8943672e86dd";
 
-// This is the component that decides whether to show the login page or the main app
+// The AppContent component decides which screen to show
 const AppContent: React.FC = () => {
   const { student, isLoading } = useAuth();
 
@@ -23,26 +24,27 @@ const AppContent: React.FC = () => {
   return student ? <StudentPortal /> : <LoginForm />;
 };
 
-// This is the main App component
+// The main App component, responsible for initialization
 function App() {
-  const initialized = useRef(false); // Use a ref to ensure this runs only once
+  const osInitialized = useRef(false);
 
+  // This useEffect runs only ONCE when the app starts
   useEffect(() => {
-    // Prevent initialization from running twice in React's Strict Mode (development)
-    if (!initialized.current) {
-      initialized.current = true;
-      
-      const initOneSignal = async () => {
-        await OneSignal.init({
-          appId: ONESIGNAL_APP_ID,
-          allowLocalhostAsSecureOrigin: true
-        });
-        console.log("OneSignal Initialized.");
-      };
-      
-      initOneSignal();
+    if (osInitialized.current) {
+      return; // Prevent re-initialization in React Strict Mode
     }
-  }, []); // Empty dependency array ensures this runs only on mount
+    osInitialized.current = true;
+    
+    const initOneSignal = async () => {
+      await OneSignal.init({
+        appId: ONESIGNAL_APP_ID,
+        allowLocalhostAsSecureOrigin: true
+      });
+      console.log("OneSignal Initialized.");
+    };
+    
+    initOneSignal();
+  }, []);
 
   return (
     <AuthProvider>
