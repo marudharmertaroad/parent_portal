@@ -366,32 +366,65 @@ const StudentPortal: React.FC = () => {
 
   
 
-  useEffect(() => {
+   useEffect(() => {
     if (!student) return;
+
+    console.log("Setting up real-time channel for notifications...");
 
     const channel = supabase
       .channel('public:notifications')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, (payload) => {
-        const newNotification = payload.new as Notification;
-
-        const isForEveryone = newNotification.target_audience === 'all';
-        const isForMyClass = newNotification.target_audience === 'class' && newNotification.target_class === student.class;
-        const isForMe = newNotification.target_audience === 'student' && newNotification.target_student_sr_no === student.srNo;
-
-        if (isForEveryone || isForMyClass || isForMe) {
-          console.log('New push notification received!', newNotification);
-          setNotifications(prev => [newNotification, ...prev]);
-          setUnreadCount(prev => prev + 1);
+      .on(
+        'postgres_changes', 
+        { 
+          event: 'INSERT', 
+          schema: 'public', 
+          table: 'notifications' 
+        }, 
+        (payload) => {
+          console.log('Real-time: New notification data received!', payload);
           
-          // Trigger a browser notification if permission is granted
-          if (Notification.permission === "granted") {
-            new window.Notification('New School Notice!', { body: newNotification.title });
+          const newNotification = payload.new as Notification;
+
+          // Double-check if the new notification is targeted for this user
+          const isForEveryone = newNotification.target_audience === 'all';
+          const isForMyClass = newNotification.target_audience === 'class' && newNotification.target_class === student.class;
+          const isForMe = newNotification.target_audience === 'student' && newNotification.target_student_sr_no === student.srNo;
+
+          if (isForEveryone || isForMyClass || isForMe) {
+            console.log('This notification is for me. Updating state.');
+            
+            // This is a safer way to update state to guarantee a re-render
+            setNotifications(currentNotifications => [newNotification, ...currentNotifications]);
+            setUnreadCount(currentCount => currentCount + 1);
+            
+            // Trigger a browser notification
+            if (window.Notification?.permission === "granted") {
+              new window.Notification(newNotification.title, { 
+                body: newNotification.message,
+                icon: '/logo.png' // Optional: Adds your school logo to the notification
+              });
+            }
+          } else {
+            console.log("This notification is not for me. Ignoring.");
           }
         }
-      })
-      .subscribe();
+      )
+      .subscribe((status) => {
+        // This callback helps debug the subscription itself
+        if (status === 'SUBSCRIBED') {
+          console.log('Successfully subscribed to real-time notifications channel!');
+        }
+        if (status === 'CHANNEL_ERROR') {
+            console.error('There was an error with the real-time channel.');
+        }
+        if (status === 'TIMED_OUT') {
+            console.warn('Real-time connection timed out.');
+        }
+      });
 
+    // Cleanup function to remove the channel when the component unmounts
     return () => {
+      console.log("Cleaning up real-time channel.");
       supabase.removeChannel(channel);
     };
   }, [student]);
