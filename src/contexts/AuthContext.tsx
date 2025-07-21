@@ -77,7 +77,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         category: data.category,
         nicStudentId: data.nic_student_id,
         isRte: data.is_rte,
-        photoUrl: data.photo_url, // <-- THE MISSING PIECE, NOW CORRECTLY MAPPED
+        photoUrl?: data.photo_url, // <-- THE MISSING PIECE, NOW CORRECTLY MAPPED
       };
       
       // Step 4: Save the complete student object to state and localStorage.
