@@ -53,16 +53,18 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ student }) => {
   ];
 
   return (
-    <div className="space-y-6 md:space-y-8">
-      {/* Header Profile Card - Now responsive */}
-      {/* [MOBILE COMPACT] Reduced padding on mobile */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 md:p-8 rounded-2xl shadow-lg text-white">
-        {/* [MOBILE COMPACT] Stack vertically on mobile, row on desktop */}
-        <div className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-4 sm:gap-6">
-          <div className="relative">
-            {/* [MOBILE COMPACT] Smaller avatar on mobile */}
-            <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 bg-white/20 border-4 border-white/50 rounded-full flex items-center justify-center font-bold text-5xl sm:text-6xl">
-              {student.name.charAt(0).toUpperCase()}
+    <div className="space-y-8">
+      {/* --- UPDATED HEADER PROFILE CARD WITH PHOTO --- */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-8 rounded-2xl shadow-lg text-white">
+        <div className="flex flex-col md:flex-row items-center gap-6">
+          {/* The Photo Avatar */}
+          <div className="relative flex-shrink-0">
+            <div className="w-24 h-24 md:w-32 md:h-32 bg-white/20 border-4 border-white/50 rounded-full flex items-center justify-center overflow-hidden">
+              {student.photoUrl ? (
+                <img src={student.photoUrl} alt={student.name} className="w-full h-full object-cover" />
+              ) : (
+                <span className="font-bold text-6xl">{student.name.charAt(0).toUpperCase()}</span>
+              )}
             </div>
           </div>
           <div>
