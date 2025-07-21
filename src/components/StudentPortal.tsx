@@ -465,7 +465,7 @@ onTabChange={handleTabChange}
       <ProfileModal
         isOpen={showProfileModal}
         onClose={() => setShowProfileModal(false)}
-        student={student}
+student={student}
         onDataRefresh={refreshStudentData}
       />
       {showReportCard && (
