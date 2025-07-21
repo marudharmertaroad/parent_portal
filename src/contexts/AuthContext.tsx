@@ -1,9 +1,10 @@
 // src/contexts/AuthContext.tsx
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import OneSignal from 'react-onesignal';
 import { supabase } from '../utils/supabaseClient';
 import { Student, LoginCredentials } from '../types';
+
+// We NO LONGER import 'react-onesignal'.
 
 interface AuthContextType {
   student: Student | null;
@@ -26,7 +27,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [student, setStudent] = useState<Student | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // useEffect for loading from localStorage remains the same
+  // useEffect for localStorage remains the same.
   useEffect(() => {
     try {
       const savedStudentData = localStorage.getItem('parentPortalStudent');
@@ -43,9 +44,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = useCallback(async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     try {
-      // Login logic to fetch student data is correct...
-      let { data, error } = await supabase.from('students').select('*').eq('sr_no', credentials.rollNumber).eq('medium', 'English').maybeSingle();
-      if (!data && !error) {
+      // Supabase login logic is correct.
+      let { data } = await supabase.from('students').select('*').eq('sr_no', credentials.rollNumber).eq('medium', 'English').maybeSingle();
+      if (!data) {
         const { data: hindiData } = await supabase.from('students').select('*').eq('sr_no', credentials.rollNumber).eq('medium', 'Hindi').maybeSingle();
         data = hindiData;
       }
@@ -53,7 +54,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (data.dob !== credentials.dateOfBirth) return { success: false, error: 'Date of Birth does not match.' };
 
       const loggedInStudent: Student = {
-        // Correct mapping of all student properties
         name: data.name, class: data.class, srNo: data.sr_no, fatherName: data.father_name,
         motherName: data.mother_name, contact: data.contact, address: data.address,
         medium: data.medium, gender: data.gender, dob: data.dob, bus_route: data.bus_route,
@@ -64,21 +64,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setStudent(loggedInStudent);
       localStorage.setItem('parentPortalStudent', JSON.stringify(loggedInStudent));
 
-      // --- THE FINAL, CORRECTED ONESIGNAL LOGIC ---
-      // The push method ensures these commands are queued and run only when OneSignal is ready.
-      // This is the most robust way to avoid race conditions.
-      await OneSignal.push(async () => {
-        await OneSignal.setExternalUserId(loggedInStudent.srNo);
-        console.log(`OneSignal External User ID set to: ${loggedInStudent.srNo}`);
-        
-        await OneSignal.sendTags({
+      // --- THE FINAL, GUARANTEED FIX ---
+      // We use the official, global window.OneSignal.push() method.
+      window.OneSignal.push(function() {
+        window.OneSignal.setExternalUserId(loggedInStudent.srNo);
+        window.OneSignal.sendTags({
           sr_no: loggedInStudent.srNo,
           class: loggedInStudent.class,
           medium: loggedInStudent.medium,
         });
-        console.log(`OneSignal tags sent for sr_no: ${loggedInStudent.srNo}`);
-
-        OneSignal.Slidedown.promptPush();
+        window.OneSignal.Slidedown.promptPush();
       });
       
       return { success: true };
@@ -90,12 +85,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, []);
       
-  const logout = useCallback(async () => {
-    // --- THIS IS THE CORRECT LOGOUT METHOD ---
-    // It uses the same .push() method to queue the command safely.
-    await OneSignal.push(async () => {
-      await OneSignal.removeExternalUserId();
-      console.log("OneSignal external user ID removed.");
+  const logout = useCallback(() => {
+    // --- THE FINAL, GUARANTEED FIX ---
+    window.OneSignal.push(function() {
+      window.OneSignal.removeExternalUserId();
     });
     
     setStudent(null);
