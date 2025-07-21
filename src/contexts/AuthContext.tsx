@@ -5,6 +5,21 @@ import OneSignal from 'react-onesignal';
 import { supabase } from '../utils/supabaseClient';
 import { Student, LoginCredentials } from '../types';
 
+const ONESIGNAL_APP_ID = "c8dca610-5f15-47e4-84f1-8943672e86dd";
+
+// --- THE DEFINITIVE FIX ---
+// Initialize OneSignal immediately when this file is loaded.
+// This returns a promise that resolves when initialization is complete.
+const oneSignalInitPromise = OneSignal.init({ appId: ONESIGNAL_APP_ID, allowLocalhostAsSecureOrigin: true })
+  .then(() => {
+    console.log("OneSignal has been successfully initialized.");
+  })
+  .catch(e => {
+    console.error("OneSignal initialization failed:", e);
+  });
+// --- END OF FIX ---
+
+
 interface AuthContextType {
   student: Student | null;
   isLoading: boolean;
