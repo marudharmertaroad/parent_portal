@@ -24,26 +24,15 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, onClose, student })
           </button>
         </div>
         <div className="p-6 md:p-8 overflow-y-auto">
-          {/* --- THIS IS THE NEW UNIFIED CARD LAYOUT --- */}
-          <div className="bg-white rounded-2xl shadow-lg border p-6 md:p-8 flex flex-col lg:flex-row gap-8">
-            
-            {/* Photo Upload Column (takes up 1/4 of the space on large screens) */}
-            <div className="lg:w-1/4 flex-shrink-0">
-              <PhotoUpload 
-                student={student} 
-                onUploadComplete={handlePhotoUploadSuccess} 
-              />
-            </div>
-
-            {/* Profile Details Column (takes up the remaining 3/4) */}
-            <div className="lg:w-3/4">
-              <ProfileSection student={student} />
-            </div>
-
-          </div>
+          {/* 
+            --- THIS IS THE FIX ---
+            The complex grid and the <PhotoUpload /> component have been removed.
+            We now only render the ProfileSection directly.
+          */}
+          <ProfileSection student={student} />
+        </div>
         </div>
       </div>
-    </div>
   );
 };
 
