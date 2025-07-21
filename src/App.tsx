@@ -1,6 +1,6 @@
 // src/App.tsx
 
-import React, {useEffect} from 'react';
+import React, {useEffect, useRef} from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import LoginForm from './components/LoginForm';
 import StudentPortal from './components/StudentPortal';
