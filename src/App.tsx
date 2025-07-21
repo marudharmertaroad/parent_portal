@@ -1,18 +1,16 @@
-// src/App.tsx
-
-import React, { useEffect} from 'react';
+import React, { useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import LoginForm from './components/LoginForm';
 import StudentPortal from './components/StudentPortal';
-import OneSignal from 'react-onesignal'
+import OneSignal from 'react-onesignal';
 
+// Your OneSignal App ID should be here
 const ONESIGNAL_APP_ID = "c8dca610-5f15-47e4-84f1-8943672e86dd";
 
+// AppContent remains the same, it correctly decides which view to show
 const AppContent: React.FC = () => {
-  // Get the session state from our context
   const { student, isLoading } = useAuth();
 
-  // 1. Show a loading spinner while the context is checking localStorage for a saved session
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -21,16 +19,26 @@ const AppContent: React.FC = () => {
     );
   }
 
-  // 2. If loading is done and a student is logged in, show the main portal.
-  //    Otherwise, show the login form.
   return student ? <StudentPortal /> : <LoginForm />;
 };
 
-// The main App component
+// --- THIS IS THE CORRECTED MAIN APP COMPONENT ---
 function App() {
- 
+  // This useEffect will run ONCE when the entire application first loads.
+  useEffect(() => {
+    const initializeOneSignal = async () => {
+      // It's safe to run init here because App is the root component.
+      await OneSignal.init({ 
+        appId: ONESIGNAL_APP_ID, 
+        allowLocalhostAsSecureOrigin: true 
+      });
+      console.log("OneSignal has been initialized in App.tsx.");
+    };
+
+    initializeOneSignal();
+  }, []); // The empty dependency array ensures this runs only once.
+
   return (
-    // Wrap the entire application with the AuthProvider so all components can access the context
     <AuthProvider>
       <AppContent />
     </AuthProvider>
