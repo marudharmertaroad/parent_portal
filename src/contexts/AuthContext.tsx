@@ -1,12 +1,15 @@
 // src/contexts/AuthContext.tsx
 
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import OneSignal from 'react-onesignal';
 import { supabase } from '../utils/supabaseClient';
 import { Student, LoginCredentials } from '../types';
 
-// Your OneSignal App ID from your OneSignal dashboard
-const ONESIGNAL_APP_ID = "c8dca610-5f15-47e4-84f1-8943672e86dd"; // Make sure this is correct
+// Your OneSignal App ID
+const ONESIGNAL_APP_ID = "c8dca610-5f15-47e4-84f1-8943672e86dd";
+
+// --- This flag ensures OneSignal.init() is only ever called once in the app's lifecycle ---
+let oneSignalInitialized = false;
 
 interface AuthContextType {
   student: Student | null;
@@ -28,107 +31,66 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [student, setStudent] = useState<Student | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  
-  // A ref to ensure OneSignal initialization only runs once, preventing errors.
-  const oneSignalInitRef = useRef(false);
 
-  // Effect to initialize OneSignal once when the app loads.
+  // This useEffect handles initializing OneSignal and loading the student from localStorage
   useEffect(() => {
-    if (oneSignalInitRef.current) {
-      return; // If already initialized, do nothing.
-    }
-    oneSignalInitRef.current = true; // Mark as initialized immediately.
+    const initializeApp = async () => {
+      // Initialize OneSignal only if it hasn't been done before
+      if (!oneSignalInitialized) {
+        try {
+          await OneSignal.init({ appId: ONESIGNAL_APP_ID, allowLocalhostAsSecureOrigin: true });
+          oneSignalInitialized = true;
+          console.log("OneSignal Initialized.");
+        } catch (e) {
+          console.error("OneSignal initialization error:", e);
+        }
+      }
 
-    const initOneSignal = async () => {
+      // Check for a saved session in localStorage
       try {
-        await OneSignal.init({ appId: ONESIGNAL_APP_ID, allowLocalhostAsSecureOrigin: true });
-        console.log("OneSignal initialized successfully.");
-      } catch (e) {
-        console.error("Error initializing OneSignal:", e);
+        const savedStudentData = localStorage.getItem('parentPortalStudent');
+        if (savedStudentData) {
+          setStudent(JSON.parse(savedStudentData));
+        }
+      } catch (error) {
+        console.error("Failed to parse student data from localStorage", error);
+        localStorage.removeItem('parentPortalStudent');
+      } finally {
+        setIsLoading(false);
       }
     };
-    initOneSignal();
-  }, []); // Empty dependency array ensures this runs only once.
-
-
-  // Effect to check for a saved session in localStorage on initial app load.
-  useEffect(() => {
-    try {
-      const savedStudentData = localStorage.getItem('parentPortalStudent');
-      if (savedStudentData) {
-        setStudent(JSON.parse(savedStudentData));
-      }
-    } catch (error) {
-      console.error("Failed to parse student data from localStorage", error);
-      localStorage.removeItem('parentPortalStudent');
-    } finally {
-      setIsLoading(false);
-    }
+    
+    initializeApp();
   }, []);
 
   const login = useCallback(async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     try {
-await oneSignalReady;
-      console.log("OneSignal is ready, proceeding with login.");
-      
-      let { data, error } = await supabase
-        .from('students')
-        .select('*')
-        .eq('sr_no', credentials.rollNumber)
-        .eq('medium', 'English')
-        .maybeSingle();
-
-      // Step 2: If not found, try the 'Hindi' medium.
+      let { data, error } = await supabase.from('students').select('*').eq('sr_no', credentials.rollNumber).eq('medium', 'English').maybeSingle();
       if (!data && !error) {
-        const { data: hindiData, error: hindiError } = await supabase
-          .from('students')
-          .select('*')
-          .eq('sr_no', credentials.rollNumber)
-          .eq('medium', 'Hindi')
-          .maybeSingle();
-        
-        if (hindiError) throw hindiError;
+        const { data: hindiData } = await supabase.from('students').select('*').eq('sr_no', credentials.rollNumber).eq('medium', 'Hindi').maybeSingle();
         data = hindiData;
       }
       
-      if (error) throw error;
-      if (!data) return { success: false, error: 'SR Number not found in either medium.' };
+      if (!data) return { success: false, error: 'SR Number not found.' };
+      if (data.dob !== credentials.dateOfBirth) return { success: false, error: 'Date of Birth does not match.' };
 
-      // Step 3: Verify the date of birth.
-      if (data.dob !== credentials.dateOfBirth) {
-        return { success: false, error: 'Date of Birth does not match.' };
-      }
-
-      // Step 4: Map the complete database record to our Student interface.
       const loggedInStudent: Student = {
-        name: data.name,
-        class: data.class,
-        srNo: data.sr_no,
-        fatherName: data.father_name,
-        motherName: data.mother_name,
-        contact: data.contact,
-        address: data.address,
-        medium: data.medium,
-        gender: data.gender,
-        dob: data.dob,
-        bus_route: data.bus_route,
-        category: data.category,
-        nicStudentId: data.nic_student_id,
-        isRte: data.is_rte,
-        photoUrl: data.photo_url, // <-- Photo URL is correctly included
+        name: data.name, class: data.class, srNo: data.sr_no, fatherName: data.father_name,
+        motherName: data.mother_name, contact: data.contact, address: data.address,
+        medium: data.medium, gender: data.gender, dob: data.dob, bus_route: data.bus_route,
+        category: data.category, nicStudentId: data.nic_student_id, isRte: data.is_rte,
+        photoUrl: data.photo_url,
       };
       
-      // Step 5: Update state, localStorage, and OneSignal.
       setStudent(loggedInStudent);
       localStorage.setItem('parentPortalStudent', JSON.stringify(loggedInStudent));
 
+      // Now we call the OneSignal functions
       await OneSignal.setExternalUserId(loggedInStudent.srNo);
       await OneSignal.sendTag("sr_no", loggedInStudent.srNo);
       OneSignal.Slidedown.promptPush();
       
-      console.log(`OneSignal user identified and tagged with sr_no: ${loggedInStudent.srNo}`);
-
       return { success: true };
     } catch (error: any) {
       console.error("Login error:", error);
@@ -139,14 +101,13 @@ await oneSignalReady;
   }, []);
       
   const logout = useCallback(async () => {
-    try {
-      await OneSignal.removeExternalUserId();
-      console.log("OneSignal external user ID removed.");
-    } catch(e) {
-      console.error("Error removing OneSignal user ID:", e);
-    }
+    // This is the correct method provided by the react-onesignal SDK.
+    // It will now work because OneSignal was initialized when the app started.
+    await OneSignal.removeExternalUserId();
+    
     setStudent(null);
     localStorage.removeItem('parentPortalStudent');
+    console.log("User logged out and OneSignal ID removed.");
   }, []);
   
   const value = { student, isLoading, login, logout };
@@ -154,6 +115,6 @@ await oneSignalReady;
   return (
     <AuthContext.Provider value={value}>
       {children}
-    </AuthContext.Provider>
+    </Auth-Context.Provider>
   );
 };
