@@ -81,7 +81,7 @@ const FeesSection: React.FC<FeesSectionProps> = ({ feeRecords = [], studentName}
       </div>
 
       {/* Fee Records List */}
-      <div className="bg-white rounded-xl shadow-md border">
+     <div className="bg-white rounded-xl shadow-md border">
         <div className="p-4 sm:p-6 border-b">
           <h3 className="text-base sm:text-lg font-semibold text-gray-800">Transaction History</h3>
         </div>
@@ -90,11 +90,10 @@ const FeesSection: React.FC<FeesSectionProps> = ({ feeRecords = [], studentName}
             const status = getStatusInfo(record);
             const isPaid = status.text === 'Paid';
             return (
-              // [MOBILE COMPACT] This is the new mobile-first card layout
               <div key={record.recordId} className={`p-4 ${isPaid ? 'bg-green-50/30' : ''}`}>
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   {/* Left Side: Details & Status */}
-                  <div className="flex-1">
+                  <div className="flex-1 space-y-3">
                     <div className="flex items-center justify-between">
                         <p className="font-bold text-gray-800">Academic Year Invoice</p>
                         <div className={`sm:hidden inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${status.color} ${status.bgColor}`}>
@@ -102,13 +101,27 @@ const FeesSection: React.FC<FeesSectionProps> = ({ feeRecords = [], studentName}
                             {status.text}
                         </div>
                     </div>
-                    <div className="text-sm text-gray-600 border-l-2 pl-3 mt-2 space-y-1">
+                    {/* Invoice Breakdown */}
+                    <div className="text-sm text-gray-600 border-l-2 pl-3 space-y-1">
                       <p>Tuition Fee: {formatCurrency(record.totalFees)}</p>
                       {record.busFees > 0 && <p>Bus Fee: {formatCurrency(record.busFees)}</p>}
                       {record.discountFees > 0 && <p className="text-green-600">Discount: -{formatCurrency(record.discountFees)}</p>}
                     </div>
-                     <p className="text-xs text-gray-500 mt-2">Due Date: {formatDate(record.dueDate)}</p>
+                    
+                    {/* --- THIS IS THE NEW PAYMENT DETAILS SECTION --- */}
+                    {record.paidFees > 0 && (
+                      <div className="text-sm text-green-700 bg-green-50 border-l-2 border-green-500 pl-3 p-2 rounded-r-lg">
+                        <p className="font-semibold">
+                          Paid: {formatCurrency(record.paidFees)}
+                          {record.lastPaymentDate && ` on ${formatDate(record.lastPaymentDate)}`}
+                        </p>
+                      </div>
+                    )}
+                    {/* --- END OF NEW SECTION --- */}
+
+                     <p className="text-xs text-gray-500 pt-1">Due Date: {formatDate(record.dueDate)}</p>
                   </div>
+
 
                   {/* Right Side: Amount and Actions */}
                   <div className="flex items-center justify-between sm:justify-end gap-4 bg-gray-50 sm:bg-transparent p-4 sm:p-0 rounded-lg">
