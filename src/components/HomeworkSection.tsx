@@ -3,7 +3,7 @@
 import React from 'react';
 import { Homework, Student } from '../types';
 import { formatDate } from '../utils';
-import { BookOpen, Calendar, Clock, AlertCircle, FileText, ExternalLink } from 'lucide-react';
+import { BookOpen, Calendar, Clock, AlertCircle, FileText, ExternalLink, CheckCircle } from 'lucide-react';
 
 interface HomeworkSectionProps {
   homeworkList: Homework[];
