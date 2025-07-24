@@ -50,28 +50,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = useCallback(async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     try {
-      // 2. Delegate the actual login logic to the apiService
-      const loggedInStudent: Student = {
-  name: data.name,
-  class: data.class,
-  srNo: data.sr_no, // Mapped
-  fatherName: data.father_name, // Mapped
-  motherName: data.mother_name, // Mapped
-  contact: data.contact,
-  address: data.address,
-  medium: data.medium,
-  gender: data.gender,
-  dob: data.dob,
-  bus_route: data.bus_route, // Mapped
-  category: data.category,
-  nicStudentId: data.nic_student_id, // Mapped
-  isRte: data.is_rte, // Mapped
-  photoUrl: data.photo_url, // MAPPED!
-};
+      const login = useCallback(async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
+    setIsLoading(true);
+    try {
+      // 1. Call the service. It returns the fully mapped student object.
+      const loggedInStudent = await apiService.login(credentials);
+      
+      // 2. Save that perfect object to state and localStorage.
+      // `loggedInStudent.photoUrl` is now correctly set.
+      setStudent(loggedInStudent);
+      localStorage.setItem('parentPortalStudent', JSON.stringify(loggedInStudent));
 
-// Now, use this correctly mapped object everywhere.
-setStudent(loggedInStudent);
-localStorage.setItem('parentPortalStudent', JSON.stringify(loggedInStudent));
     
 
       // --- OneSignal logic remains here, as it's a side-effect of login ---
