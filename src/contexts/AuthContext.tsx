@@ -51,7 +51,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setIsLoading(true);
     try {
       // 2. Delegate the actual login logic to the apiService
-      const loggedInStudent = await apiService.login(credentials);
       const loggedInStudent: Student = {
   name: data.name,
   class: data.class,
