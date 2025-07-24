@@ -73,9 +73,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 // Now, use this correctly mapped object everywhere.
 setStudent(loggedInStudent);
 localStorage.setItem('parentPortalStudent', JSON.stringify(loggedInStudent));
-      
-      setStudent(loggedInStudent);
-      localStorage.setItem('parentPortalStudent', JSON.stringify(loggedInStudent));
+    
 
       // --- OneSignal logic remains here, as it's a side-effect of login ---
       window.OneSignal.push(async function() {
