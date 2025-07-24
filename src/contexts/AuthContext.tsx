@@ -50,9 +50,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = useCallback(async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
     setIsLoading(true);
     try {
-      const login = useCallback(async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
-    setIsLoading(true);
-    try {
+      
       // 1. Call the service. It returns the fully mapped student object.
       const loggedInStudent = await apiService.login(credentials);
       
