@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { supabase } from '../utils/supabaseClient';
 import { Student, LoginCredentials } from '../types';
+import { apiLogout } from '../utils/api';
 
 // We are interacting with the global window.OneSignal object
 declare global {
