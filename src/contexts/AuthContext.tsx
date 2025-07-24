@@ -77,12 +77,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
       
   const logout = useCallback(() => {
-    // --- THE FINAL, CORRECTED LOGOUT METHOD ---
-    window.OneSignal.push(async function() {
-      // Use the modern `logout` method.
-      await window.OneSignal.logout();
-      console.log("OneSignal user logged out.");
+    // --- OneSignal logout logic ---
+    window.OneSignal.push(function() {
+      window.OneSignal.logout();
     });
+
+    // 3. Delegate logout to the service (optional but good practice)
+    apiService.logout();
     
     setStudent(null);
     localStorage.removeItem('parentPortalStudent');
