@@ -4,30 +4,20 @@ import { LoginCredentials, Student, FeeRecord, ExamRecord, Notice } from '../typ
 
 class ApiService {
   // 2. This is now the ONLY login function. It contains all the DB logic.
-  async login(credentials: LoginCredentials): Promise<Student> {
-    const { rollNumber, dateOfBirth } = credentials;
-
-    if (!rollNumber || !dateOfBirth) {
-      throw new Error("SR Number and Date of Birth are required.");
-    }
-
-    // Combine the logic from your old context into here
-    let { data, error } = await supabase
+  async getStudentBySrNo(srNo: string): Promise<Student> {
+    console.log(`[API] Refreshing data for sr_no: '${srNo}'`);
+    const { data, error } = await supabase
       .from('students')
       .select('*')
-      .eq('sr_no', rollNumber.trim())
-      .single(); // Use single() and check for dob after, it's more efficient
+      .eq('sr_no', srNo)
+      .single();
 
     if (error || !data) {
-      console.error("Login API Error or no user found:", error);
-      throw new Error("Invalid SR Number.");
+      console.error("API Error refreshing student data:", error);
+      throw new Error("Could not find student to refresh.");
     }
 
-    if (data.dob !== dateOfBirth) {
-        throw new Error("Date of Birth does not match.");
-    }
-
-    // Map the database snake_case to our application's camelCase
+    // Reuse the exact same mapping logic from your login function
     const mappedStudent: Student = {
       name: data.name,
       class: data.class,
@@ -43,9 +33,9 @@ class ApiService {
       category: data.category,
       nicStudentId: data.nic_student_id,
       isRte: data.is_rte,
-      // ✨ HERE IS THE FIX FOR THE PHOTO ✨
       photoUrl: data.photo_url, 
     };
+    
     return mappedStudent;
   }
 
