@@ -29,13 +29,23 @@ class ApiService {
 
     // Map the database snake_case to our application's camelCase
     const mappedStudent: Student = {
-      name: data.name, class: data.class, srNo: data.sr_no, fatherName: data.father_name,
-      motherName: data.mother_name, contact: data.contact, address: data.address,
-      medium: data.medium, gender: data.gender, dob: data.dob, bus_route: data.bus_route,
-      category: data.category, nicStudentId: data.nic_student_id, isRte: data.is_rte,
-      photoUrl: data.photo_url,
+      name: data.name,
+      class: data.class,
+      srNo: data.sr_no,
+      fatherName: data.father_name,
+      motherName: data.mother_name,
+      contact: data.contact,
+      address: data.address,
+      medium: data.medium,
+      gender: data.gender,
+      dob: data.dob,
+      bus_route: data.bus_route,
+      category: data.category,
+      nicStudentId: data.nic_student_id,
+      isRte: data.is_rte,
+      // ✨ HERE IS THE FIX FOR THE PHOTO ✨
+      photoUrl: data.photo_url, 
     };
-    
     return mappedStudent;
   }
 
