@@ -1,9 +1,9 @@
 // src/contexts/AuthContext.tsx
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { supabase } from '../utils/supabaseClient';
+// 1. Import the service, NOT the supabase client or individual functions
+import { apiService } from '../services/api';
 import { Student, LoginCredentials } from '../types';
-import { apiLogout } from '/home/project/src/services';
 
 // We are interacting with the global window.OneSignal object
 declare global {
