@@ -99,6 +99,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
       
   const logout = useCallback(() => {
+    apiLogout();
     // --- THE FINAL, CORRECTED LOGOUT METHOD ---
     window.OneSignal.push(async function() {
       // Use the modern `logout` method.
