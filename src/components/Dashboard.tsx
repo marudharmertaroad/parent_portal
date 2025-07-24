@@ -60,7 +60,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   <div className="relative z-10">
     {/* [MOBILE COMPACT V2] Reduced text size even more on mobile */}
     <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2">Marudhar Defence School</h2>
-    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2">Welcome to the Student ERP</h1>
+    <h1 className="text-blue-100 text-sm md:text-lg hidden sm:block">Welcome to the Student ERP</h1>
     {/* [MOBILE COMPACT V2] Hiding this secondary text on the smallest screens */}
     <p className="text-blue-100 text-sm md:text-lg hidden sm:block">Excellence in Education & Character - Manage your Ward's Profile</p>
     {/* [MOBILE COMPACT V2] Tighter layout for the stats row */}
