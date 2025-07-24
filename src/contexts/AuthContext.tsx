@@ -66,6 +66,40 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         });
         window.OneSignal.Slidedown.promptPush();
       });
+      const { data, error } = await supabase
+  .from('students')
+  .select('*')
+  .eq('sr_no', credentials.rollNumber)
+  .single();
+
+if (error || !data) {
+  // handle error
+  return;
+}
+
+// --- THIS IS THE CRITICAL STEP ---
+// Create the correctly formatted student object before setting state.
+const loggedInStudent: Student = {
+  name: data.name,
+  class: data.class,
+  srNo: data.sr_no, // Mapped
+  fatherName: data.father_name, // Mapped
+  motherName: data.mother_name, // Mapped
+  contact: data.contact,
+  address: data.address,
+  medium: data.medium,
+  gender: data.gender,
+  dob: data.dob,
+  bus_route: data.bus_route, // Mapped
+  category: data.category,
+  nicStudentId: data.nic_student_id, // Mapped
+  isRte: data.is_rte, // Mapped
+  photoUrl: data.photo_url, // MAPPED!
+};
+
+// Now, use this correctly mapped object everywhere.
+setStudent(loggedInStudent);
+localStorage.setItem('parentPortalStudent', JSON.stringify(loggedInStudent));
       
       return { success: true };
     } catch (error: any) {
