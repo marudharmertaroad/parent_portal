@@ -1,0 +1,40 @@
+/* This class will be applied to our mobile-specific components */
+.mobile-only {
+  display: flex; /* Or 'block', depending on the element */
+}
+
+/* This class can be used to hide desktop elements on mobile */
+.desktop-only {
+  display: none;
+}
+
+/* 
+  Use a media query to define the "desktop" breakpoint.
+  768px is a common breakpoint for tablets and larger.
+*/
+@media (min-width: 768px) {
+  /* On screens 768px and wider, hide the mobile components */
+  .mobile-only {
+    display: none;
+  }
+
+  /* And show the desktop components */
+  .desktop-only {
+    display: flex; /* Or 'block', 'grid', etc. as needed */
+  }
+}
+
+/* Add padding to the main content to prevent it from being hidden
+   behind the fixed header and footer on mobile */
+body .main-content {
+  padding-top: 4rem; /* 64px, the height of the header */
+  padding-bottom: 4rem; /* 64px, the height of the footer */
+}
+
+/* Remove the padding on desktop where the fixed elements are hidden */
+@media (min-width: 768px) {
+  body .main-content {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
