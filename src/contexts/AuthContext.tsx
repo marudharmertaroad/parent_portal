@@ -34,17 +34,39 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isLoading, setIsLoading] = useState(true);
 
   // This useEffect correctly loads the student from localStorage
-  useEffect(() => {
-    try {
-      const savedStudentData = localStorage.getItem('parentPortalStudent');
-      if (savedStudentData) {
-        setStudent(JSON.parse(savedStudentData));
+   useEffect(() => {
+    const initializeAuth = async () => {
+      try {
+        const savedStudentData = localStorage.getItem('parentPortalStudent');
+        if (savedStudentData) {
+          const storedStudent: Student = JSON.parse(savedStudentData);
+          
+          // 1. Set the stale data immediately for a fast UI load.
+          // The user sees the old profile instantly.
+          setStudent(storedStudent);
+          
+          // 2. In the background, fetch the LATEST data from the database.
+          console.log("AuthContext: Refreshing student data in the background...");
+          const freshStudentData = await apiService.getStudentBySrNo(storedStudent.srNo);
+          
+          // 3. Update the state and localStorage with the fresh data.
+          // The UI will seamlessly update if anything changed (like the photo).
+          setStudent(freshStudentData);
+          localStorage.setItem('parentPortalStudent', JSON.stringify(freshStudentData));
+          console.log("AuthContext: Student data has been refreshed.");
+        }
+      } catch (error) {
+        console.error("Auth initialization/refresh failed:", error);
+        // If the refresh fails (e.g., student was deleted), log them out.
+        localStorage.removeItem('parentPortalStudent');
+        setStudent(null);
+      } finally {
+        // We are finished loading, whether we found a user or not.
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error("Failed to parse student data from localStorage", error);
-    } finally {
-      setIsLoading(false);
-    }
+    };
+
+    initializeAuth();
   }, []);
 
   const login = useCallback(async (credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> => {
