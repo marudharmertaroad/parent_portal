@@ -73,19 +73,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         });
         window.OneSignal.Slidedown.promptPush();
       });
-      const { data, error } = await supabase
-  .from('students')
-  .select('*')
-  .eq('sr_no', credentials.rollNumber)
-  .single();
-
-if (error || !data) {
-  // handle error
-  return;
-}
-
-// --- THIS IS THE CRITICAL STEP ---
-// Create the correctly formatted student object before setting state.
+  
 
       
       return { success: true };
