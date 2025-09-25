@@ -360,8 +360,17 @@ const StudentPortal: React.FC = () => {
     supabase.from('notices').select('*').or(`target_class.is.null,target_class.eq.all,target_class.eq.${student.class}`).eq('is_active', true),
     
     // Promise 5: notificationRes -> gets notifications
-    supabase.from('notifications').select('*').or(`target_audience.eq.all,target_class.eq.${student.class},target_student_sr_no.eq.${student.srNo}`).order('created_at', { ascending: false }).limit(50)
-  ]);
+    supabase.from('notifications').select('*').or(`target_audience.eq.all,target_class.eq.${student.class},target_student_sr_no.eq.${student.srNo}`).order('created_at', { ascending: false }).limit(50),
+      
+  supabase.from('exam_records').select(`
+          id, exam_type, exam_date, total_marks, obtained_marks, percentage, grade,
+          students!inner(sr_no, name, class),
+          subjects:subject_marks(subject, max_marks, obtained_marks, grade)
+        `)
+        .eq('students.class', student.class)
+        .eq('students.medium', student.medium)
+      // =========================================
+    ]);
 
     const { data: feeData, error: feeError } = feeResponse;
     if (feeError) console.error("Error fetching fees:", feeError);
