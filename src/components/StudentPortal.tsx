@@ -536,7 +536,6 @@ const { data: allExamsData, error: allExamsError } = allExamsForRankingResponse;
         return <Dashboard student={student} feeRecords={feeRecords} examRecords={examRecords} notices={notices} onTabChange={setActiveTab} />;
     }
   };
-
   return (
     <div className="min-h-screen bg-gray-100">
       <Header
