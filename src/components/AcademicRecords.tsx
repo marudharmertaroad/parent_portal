@@ -159,6 +159,32 @@ const AcademicRecords: React.FC<AcademicRecordsProps> = ({ student, examRecords 
     return { overallPercentage, examsTaken: safeExamRecords.length, bestSubject };
   }, [examRecords]);
 
+  const calculateRanks = (histories: StudentExamHistory[]): Map<string, number> => {
+    const ranks = new Map<string, number>();
+    const studentsInClass = histories.filter(h => h.class === student.class);
+    
+    const sortedStudents = [...studentsInClass].sort(
+      (a, b) => b.overallPerformance.percentage - a.overallPerformance.percentage
+    );
+
+    let currentRank = 0;
+    let lastPercentage = -1;
+
+    sortedStudents.forEach((s, index) => {
+      // Handle ties: if percentages are the same, give the same rank
+      if (s.overallPerformance.percentage !== lastPercentage) {
+        currentRank = index + 1;
+      }
+      ranks.set(s.studentId, currentRank);
+      lastPercentage = s.overallPerformance.percentage;
+    });
+    
+    return ranks;
+  };
+
+  const studentRanks = useMemo(() => calculateRanks(allStudentHistories), [allStudentHistories, student.class]);
+  const classRank = studentRanks.get(student.srNo);
+
   return (
     <div className="space-y-6 md:space-y-8">
       {/* Header and Action Buttons - now responsive */}
