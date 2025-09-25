@@ -197,6 +197,7 @@ const EnhancedReportCardModal = ({ student, examRecords, onClose, settings, rank
                     <p><strong>Percentage:</strong> {overallPercentage.toFixed(1)}%</p>
                     <p><strong>Grade:</strong> <span className={`px-2 py-0.5 rounded font-bold ${getGradeColor(overallGrade)}`}>{overallGrade}</span></p>
                     <p className="col-span-2"><strong>Result:</strong><span className={`px-2 py-0.5 rounded font-bold ${overallResult === 'PASS' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{overallResult}</span></p>
+                    <p><strong>Class Rank:</strong> <span className="font-bold text-purple-700">{rank ? `#${rank}` : 'N/A'}</span></p>
                   </div>
                 </div>
               </section>
