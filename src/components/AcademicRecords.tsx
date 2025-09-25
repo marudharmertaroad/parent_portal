@@ -203,7 +203,7 @@ const AcademicRecords: React.FC<AcademicRecordsProps> = ({ student, examRecords 
           <h3 className="text-lg sm:text-xl font-bold text-gray-800">Consolidated Performance</h3>
           <p className="text-sm text-gray-500 mt-1">View a summary of all exam results for the entire year.</p>
         </div>
-        <button onClick={onViewReport} className="w-full md:w-auto shrink-0 flex items-center justify-center px-5 py-2 sm:px-6 sm:py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 font-medium shadow-lg transition-transform hover:scale-105"><FileText size={18} className="mr-2" /> View Report</button>
+        <button onClick={() => onViewReport(classRank)} className="w-full md:w-auto shrink-0 flex items-center justify-center px-5 py-2 sm:px-6 sm:py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 font-medium shadow-lg transition-transform hover:scale-105"><FileText size={18} className="mr-2" /> View Report</button>
       </div>
 
       {/* Stats Cards - now responsive */}
