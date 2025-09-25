@@ -565,6 +565,7 @@ onTabChange={handleTabChange}
           examRecords={examRecords}
           onClose={() => setShowReportCard(false)}
           settings={reportSettings}
+          rank={selectedStudentRank}
         />
       )}
       <NotificationDrawer isOpen={showNotificationDrawer} onClose={() => setShowNotificationDrawer(false)} notifications={notifications} />
