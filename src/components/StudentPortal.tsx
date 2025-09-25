@@ -528,7 +528,7 @@ const { data: allExamsData, error: allExamsError } = allExamsForRankingResponse;
       case 'fees':
         return <FeesSection feeRecords={feeRecords} studentName={student.name} />;
       case 'academic':
-        return <AcademicRecords student={student} examRecords={examRecords} allStudentHistories={allStudentHistories} onViewReport={() => setShowReportCard(true)} />;
+        return <AcademicRecords student={student} examRecords={examRecords} allStudentHistories={allStudentHistories} onViewReport={handleViewReport} />;
       case 'homework':
         return <HomeworkSection homeworkList={homework} student={student} />;
       case 'notices':
