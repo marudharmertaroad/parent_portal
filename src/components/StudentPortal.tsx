@@ -301,6 +301,47 @@ const StudentPortal: React.FC = () => {
     session: '2024-25',
   });
 
+  const groupExamsByStudent = (records: any[]): any[] => {
+      const grouped = records.reduce((acc: Record<string, any>, record) => {
+        const studentId = record.students.sr_no;
+        if (!acc[studentId]) {
+          acc[studentId] = {
+            studentId: studentId,
+            studentName: record.students.name,
+            class: record.students.class,
+            exams: [],
+          };
+        }
+        acc[studentId].exams.push({
+            id: record.id,
+            examType: record.exam_type,
+            examDate: record.exam_date,
+            subjects: record.subjects,
+            totalMarks: record.total_marks,
+            obtainedMarks: record.obtained_marks,
+            percentage: record.percentage,
+            grade: record.grade,
+        });
+        return acc;
+      }, {});
+      
+      return Object.values(grouped).map(s => {
+          const allMarks = s.exams.reduce((total: number, exam: ExamRecord) => total + (exam.obtainedMarks || 0), 0);
+          const allMaxMarks = s.exams.reduce((total: number, exam: ExamRecord) => total + (exam.totalMarks || 0), 0);
+          const overallPercentage = allMaxMarks > 0 ? (allMarks / allMaxMarks) * 100 : 0;
+          return {
+              ...s,
+              overallPerformance: {
+                  totalMarks: allMaxMarks,
+                  obtainedMarks: allMarks,
+                  percentage: overallPercentage,
+                  grade: calculateGrade(overallPercentage),
+                  result: overallPercentage >= 35 ? 'PASS' : 'FAIL',
+              }
+          };
+      });
+  };
+  
   const fetchStudentData = useCallback(async () => {
     if (!student) return;
     setIsLoadingData(true);
