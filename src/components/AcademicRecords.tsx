@@ -209,6 +209,14 @@ const AcademicRecords: React.FC<AcademicRecordsProps> = ({ student, examRecords 
       {/* Stats Cards - now responsive */}
       <div className="flex flex-wrap gap-4">
         <div className="flex-grow min-w-[160px]"><StatCard title="Overall Percentage" value={`${stats.overallPercentage.toFixed(1)}%`} icon={TrendingUp} color="bg-green-500" /></div>
+        <div className="flex-grow min-w-[160px]">
+        <StatCard 
+            title="Class Rank" 
+            value={classRank ? `#${classRank}` : 'N/A'} 
+            icon={Award} 
+            color="bg-purple-500" 
+        />
+    </div>
         <div className="flex-grow min-w-[160px]"><StatCard title="Exams Appeared" value={stats.examsTaken} icon={Book} color="bg-blue-500" /></div>
         <div className="flex-grow min-w-[160px]"><StatCard title="Top Subject" value={stats.bestSubject} icon={StarIcon} color="bg-yellow-500" /></div>
       </div>
