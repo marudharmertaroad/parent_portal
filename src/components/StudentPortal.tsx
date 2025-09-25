@@ -407,6 +407,13 @@ const StudentPortal: React.FC = () => {
     if (notificationRes.error) console.error("Error fetching notifications:", notificationRes.error);
     else setNotifications(notificationRes.data || []);
     
+const { data: allExamsData, error: allExamsError } = allExamsForRankingResponse;
+    if (allExamsError) {
+      console.error("Error fetching all student histories for ranking:", allExamsError);
+    } else if (allExamsData) {
+      const groupedHistories = groupExamsByStudent(allExamsData);
+      setAllStudentHistories(groupedHistories);
+    }
     
     setIsLoadingData(false);
   }, [student]);
