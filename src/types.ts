@@ -61,6 +61,24 @@ export interface ExamRecord {
   subjects: SubjectMark[]; // <-- ADD THIS LINE
 }
 
+export interface StudentExamHistory {
+  studentId: string;
+  studentName: string;
+  class: string;
+  exams: ExamRecord[];
+  overallPerformance: {
+    totalMarks: number;
+    obtainedMarks: number;
+    percentage: number;
+    grade: string;
+    result: 'PASS' | 'FAIL';
+  };
+  // Add other fields from the admin portal version if needed
+  rollNumber?: string;
+  fatherName?: string;
+  photoUrl?: string;
+}
+
 // For displaying homework
 export interface Homework {
   id: number;
