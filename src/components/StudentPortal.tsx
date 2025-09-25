@@ -489,6 +489,11 @@ const { data: allExamsData, error: allExamsError } = allExamsForRankingResponse;
     };
   }, [student]);
 
+  const handleViewReport = (rank?: number) => {
+    setSelectedStudentRank(rank); // Store the rank
+    setShowReportCard(true);      // Open the modal
+  };
+
   // Request notification permission on component mount
 
   const handleBellClick = () => {
