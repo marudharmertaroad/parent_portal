@@ -285,6 +285,7 @@ const StudentPortal: React.FC = () => {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [showReportCard, setShowReportCard] = useState(false);
+  const [selectedStudentRank, setSelectedStudentRank] = useState<number | undefined>(undefined);
   const [allStudentHistories, setAllStudentHistories] = useState<any[]>([]);
   const [feeRecords, setFeeRecords] = useState<FeeRecord[]>([]);
   const [examRecords, setExamRecords] = useState<ExamRecord[]>([]);
