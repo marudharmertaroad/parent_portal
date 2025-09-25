@@ -117,7 +117,8 @@ const StatCard: React.FC<{ title: string; value: string | number; icon: React.El
 interface AcademicRecordsProps {
   student: Student;
   examRecords: ExamRecord[];
-  onViewReport: () => void;
+  allStudentHistories: StudentExamHistory[]; 
+  onViewReport: (rank?: number) => void;
 }
 
 const AcademicRecords: React.FC<AcademicRecordsProps> = ({ student, examRecords = [], onViewReport }) => {
