@@ -346,7 +346,7 @@ const StudentPortal: React.FC = () => {
     if (!student) return;
     setIsLoadingData(true);
 
-    const [feeResponse, examResponse, homeworkResponse, noticeResponse, notificationRes] = await Promise.all([
+    const [feeResponse, examResponse, homeworkResponse, noticeResponse, notificationRes, allExamsForRankingResponse] = await Promise.all([
     // Promise 1: feeResponse -> gets fee_records
     supabase.from('fee_records').select('*, student:students!inner(name, father_name, medium)').eq('student_id', student.srNo).eq('students.medium', student.medium),
     
