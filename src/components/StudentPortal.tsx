@@ -18,12 +18,18 @@ import NoticeBoard from './NoticeBoard';
 import NotificationDrawer from './NotificationDrawer';
 
 // --- Report Card Modal (Corrected and Self-Contained) ---
-const EnhancedReportCardModal = ({ student, examRecords, onClose, settings, rank }: { student: Student, examRecords: ExamRecord[], onClose: () => void, settings: any, rank?: number }) => {
+const EnhancedReportCardModal = ({ student, examRecords, onClose, settings, rank }: { 
+  student: Student, 
+  examRecords: ExamRecord[], 
+  onClose: () => void, 
+  settings: any, 
+  rank?: number 
+}) => {
   if (!student) return null;
 
   const handlePrint = () => window.print();
 
-  // --- SAFE & CORRECTED CALCULATIONS ---
+  // --- Calculations remain the same ---
   const safeExamRecords = Array.isArray(examRecords) ? examRecords : [];
   const reportTitle = "PROGRESS REPORT - CONSOLIDATED";
   
@@ -43,169 +49,83 @@ const EnhancedReportCardModal = ({ student, examRecords, onClose, settings, rank
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4 print:p-0 print:bg-white">
        <style>
-    {`
-      /* --- Watermark & Print Preparation --- */
-      #report-card {
-        position: relative; 
-      }
-      * {
-        -webkit-print-color-adjust: exact !important; /* For older Safari/Chrome */
-        print-color-adjust: exact !important;        /* The standard */
-        box-sizing: border-box !important;
-      }
-      #report-card::after {
-        content: '';
-        background: url('/logo.png') center/contain no-repeat;
-        position: absolute;
-        inset: 0;
-        opacity: 0.08;
-        z-index: 0;
-      }
-      
-      #report-card > * {
-        position: relative;
-        z-index: 1;
-      }
-
-      /* --- Print-specific Styles --- */
-      @page {
-        size: landscape;
-        margin: 1cm;
-      }
-      
-      @media print {
-        /* A universal fix for many layout issues */
-        * {
-          box-sizing: border-box !important;
-        }
-
-        /* Reset body and hide overflow */
-        html, body {
-          width: 100%;
-          height: 100%;
-          margin: 0 !important;
-          padding: 0 !important;
-          overflow: hidden !important; /* CRUCIAL: Prevents scrollbars/overflow from creating a second page */
-        }
-        
-        /* Hide EVERYTHING on the page by default */
-        body * {
-          visibility: hidden;
-        }
-        
-        /* Make ONLY the report card wrapper and its contents visible */
-        #report-card-wrapper, #report-card-wrapper * {
-          visibility: visible;
-        }
-        
-        /* Position the wrapper to fill the entire print page */
-        #report-card-wrapper {
-          position: absolute;
-          left: 0;
-          top: 0;
-          width: 100%;
-          height: 100%;
-          overflow: hidden !important; /* Double-down on preventing overflow */
-        }
-      
-        /* Hide elements not meant for printing */
-        .no-print { 
-          display: none !important; 
-        }
-        
-        /* Style the report card itself for the page */
-        #report-card {
-          width: 100%;
-          height: 100%;
-          border: 2px solid black !important;
-          box-shadow: none !important;
-          border-radius: 0;
-          font-size: 10pt;
-          overflow: hidden !important; /* TRIPLE-down: no content can spill out */
-          display: flex;
-          flex-direction: column;
-        }
-        
-        #report-card table { 
-          font-size: 9pt; 
-        }
-
-        /* Ensure main content does not try to grow past the page height */
-        #report-card main {
-          flex-grow: 1;
-          flex-shrink: 1; /* Allow shrinking if needed */
-          overflow: hidden; /* Hide any internal overflow in the main section */
-        }
-      }
-    `}
-  </style>
-      <div className="bg-white rounded-2xl w-full max-w-7xl max-h-[95vh] overflow-auto shadow-2xl">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-4 no-print">
+        {`
+          /* --- Print Styles (No changes needed here) --- */
+          #report-card { position: relative; }
+          * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box !important; }
+          #report-card::after { content: ''; background: url('/logo.png') center/contain no-repeat; position: absolute; inset: 0; opacity: 0.08; z-index: 0; }
+          #report-card > * { position: relative; z-index: 1; }
+          @page { size: landscape; margin: 1cm; }
+          @media print {
+            html, body { width: 100%; height: 100%; margin: 0 !important; padding: 0 !important; overflow: hidden !important; }
+            body * { visibility: hidden; }
+            #report-card-wrapper, #report-card-wrapper * { visibility: visible; }
+            #report-card-wrapper { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: hidden !important; }
+            .no-print { display: none !important; }
+            #report-card { width: 100%; height: 100%; border: 2px solid black !important; box-shadow: none !important; border-radius: 0; font-size: 10pt; overflow: hidden !important; display: flex; flex-direction: column; }
+            #report-card table { font-size: 9pt; }
+            #report-card main { flex-grow: 1; flex-shrink: 1; overflow: hidden; }
+          }
+        `}
+      </style>
+      <div className="bg-white rounded-2xl w-full max-w-7xl max-h-[95vh] overflow-y-auto shadow-2xl flex flex-col">
+        <div className="p-4 sm:p-6 border-b no-print flex justify-between items-center">
             <h3 className="text-xl font-bold text-gray-800">Student Report Card</h3>
             <div className="flex space-x-3">
               <button onClick={handlePrint} className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"><Printer className="w-4 h-4 mr-2" />Print</button>
               <button onClick={onClose} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Close</button>
             </div>
-          </div>
-          <div id="report-card-wrapper">
-            <div className="border-2 border-black p-4 bg-white rounded-lg flex flex-col h-full relative" id="report-card">
-              <header className="flex flex-col sm:flex-row items-center justify-between mb-2 gap-2">
-                <div className="flex items-center space-x-2 sm:space-x-4">
-                  <img src="/logo.png" alt="School Logo" className="h-16 w-16 sm:h-20 sm:w-20 object-contain" />
-                  <div>
-                    <h1 className="text-xl sm:text-3xl font-bold text-blue-800">{settings.schoolName}</h1>
-                    <p className="text-xs sm:text-sm text-gray-500">{settings.schoolAddress}</p>
-                  </div>
+        </div>
+        
+        <div id="report-card-wrapper" className="p-4">
+          <div className="border-2 border-black p-4 bg-white rounded-lg flex flex-col h-full relative" id="report-card">
+            
+            {/* === RESPONSIVE HEADER === */}
+            <header className="flex flex-col sm:flex-row items-center justify-between mb-4 gap-2 text-center sm:text-left">
+              <div className="flex items-center space-x-4">
+                <img src="/logo.png" alt="School Logo" className="h-16 w-16 sm:h-20 sm:w-20 object-contain" />
+                <div>
+                  <h1 className="text-xl sm:text-3xl font-bold text-blue-800">{settings.schoolName}</h1>
+                  <p className="text-xs sm:text-sm text-gray-500">{settings.schoolAddress}</p>
                 </div>
-                <div className="text-center mt-2 sm:mt-0">
-                  <h2 className="text-lg sm:text-2xl font-bold text-blue-800">{reportTitle}</h2>
-                  <p className="text-base sm:text-lg text-blue-600">Session: {settings.session}</p>
-                </div>
-                {/* Hiding the photo box on the smallest screens to save space */}
-                <div className="w-20 h-24 sm:w-24 sm:h-28 border-2 border-gray-400 rounded-lg p-1 bg-white hidden sm:flex items-center justify-center">
-                  
-                  {student.photoUrl ? (
-                    <img 
-                      src={student.photoUrl} 
-                      alt="Student" 
-                      className="w-full h-full object-cover rounded-md" 
-                    />
-                  ) : (
-                    <span className="text-xs text-gray-400">Photo</span>
-                  )}
-                </div>
-              </header>
+              </div>
+              <div className="mt-2 sm:mt-0 text-center">
+                <h2 className="text-lg sm:text-2xl font-bold text-blue-800">{reportTitle}</h2>
+                <p className="text-base sm:text-lg text-blue-600">Session: {settings.session}</p>
+              </div>
+            </header>
 
-              {/* [MOBILE COMPACT] Sections now stack on mobile */}
-              <section className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-x-4 text-xs">
-                <div className="bg-blue-50 rounded-lg p-2 sm:p-3 border border-blue-200">
-                  <h3 className="font-bold text-sm mb-1 text-blue-800">Student Information</h3>
-                  <div className="grid grid-cols-2 gap-x-2 gap-y-1">
-                    <p><strong>Name:</strong> {student.name}</p>
-                    <p><strong>SR No:</strong> {student.srNo}</p>
-                    <p><strong>Father's Name:</strong> {student.fatherName}</p>
-                    <p><strong>D.O.B:</strong> {formatDate(student.dob)}</p>
-                    <p className="col-span-2"><strong>Class:</strong> {student.class}</p>
-                  </div>
+            {/* === RESPONSIVE STUDENT & PERFORMANCE INFO === */}
+            <section className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-4">
+              <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                <h3 className="font-bold text-md mb-2 text-blue-800">Student Information</h3>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                  <p><strong>Name:</strong></p><p>{student.name}</p>
+                  <p><strong>SR No:</strong></p><p>{student.srNo}</p>
+                  <p><strong>Father's Name:</strong></p><p>{student.fatherName}</p>
+                  <p><strong>Class:</strong></p><p>{student.class}</p>
                 </div>
-                <div className="bg-green-50 rounded-lg p-2 sm:p-3 border border-green-200">
-                  <h3 className="font-bold text-sm mb-1 text-green-800">Performance Summary</h3>
-                  <div className="grid grid-cols-2 gap-x-2 gap-y-1">
-                    <p><strong>Total Marks:</strong> {totalMax}</p>
-                    <p><strong>Marks Obt:</strong> {totalObtained}</p>
-                    <p><strong>Percentage:</strong> {overallPercentage.toFixed(1)}%</p>
-                    <p><strong>Grade:</strong> <span className={`px-2 py-0.5 rounded font-bold ${getGradeColor(overallGrade)}`}>{overallGrade}</span></p>
-                    <p className="col-span-2"><strong>Result:</strong><span className={`px-2 py-0.5 rounded font-bold ${overallResult === 'PASS' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{overallResult}</span></p>
-                    <p><strong>Class Rank:</strong> <span className="font-bold text-purple-700">{rank ? `#${rank}` : 'N/A'}</span></p>
-                  </div>
+              </div>
+              <div className="bg-green-50 rounded-lg p-3 border border-green-200">
+                <h3 className="font-bold text-md mb-2 text-green-800">Performance Summary</h3>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                  <p><strong>Percentage:</strong></p><p>{overallPercentage.toFixed(1)}%</p>
+                  <p><strong>Grade:</strong></p><p><span className={`px-2 py-0.5 rounded font-bold ${getGradeColor(overallGrade)}`}>{overallGrade}</span></p>
+                  <p><strong>Result:</strong></p><p><span className={`px-2 py-0.5 rounded font-bold ${overallResult === 'PASS' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{overallResult}</span></p>
+                  <p><strong>Class Rank:</strong></p><p><span className="font-bold text-purple-700">{rank ? `#${rank}` : 'N/A'}</span></p>
                 </div>
-              </section>
+              </div>
+            </section>
 
-              {/* [MOBILE COMPACT] This wrapper makes the table horizontally scrollable on small screens */}
-              <main className="flex-grow mt-4 overflow-x-auto">
+            {/* === SCHOLASTIC AREAS (MAIN CONTENT) === */}
+            <main className="flex-grow">
+              <h3 className="font-bold text-lg mb-2 text-blue-800">Scholastic Areas</h3>
+
+              {/* --- DESKTOP VIEW: WIDE TABLE (Hidden on mobile) --- */}
+              <div className="hidden md:block overflow-x-auto">
                 <table className="w-full border-collapse border border-gray-400 text-xs">
-                  <thead className="font-bold">
+                  {/* ... Your existing table thead, tbody, tfoot for desktop ... */}
+                   <thead className="font-bold">
                     <tr className="bg-blue-100"><th rowSpan={2} className="border p-1">Subject</th>{uniqueExamTypes.map(et => (<th key={et} colSpan={3} className="border p-1">{et}</th>))}<th colSpan={3} className="border p-1 bg-green-200">Total</th></tr>
                     <tr className="bg-blue-50">{uniqueExamTypes.flatMap(() => ['Max', 'Obt.', 'Grd.']).map((h, i) => <th key={i} className="border p-1">{h}</th>)}<th className="border p-1 bg-green-100">Marks</th><th className="border p-1 bg-green-100">Grade</th><th className="border p-1 bg-green-100">%</th></tr>
                   </thead>
@@ -235,40 +155,70 @@ const EnhancedReportCardModal = ({ student, examRecords, onClose, settings, rank
                       );
                     })}
                   </tbody>
-                  <tfoot className="font-bold bg-blue-50 text-center">
+                   <tfoot className="font-bold bg-blue-50 text-center">
                     <tr>
                       <td className="border p-1 text-left">Total Marks</td>
                       {uniqueExamTypes.map(examType => {
                         const exam = safeExamRecords.find(e => e.examType === examType);
-                        return (
-                          <React.Fragment key={examType}>
-                            <td className="border p-1" colSpan={3}>{exam ? `${exam.obtainedMarks} / ${exam.totalMarks}` : '-'}</td>
-                          </React.Fragment>
-                        );
+                        return ( <td className="border p-1" colSpan={3} key={examType}>{exam ? `${exam.obtainedMarks} / ${exam.totalMarks}` : '-'}</td> );
                       })}
-                      {/* Grand Total */}
                       <td className="border p-1 bg-green-100" colSpan={3}>{`${totalObtained} / ${totalMax}`}</td>
-                    </tr>
-                    <tr>
-                      <td className="border p-1 text-left">Percentage & Grade</td>
-                      {uniqueExamTypes.map(examType => {
-                        const exam = safeExamRecords.find(e => e.examType === examType);
-                        const grade = exam ? calculateGrade(exam.percentage) : 'N/A';
-                        return (
-                          <React.Fragment key={examType}>
-                            <td className="border p-1" colSpan={3}>
-                              {exam ? `${exam.percentage.toFixed(1)}% (${grade})` : '-'}
-                            </td>
-                          </React.Fragment>
-                        );
-                      })}
-                       {/* Grand Total Percentage */}
-                      <td className="border p-1 bg-green-100" colSpan={3}>{`${overallPercentage.toFixed(1)}% (${overallGrade})`}</td>
                     </tr>
                   </tfoot>
                 </table>
-              </main>
-            </div>
+              </div>
+
+              {/* --- MOBILE VIEW: VERTICAL CARDS (Only visible on mobile) --- */}
+              <div className="md:hidden space-y-3">
+                {mainSubjectNames.map(subjectName => {
+                  let totalSubObtained = 0;
+                  let totalSubMax = 0;
+                  safeExamRecords.forEach(exam => {
+                    const subject = exam.subjects?.find(s => s.subject === subjectName);
+                    if (subject) {
+                      totalSubObtained += (subject.obtainedMarks || 0);
+                      totalSubMax += (subject.maxMarks || 0);
+                    }
+                  });
+                  const subjectPercentage = totalSubMax > 0 ? (totalSubObtained / totalSubMax) * 100 : 0;
+                  
+                  return (
+                    <div key={subjectName} className="bg-gray-50 border rounded-lg p-3">
+                      <div className="flex justify-between items-center mb-2">
+                        <h4 className="font-bold text-gray-800">{subjectName}</h4>
+                        <div className="text-right">
+                          <p className="text-xs text-gray-500">Total</p>
+                          <p className="font-bold">{totalSubObtained} / {totalSubMax} ({calculateGrade(subjectPercentage)})</p>
+                        </div>
+                      </div>
+                      <div className="border-t pt-2 space-y-1 text-xs">
+                        {uniqueExamTypes.map(examType => {
+                          const subject = safeExamRecords.find(e => e.examType === examType)?.subjects?.find(s => s.subject === subjectName);
+                          return (
+                            <div key={examType} className="flex justify-between">
+                              <span className="text-gray-600">{examType}:</span>
+                              <span className="font-mono">{subject ? `${subject.obtainedMarks}/${subject.maxMarks}` : 'N/A'}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+            </main>
+
+            <footer className="pt-6 mt-auto">
+                <div className="grid grid-cols-2 gap-x-8">
+                    <div className="border-t-2 border-gray-400 pt-1">
+                        <p className="text-center font-bold text-sm">Class Teacher's Signature</p>
+                    </div>
+                    <div className="border-t-2 border-gray-400 pt-1">
+                        <p className="text-center font-bold text-sm">Principal's Signature & Seal</p>
+                    </div>
+                </div>
+            </footer>
           </div>
         </div>
       </div>
