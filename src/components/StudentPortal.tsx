@@ -353,7 +353,7 @@ const StudentPortal: React.FC = () => {
     supabase.from('fee_records').select('*, student:students!inner(name, father_name, medium)').eq('student_id', student.srNo).eq('students.medium', student.medium),
     
     // Promise 2: examResponse -> gets exam_records
-    supabase.from('exam_records').select(`*, students!inner(medium), subjects:subject_marks(*)`).eq('student_id', student.srNo).eq('students.medium', student.medium).order('exam_date', { ascending: false }),
+    supabase.from('exam_records').select(`*, students!inner(medium), subjects:subject_marks(*)`).eq('student_id', student.srNo).eq('students.medium', student.medium).eq('is_published', true).order('exam_date', { ascending: false }),
     
     // Promise 3: homeworkResponse -> CORRECTLY gets homework_assignments now
     supabase.from('homework_assignments').select('*').eq('class', student.class).eq('medium', student.medium).eq('is_active', true),
