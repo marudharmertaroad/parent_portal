@@ -371,6 +371,7 @@ const StudentPortal: React.FC = () => {
         `)
         .eq('students.class', student.class)
         .eq('students.medium', student.medium)
+        .eq('is_published', true)
       // =========================================
     ]);
 
