@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Student, FeeRecord, ExamRecord, Notice, SubjectMark } from '../types';
 import { supabase } from '../utils/supabaseClient';
 import { X, Printer, Settings } from 'lucide-react';
-import { formatDate, getGradeColor, calculateGrade } from '../utils';
+import { formatDate, getGradeColor, calculateGrade, getCurrentAcademicSession } from '../utils';
 
 // Import all necessary components
 import Header from './Header';
