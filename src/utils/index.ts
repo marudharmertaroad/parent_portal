@@ -41,3 +41,22 @@ export const getGradeColor = (grade: string): string => {
       return 'bg-gray-100 text-gray-800';
   }
 };
+
+export const getCurrentAcademicSession = (): string => {
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth(); // 0 = January, 3 = April
+
+  // The new academic session starts in April (month index 3).
+  // If the current month is April or later, the session has already started.
+  if (currentMonth >= 3) {
+    // e.g., If it's May 2025, the session is 2025-26
+    const nextYear = (currentYear + 1).toString().slice(-2);
+    return `${currentYear}-${nextYear}`;
+  } else {
+    // e.g., If it's February 2026, the session is still 2025-26
+    const lastYear = currentYear - 1;
+    const thisYearShort = currentYear.toString().slice(-2);
+    return `${lastYear}-${thisYearShort}`;
+  }
+};
