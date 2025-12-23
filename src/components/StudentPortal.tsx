@@ -300,7 +300,7 @@ const StudentPortal: React.FC = () => {
     schoolName: 'MARUDHAR DEFENCE SCHOOL',
     schoolAddress: 'Merta Road, Nagaur, Rajasthan - 341511',
     passingMarks: 35,
-    session: '2024-25',
+    session: getCurrentAcademicSession(),
   });
 
   const groupExamsByStudent = (records: any[]): any[] => {
